@@ -12,9 +12,11 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.1.0",
     "react-router-dom": "^6.23.0"
   },
   "devDependencies": {
+    "@shrutibalasa/tailwind-grid-auto-fit": "^1.1.0",
     "@svgr/cli": "^8.1.0",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
