@@ -3,7 +3,7 @@ import React from "react";
 export default function Header() {
   return (
     <div>
-      <div className="navbar bg-base-100 mt-1 fixed top-0 z-10">
+      <div className="navbar bg-accent fixed top-0 z-40">
         <div className="navbar-start">
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -48,13 +48,25 @@ export default function Header() {
           <a className="btn btn-ghost text-xl">GadgetHouse</a>
         </div>
         <div className="navbar-center hidden md:flex">
-        <div className="form-control">
+          <label className="input input-bordered flex items-center gap-2">
             <input
               type="text"
               placeholder="Search"
-              className="input input-bordered w-96"
+              className="w-96"
             />
-          </div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              className="w-4 h-4 opacity-70"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </label>
         </div>
         <div className="navbar-end mr-4">
           {/* NOTE: Cart and Profile > Auth buttn */}
@@ -92,7 +104,7 @@ export default function Header() {
                   <span className="text-info">Subtotal: $999</span>
                   <div className="card-actions">
                     <button className="btn btn-accent btn-block">
-                      View cart
+                      ดูตะกร้า
                     </button>
                   </div>
                 </div>
@@ -117,16 +129,15 @@ export default function Header() {
                 className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
               >
                 <li>
-                  <a className="justify-between">
-                    Profile
-                    <span className="badge">New</span>
+                  <a >
+                    บัญชีของฉัน
                   </a>
                 </li>
                 <li>
-                  <a>Settings</a>
+                  <a>การซื้อของฉัน</a>
                 </li>
                 <li>
-                  <a>Logout</a>
+                  <a>ออกจากระบบ</a>
                 </li>
               </ul>
             </div>
