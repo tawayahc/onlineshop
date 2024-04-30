@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import FilterCollapse from "./FilterCollapse";
+import axios from "axios";
 
 function FilterSidebar() {
   const fakeData = {
@@ -8,6 +9,18 @@ function FilterSidebar() {
     brands:["Apple", "Samsung", "Xiaomi", "Huawei"],
     review:[1,2,3,4,5]
   }
+  const [categories, setCategories] = useState([]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get("https://dummyjson.com/products/categories");
+        setCategories(res.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    }
+    fetchCategories();
+  }, []);
   return (
     <div>
       <div className="flex flex-col md:w-32 lg:w-72 ">
@@ -16,7 +29,7 @@ function FilterSidebar() {
             title="ประเภทสินค้า"
             type="category"
             onFilterChange={(type, values) => console.log(type, values)}
-            data = {fakeData.category}
+            data = {categories}
           />
           <FilterCollapse
             title="แบรนด์"

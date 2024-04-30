@@ -1,10 +1,11 @@
 import React from "react";
 import { BsBagFill, BsStarFill, BsStarHalf, BsStar } from "react-icons/bs";
 
-function ProductCard({ img, title, star, reviews, price }) {
+function ProductCard({ id, img, title, star, reviews, price }) {
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
+    const emptyStars = Math.max(0, 5 - fullStars - (hasHalfStar ? 1 : 0));
 
     return (
       <>
@@ -12,7 +13,7 @@ function ProductCard({ img, title, star, reviews, price }) {
           <BsStarFill key={index} className="text-warning" />
         ))}
         {hasHalfStar && <BsStarHalf key="half" className="text-warning" />}
-        {[...Array(5 - fullStars - (hasHalfStar ? 1 : 0))].map((_, index) => (
+        {[...Array(emptyStars)].map((_, index) => (
           <BsStar
             key={index + fullStars + (hasHalfStar ? 1 : 0)}
             className="text-gray-400"
@@ -34,14 +35,16 @@ function ProductCard({ img, title, star, reviews, price }) {
           </div>
           <div className="card-actions justify-between items-center mt-auto">
             <div className="flex flex-row items-center">
-              {renderStars(star)} <p>{reviews}</p>
+              {renderStars(star)}
+              <p>{reviews}</p>
             </div>
-            <div className="flex">
+            <div className="flex flex-row justify-between w-full items-center">
               <p>${price}</p>
+              <button className="btn btn-accent btn-sm">
+                <BsBagFill /> Add to cart
+              </button>
             </div>
-            <button className="btn btn-accent btn-sm">
-              <BsBagFill /> Add to cart
-            </button>
+
             <div className="">
               <div className="badge badge-outline mr-2">Fashion</div>
               <div className="badge badge-outline">Products</div>
