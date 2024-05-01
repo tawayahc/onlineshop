@@ -13,29 +13,40 @@ export default {
   plugins: [require("daisyui")],
   daisyui: {
     themes: [
-      {'light': {
-        "primary": "#F4F3F0",
-        "primary-focus": "#570df8",
-        "primary-content": "#ffffff",
-        "secondary": "#F4F3F0",
-        "secondary-focus": "#bd0091",
-        "secondary-content": "#ffffff",
-        "accent": "#37cdbe",
-        "accent-focus": "#2aa79b",
-        "accent-content": "#ffffff",
-        "neutral": "#2a2e37",
-        "neutral-focus": "#16181d",
-        "neutral-content": "#ffffff",
-        "base-100": "#3d4451",
-        "base-200": "#2a2e37",
-        "base-300": "#16181d",
-        "base-content": "#ebecf0",
-        "info": "#66c6ff",
-        "success": "#87d039",
-        "warning": "#e2d562",
-        "error": "#ff6f6f"
-      }},
+        {
+          mytheme: {
+            "primary": "#F4F3F0",
+            "primary-content": "#141414",
+
+            "secondary": "#F4F3F0",
+            "secondary-content": "#141414",
+
+            "accent": "#2F84FF",
+            "accent-content": "#010616",
+
+            "neutral": "#21232b",
+            "neutral-content": "#F4F3F0",
+
+            "base-100": "#F4F3F0",
+            "base-200": "#d4d3d1",
+            "base-300": "#b5b4b2",
+            "base-content": "#141414",
+
+            "info": "#22d3ee",
+            "info-content": "#001014",
+
+            "success": "#00bc68",
+            "success-content": "#000d04",
+
+            "warning": "#d39900",
+            "warning-content": "#100800",
+            
+            "error": "#cf284c",
+            "error-content": "#fcd8d9",
+          }
+        },
     ]
 }
 }
+
 
