@@ -3,19 +3,25 @@ import Layout from "../../components/Layout/Layout";
 import ProductCard from "../../components/Product/ProductCard";
 // import data from "../../db/data";
 import FilterSidebar from "../../components/Filter/FilterSidebar";
+import Pagination from "../../components/Product/Pagination";
 import axios from "axios";
 
 function ProductListPage() {
   const [selectedFilters, setSelectedFilters] = useState(null);
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage, setProductsPerPage] = useState(20);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         //NOTE : Fetch data from database
-        const response = await axios.get("https://dummyjson.com/products");
-        // console.log(response.data.products);
-        setProducts(response.data.products);
+        setLoading(true);
+        const response = await axios.get("https://dummyjson.com/products?limit=100");
+        if (response.data.products && response.data.products.length)
+          setProducts(response.data.products);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching products:", error);
       }
@@ -23,6 +29,18 @@ function ProductListPage() {
 
     fetchProducts();
   }, []);
+
+  // Pagination
+  const handlePagination = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+  
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = products.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  )
 
   // Fiter section
   const handleChange = (event) => {
@@ -63,11 +81,15 @@ function ProductListPage() {
         </div>
         <div className="flex flex-col p-3 w-full">
           <div>
-            <h2>รายการสินค้า</h2>
+            <h2 className="text-3xl font-bold">รายการสินค้า</h2>
           </div>
-          {products.length > 0 ? (
+          {loading ? (
+            <div className="flex justify-center h-96">
+              <span className="loading loading-spinner loading-lg"></span>
+            </div>
+          ) : (
             <div className="grid grid-auto-fit-[15rem] gap-4 my-4">
-              {products.map((product, index) => (
+              {currentProducts.map((product, index) => (
                 <ProductCard
                   key={index}
                   img={product.thumbnail}
@@ -78,20 +100,13 @@ function ProductListPage() {
                 />
               ))}
             </div>
-           
-          ) : (
-            <div className="flex justify-center h-96">
-              <span className="loading loading-spinner loading-lg"></span>
-            </div>
           )}
-          <div className="flex justify-center">
-            <div className="join">
-              <button className="join-item btn">1</button>
-              <button className="join-item btn btn-active">2</button>
-              <button className="join-item btn">3</button>
-              <button className="join-item btn">4</button>
-            </div>
-          </div>
+            <Pagination
+              length={products.length}
+              productsPerPage={productsPerPage}
+              handlePagination={handlePagination}
+              currentPage={currentPage}
+            />
         </div>
       </div>
     </div>

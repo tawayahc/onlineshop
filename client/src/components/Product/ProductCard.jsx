@@ -24,8 +24,10 @@ function ProductCard({ id, img, title, star, reviews, price }) {
   };
   return (
     // TODO : Wishlist
-    <div>
-      <div className="card w-60 min-96 bg-black shadow-xl">
+    // TODO : Add to cart
+    // TODO : `/product/${id}`
+    <a href='#'>
+      <div className="card card-compact w-60 min-96 bg-black shadow-xl">
         <figure className="h-40">
           <img src={img} alt={title} className="w-full h-full object-cover" />
         </figure>
@@ -39,20 +41,20 @@ function ProductCard({ id, img, title, star, reviews, price }) {
               <p>{reviews}</p>
             </div>
             <div className="flex flex-row justify-between w-full items-center">
-              <p>${price}</p>
+              <p className="text-xl">${price}</p>
               <button className="btn btn-accent btn-sm">
                 <BsBagFill /> Add to cart
               </button>
             </div>
 
-            <div className="">
+            <div className="mt-2">
               <div className="badge badge-outline mr-2">Fashion</div>
               <div className="badge badge-outline">Products</div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </a>
   );
 }
 
