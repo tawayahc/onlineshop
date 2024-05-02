@@ -27,7 +27,7 @@ function ProductCard({ id, img, title, star, reviews, price }) {
     // TODO : Add to cart
     // TODO : `/product/${id}`
     <a href='#'>
-      <div className="card card-compact w-60 min-96 bg-black shadow-xl">
+      <div className="card card-compact w-60 min-96 shadow-xl">
         <figure className="h-40">
           <img src={img} alt={title} className="w-full h-full object-cover" />
         </figure>
