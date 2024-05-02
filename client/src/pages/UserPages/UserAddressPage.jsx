@@ -1,4 +1,5 @@
 import React from 'react'
+import Layout from '../../components/Layout/Layout'
 
 function UserAddressPage() {
   return (
@@ -6,4 +7,8 @@ function UserAddressPage() {
   )
 }
 
-export default UserAddressPage
+export default () => (
+  <Layout>
+    <UserAddressPage />
+  </Layout>
+)

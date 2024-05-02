@@ -1,4 +1,5 @@
 import React from 'react'
+import Layout from '../../components/Layout/Layout'
 
 function UserOrder() {
   return (
@@ -6,4 +7,8 @@ function UserOrder() {
   )
 }
 
-export default UserOrder
+export default () => (
+  <Layout>
+    <UserOrder />
+  </Layout>
+)

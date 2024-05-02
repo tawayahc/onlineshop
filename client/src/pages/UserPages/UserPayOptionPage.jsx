@@ -1,4 +1,6 @@
 import React from 'react'
+import Layout from '../../components/Layout/Layout'
+
 
 function UserPayOptionPage() {
   return (
@@ -6,4 +8,8 @@ function UserPayOptionPage() {
   )
 }
 
-export default UserPayOptionPage
+export default () => (
+  <Layout>
+    <UserPayOptionPage />
+  </Layout>
+)

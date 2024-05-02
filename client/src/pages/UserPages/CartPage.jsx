@@ -1,7 +1,14 @@
 import React from 'react'
+import Layout from '../../components/Layout/Layout'
 
-export default function CartPage() {
+function CartPage() {
   return (
     <div>CartPage</div>
   )
 }
+
+export default () => (
+  <Layout>
+    <CartPage />
+  </Layout>
+)
