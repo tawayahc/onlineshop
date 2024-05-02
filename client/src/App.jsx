@@ -4,9 +4,12 @@ import Products from './pages/ProductPages/ProductListPage';
 import ProductDetails from './pages/ProductPages/ProductDetailPage';
 import Cart from './pages/UserPages/CartPage';
 import Checkout from './pages/UserPages/CheckoutPage';
-// import Login from './pages/AuthPages/LoginPage';
-// import Signup from './pages/AuthPages/SignupPage';
-// import NotFound from './pages/NotFoundPage';
+import ErrorPage from './pages/ErrorPage';
+import UserProfilePage from './pages/UserPages/UserProfilePage';
+import UserAddressPage from './pages/UserPages/UserAddressPage';
+import UserOrder from './pages/UserPages/UserOrder';
+import UserPayOptionPage from './pages/UserPages/UserPayOptionPage';
+import WishlistPage from './pages/UserPages/WishlistPage';
 
 function App() {
 
@@ -14,15 +17,23 @@ function App() {
     <>
       <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Home />} errorElement={<ErrorPage />} />
+
         <Route path="/products" element={<Products />} />
         <Route path="/product/:productId" element={<ProductDetails />} /> 
-        <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
 
-        {/* <Route path="/login" element={<Login />} />  
-        <Route path="/signup" element={<Signup />} />  
-        <Route path="*" element={<NotFound />} />  */}
+        {/* User Pages */}
+        <Route path="/wishlist" element={<WishlistPage />} />
+        <Route path="/cart" element={<Cart />} />
+
+        {/* User Dashboard */}
+        <Route path="/user">
+          <Route index element={<UserProfilePage />} />
+          <Route path="address" element={<UserAddressPage />} />
+          <Route path="payoption" element={<UserPayOptionPage />} />
+          <Route path="orders" element={<UserOrder />} />  
+        </Route>
       </Routes>
     </BrowserRouter>
     </>
