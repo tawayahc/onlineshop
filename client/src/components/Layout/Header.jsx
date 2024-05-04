@@ -1,5 +1,5 @@
 import React from "react";
-import { FaRegHeart } from "react-icons/fa";
+// import { FaRegHeart } from "react-icons/fa";
 
 export default function Header() {
   return (
