@@ -1,8 +1,14 @@
+//http://localhost:5173/vendor/products
 import React, { useState } from 'react';
 import Layout from '../../components/Layout/Layout';
-import productsData from '../../db/products';
+import productsData from '../../db/products.js';
+//If use data base
+// import productsData from '../../db/products.json';
 
 function ProductControlPanelPage() {
+  //If use data base
+  // const [products, setProducts] = useState(productsData.products);
+
   const [products, setProducts] = useState(productsData);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -13,6 +19,7 @@ function ProductControlPanelPage() {
   const [productCount, setProductCount] = useState(0);
   const [productId, setProductId] = useState(null);
   const [productPublished, setProductPublished] = useState(false);
+  const [productImage, setProductImage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
@@ -21,15 +28,17 @@ function ProductControlPanelPage() {
     return Math.floor(Math.random() * 10000);
   };
 
-  const addProduct = (name, price, category, count, published) => {
+  const addProduct = (name, price, category, count, published, image) => {
+    const inStock = count > 0;
     const newProduct = {
       id: generateId(),
       name: name,
       price: price,
       category: category,
       count: count,
-      inStock: true,
+      inStock: inStock,
       published: published,
+      image: image,
     };
     setProducts([...products, newProduct]);
   };
@@ -48,15 +57,6 @@ function ProductControlPanelPage() {
     }
   };
 
-  const toggleProductStatus = (productId) => {
-    setProducts(products.map(product => {
-      if (product.id === productId) {
-        return { ...product, inStock: !product.inStock };
-      }
-      return product;
-    }));
-  };
-
   const toggleProductPublishing = (productId) => {
     setProducts(products.map(product => {
       if (product.id === productId) {
@@ -66,10 +66,11 @@ function ProductControlPanelPage() {
     }));
   };
 
-  const editProduct = (productId, newName, newPrice, newCategory, newCount) => {
+  const editProduct = (productId, newName, newPrice, newCategory, newCount, newImage) => {
+    const inStock = newCount > 0;
     setProducts(products.map(product => {
       if (product.id === productId) {
-        return { ...product, name: newName, price: newPrice, category: newCategory, count: newCount };
+        return { ...product, name: newName, price: newPrice, category: newCategory, count: newCount, inStock: inStock, image: newImage };
       }
       return product;
     }));
@@ -83,9 +84,10 @@ function ProductControlPanelPage() {
     setProductCategory('');
     setProductCount(0);
     setProductPublished(false);
+    setProductImage('');
   };
 
-  const openEditModal = (productId, productName, productPrice, productCategory, productCount, productPublished) => {
+  const openEditModal = (productId, productName, productPrice, productCategory, productCount, productPublished, productImage) => {
     setModalMode('edit');
     setModalOpen(true);
     setProductName(productName);
@@ -94,6 +96,7 @@ function ProductControlPanelPage() {
     setProductCount(productCount);
     setProductId(productId);
     setProductPublished(productPublished);
+    setProductImage(productImage);
   };
 
   const closeModal = () => {
@@ -102,9 +105,9 @@ function ProductControlPanelPage() {
 
   const handleSubmit = () => {
     if (modalMode === 'add') {
-      addProduct(productName, productPrice, productCategory, productCount, productPublished);
+      addProduct(productName, productPrice, productCategory, productCount, productPublished, productImage);
     } else if (modalMode === 'edit') {
-      editProduct(productId, productName, productPrice, productCategory, productCount);
+      editProduct(productId, productName, productPrice, productCategory, productCount, productImage);
     }
     closeModal();
   };
@@ -178,6 +181,7 @@ function ProductControlPanelPage() {
           <thead>
             <tr>
               <th className="border px-4 py-2"></th>
+              <th className="border px-4 py-2">Image</th>
               <th className="border px-4 py-2">Product Name</th>
               <th className="border px-4 py-2">Category</th>
               <th className="border px-4 py-2">Price</th>
@@ -198,6 +202,9 @@ function ProductControlPanelPage() {
                     onChange={() => toggleProductSelection(product.id)}
                   />
                 </td>
+                <td className="border px-4 py-2">
+                  <img src={product.image} alt={product.name} className="w-12 h-12" />
+                </td>
                 <td className="border px-4 py-2">{product.name}</td>
                 <td className="border px-4 py-2">{product.category}</td>
                 <td className="border px-4 py-2">{product.price}$</td>
@@ -217,7 +224,7 @@ function ProductControlPanelPage() {
                   />
                 </td>
                 <td className="border px-4 py-2">
-                  <button onClick={() => openEditModal(product.id, product.name, product.price, product.category, product.count, product.published)} className="btn btn-primary">Edit</button>
+                  <button onClick={() => openEditModal(product.id, product.name, product.price, product.category, product.count, product.published, product.image)} className="btn btn-primary">Edit</button>
                 </td>
               </tr>
             ))}
@@ -233,6 +240,7 @@ function ProductControlPanelPage() {
             <input type="number" value={productPrice} onChange={(e) => setProductPrice(parseFloat(e.target.value))} className="input mb-2" placeholder="Product Price" />
             <input type="text" value={productCategory} onChange={(e) => setProductCategory(e.target.value)} className="input mb-2" placeholder="Product Category" />
             <input type="number" value={productCount} onChange={(e) => setProductCount(parseInt(e.target.value))} className="input mb-2" placeholder="Product Count" />
+            <input type="url" value={productImage} onChange={(e) => setProductImage(e.target.value)} className="input mb-2" placeholder="Image URL" />
             <div className="flex items-center mb-4">
               <label className="mr-2">Published:</label>
               <input
