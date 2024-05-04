@@ -17,6 +17,7 @@ import UserPayOptionPage from './pages/UserPages/UserPayOptionPage';
 import WishlistPage from './pages/UserPages/WishlistPage';
 
 import ProductControlPanelPage from './pages/VendorPage/ProductControlPanelPage';
+import OrderControlPanelPage from './pages/VendorPage/VendorOrder/OrderControlPanelPage';
 
 function App() {
 
@@ -44,6 +45,7 @@ function App() {
 
         <Route path="/vendor">
           <Route path="products" element={<ProductControlPanelPage />} />
+          <Route path="orders" element={<OrderControlPanelPage />} />
           {/* <Route index element={<UserProfilePage />} />
           <Route path="address" element={<UserAddressPage />} />
           <Route path="payoption" element={<UserPayOptionPage />} />
