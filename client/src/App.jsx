@@ -1,15 +1,22 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/HomePage';
+
 import Products from './pages/ProductPages/ProductListPage';
 import ProductDetails from './pages/ProductPages/ProductDetailPage';
+
 import Cart from './pages/UserPages/CartPage';
 import Checkout from './pages/UserPages/CheckoutPage';
+
 import ErrorPage from './pages/ErrorPage';
+
 import UserProfilePage from './pages/UserPages/UserProfilePage';
 import UserAddressPage from './pages/UserPages/UserAddressPage';
 import UserOrder from './pages/UserPages/UserOrder';
 import UserPayOptionPage from './pages/UserPages/UserPayOptionPage';
+
 import WishlistPage from './pages/UserPages/WishlistPage';
+
+import ProductControlPanelPage from './pages/VendorPage/ProductControlPanelPage';
 
 function App() {
 
@@ -33,6 +40,14 @@ function App() {
           <Route path="address" element={<UserAddressPage />} />
           <Route path="payoption" element={<UserPayOptionPage />} />
           <Route path="orders" element={<UserOrder />} />  
+        </Route>
+
+        <Route path="/vendor">
+          <Route path="products" element={<ProductControlPanelPage />} />
+          {/* <Route index element={<UserProfilePage />} />
+          <Route path="address" element={<UserAddressPage />} />
+          <Route path="payoption" element={<UserPayOptionPage />} />
+          <Route path="orders" element={<UserOrder />} />   */}
         </Route>
       </Routes>
     </BrowserRouter>
