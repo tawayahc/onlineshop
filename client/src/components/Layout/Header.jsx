@@ -2,6 +2,12 @@ import React from "react";
 // import { FaRegHeart } from "react-icons/fa";
 
 export default function Header() {
+  const handleLogout = (event) => {
+    event.preventDefault();
+    localStorage.removeItem('token');
+    window.location = '/';
+  }
+
   return (
     <div>
       <div className="navbar bg-accent fixed top-0 z-40">
@@ -119,7 +125,7 @@ export default function Header() {
                   <a href="/user/orders">การซื้อของฉัน</a>
                 </li>
                 <li>
-                  <a>ออกจากระบบ</a>
+                  <a onClick={ handleLogout }>ออกจากระบบ</a>
                 </li>
               </ul>
             </div>

@@ -2,6 +2,38 @@ import React from 'react'
 import LoginImage from '../assets/png/login-img.jpg'
 
 export default function Login() {
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        const data = new FormData(event.currentTarget);
+        const jsonData = {
+            email: data.get('email'),
+            password: data.get('password'),
+        }
+
+        try {
+            fetch("http://localhost:3333/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(jsonData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    // alert("Login Success");
+                    localStorage.setItem('token', data.token);
+                    window.location = '/';
+                } else {
+                    alert("Login Failed");
+                }
+            })
+            
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
   return (
     <>
         <div className='grid grid-cols-2 h-screen '>
@@ -14,19 +46,19 @@ export default function Login() {
                     <h1 className='text-5xl font-bold'>Log in to GadgetHouse</h1><br />
                     <p className='text-xl'>Enter your details below</p><br /><hr /><br />
 
-                    <form className="">
+                    <form onSubmit={ handleSubmit }>
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text">Email</span>
                             </label>
-                            <input type="email" placeholder="email" className="input input-bordered" required />
+                            <input name="email" type="email" placeholder="email" className="input input-bordered" required />
                         </div>
 
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text">Password</span>
                             </label>
-                            <input type="password" placeholder="password" className="input input-bordered" required />
+                            <input name="password" type="password" placeholder="password" className="input input-bordered" required />
                             <label className="label">
                                 <a href="#" className="label-text-alt link link-hover">Forgot password?</a>
                             </label>
@@ -35,7 +67,7 @@ export default function Login() {
                         <div className="form-control mt-8">
                             <button className="btn btn-accent text-white">Log In</button>
                             <label className="label">
-                                <a href="#" className="label-text-alt link link-hover">Don't have an account?</a>
+                                <a href="/register" className="label-text-alt link link-hover">Don't have an account?</a>
                             </label>
                         </div>
                     </form>
@@ -44,4 +76,4 @@ export default function Login() {
       </div>
     </>
   )
-}
+};
