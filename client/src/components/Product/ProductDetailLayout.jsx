@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import AboutSeller from "./AboutSeller";
-import Comment from "./Comment";
+import Review from "./Review";
 
 const Description = () => {
   return <div className="p-4 bg-gray-200 rounded">This is description</div>;
 };
 
 export default function ProductDetailLayout() {
-  const [activeButton, setActiveButton] = useState("component1"); // Track clicked button
+  const [activeButton, setActiveButton] = useState("Description"); 
 
   const handleClick = (buttonName) => {
-    setActiveButton(buttonName); // Update state on click
+    setActiveButton(buttonName); 
   };
 
   return (
@@ -19,7 +19,7 @@ export default function ProductDetailLayout() {
         <div className="text-sm breadcrumbs">
           <ul>
             <li>
-              <a>Home</a>
+              <a href="/">Home</a>
             </li>
             <li>
               <a>Documents</a>
@@ -103,7 +103,7 @@ export default function ProductDetailLayout() {
               className={`m-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${
                 activeButton === "component2" && "bg-opacity-50"
               }`}
-              onClick={() => handleClick("Comment")}
+              onClick={() => handleClick("Review")}
             >
               Review
             </button>
@@ -117,7 +117,7 @@ export default function ProductDetailLayout() {
             </button>
           </div>
           {activeButton === "Description" && <Description />}
-          {activeButton === "Comment" && <Comment />}
+          {activeButton === "Review" && <Review />}
           {activeButton === "AboutSeller" && <AboutSeller/>}
         </div>
       </div>
