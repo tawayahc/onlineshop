@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const ProductImage = ({ thumbnailImages }) => {
   const [selectedImage, setSelectedImage] = useState(thumbnailImages[0]);
@@ -9,27 +9,44 @@ const ProductImage = ({ thumbnailImages }) => {
 
   return (
     <div className="flex flex-col md:w-[450px]">
-    <div id="main" className="mb-4">
-      <img
-        src={selectedImage}
-        alt="Shoes"
-        className="rounded-xl max-w-full cursor-pointer"
-        onClick={() => handleClick(thumbnailImages[0])} 
-      />
-    </div>
-    <div className="flex flex-row mt-3 overflow-x-auto md:overflow-x-visible justify-evenly">
-      {thumbnailImages.map((image, index) => (
-        <picture key={index} className="w-24 h-24">
+      <div id="main" className="mb-4">
+        <img
+          src={selectedImage}
+          alt="Shoes"
+          className="rounded-xl max-w-full cursor-pointer"
+          onClick={()=>document.getElementById('my_modal_2').showModal()}
+        />
+      </div>
+      <div className="flex flex-row mt-3 overflow-x-auto md:overflow-x-visible justify-evenly">
+        {thumbnailImages.map((image, index) => (
+          <picture key={index} className="w-24 h-24">
+            <img
+              src={image}
+              alt={`Shoes Thumbnail ${index + 1}`}
+              className={`rounded-xl cursor-pointer ${
+                selectedImage === image
+                  ? "border-4 border-blue-500"
+                  : "opacity-50"
+              }`}
+              onClick={() => handleClick(image)}
+            />
+          </picture>
+        ))}
+      </div>
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box flex flex-col">
           <img
-            src={image}
-            alt={`Shoes Thumbnail ${index + 1}`}
-            className={`rounded-xl cursor-pointer ${selectedImage === image ? 'border-4 border-blue-500' : 'opacity-50'}`} 
-            onClick={() => handleClick(image)}
+            src={selectedImage}
+            alt="Shoes"
+            className="rounded-xl max-w-full "
           />
-        </picture>
-      ))}
+          {/* <p className="py-4">Click outside to close.</p> */}
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </div>
-  </div>
   );
 };
 

@@ -38,21 +38,8 @@ export default function ProductDetailLayout() {
 
   return (
     <div className="flex flex-col">
-      <div className="w-full mb-5 md:mb-0">
-        <div className="text-sm breadcrumbs">
-          <ul>
-            <li>
-              <a href="/">Home</a>
-            </li>
-            <li>
-              <a>Documents</a>
-            </li>
-            <li>Add Document</li>
-          </ul>
-        </div>
-      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-center mx-auto">
-        <ProductImage 
+        <ProductImage
           thumbnailImages={[
             "https://picsum.photos/450?id=1",
             "https://picsum.photos/450?id=2",
