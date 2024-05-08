@@ -18,7 +18,7 @@ function AboutSeller() {
           <p>Description</p>
           <p>Contact</p>
           <div className="card-actions justify-end">
-            <button className="btn btn-primary">ดูเพิ่มเติม</button>
+            <button className="btn bg-red-500">ดูเพิ่มเติม</button>
           </div>
         </div>
       </div>

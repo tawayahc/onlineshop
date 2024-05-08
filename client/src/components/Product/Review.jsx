@@ -1,30 +1,69 @@
 import React from "react";
+import Comment from "./Comment";
 
-function Comment() {
+const ReviewBar = ({ star, reviewAmount }) => {
+  return (
+    <div className="flex flex-row content-center items-center">
+      <p className="text-xl">{star}</p>
+      <progress
+        className="progress progress-accent w-56 ml-4 h-4"
+        value={reviewAmount}
+        max="100"
+      />
+    </div>
+  );
+};
+
+const reviewData = [
+  {
+    star: 5,
+    reviewAmount: 100,
+  },
+  {
+    star: 4,
+    reviewAmount: 50,
+  },
+  {
+    star: 3,
+    reviewAmount: 20,
+  },
+  {
+    star: 2,
+    reviewAmount: 10,
+  },
+  {
+    star: 1,
+    reviewAmount: 5,
+  },
+];
+
+function Review() {
   return (
     <div className="p-4">
-      <div>
-        <div>
-          <div className="collapse bg-base-200">
-            <input type="checkbox" />
-            <div className="collapse-title text-xl font-medium">
-              Click me to show/hide content
-            </div>
-            <div className="collapse-content">
-              <p>hello</p>
-            </div>
-          </div>
+      <div className="grid grid-cols-3">
+        <div className="col-span-2">
+          <Comment />
+          <Comment />
+          <Comment />
+          <Comment />
+          <Comment />
+          <Comment />
+          <Comment />
+          <Comment />
         </div>
-        <div>
-          <div className="avatar">
-            <div className="w-24 rounded-full">
-              <img src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg" />
-            </div>
-          </div>
+        <div className="flex flex-col">
+          <p>Avg star</p>
+          <div className="divider"></div>
+          {reviewData.map((data) => (
+            <ReviewBar
+              star={data.star}
+              reviewAmount={data.reviewAmount}
+            />
+          ))}
         </div>
       </div>
     </div>
   );
 }
 
-export default Comment;
+export default Review;
