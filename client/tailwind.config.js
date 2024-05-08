@@ -32,16 +32,12 @@ export default {
             "base-300": "#b5b4b2",
             "base-content": "#141414",
 
-            "info": "#22d3ee",
             "info-content": "#001014",
 
-            "success": "#00bc68",
             "success-content": "#000d04",
 
-            "warning": "#d39900",
             "warning-content": "#100800",
             
-            "error": "#cf284c",
             "error-content": "#fcd8d9",
           }
         },
