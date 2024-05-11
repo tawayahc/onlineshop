@@ -76,19 +76,53 @@ app.post('/authentication', jsonParser, function (req, res, next) {
     
 });
 
+// app.post('/add', jsonParser, function (req, res, next) {
+//     const newProduct = {
+//         ProductID: ProductID,
+//         ProductName: ProductName,
+//         Price: Price,
+//         QuantityAvailable: QuantityAvailable,
+//     };
+
+//     connection.query(
+//         'INSERT INTO `product`(ProductID, ProductName, 	Price, QuantityAvailable) VALUES (?, ?, ?, ?)',
+//         [newProduct.ProductID, newProduct.ProductName, newProduct.Price, newProduct.QuantityAvailable],
+//         function(err, results) {
+//           res.json(results);
+//         }
+//       );
+// })
+
 app.post('/add', jsonParser, function (req, res, next) {
+    const newProduct = {
+        ProductName: req.body.ProductName,
+        Price: req.body.Price,
+        QuantityAvailable: req.body.QuantityAvailable,
+    };
+
     connection.query(
-        'INSERT INTO `product`(Id, seller, cate, price) VALUES (?, ?, ?, ?)',
-        [req.body.Id, req.body.seller, req.body.cate, req.body.price],
+        'INSERT INTO `product`(ProductName, Price, QuantityAvailable) VALUES (?, ?, ?)',
+        [newProduct.ProductName, newProduct.Price, newProduct.QuantityAvailable],
         function(err, results) {
-          res.json(results);
+            if (err) {
+                res.json({ status: 'error', message: err });
+            } else {
+                // Return the newly inserted product with its generated ID
+                const insertedProduct = {
+                    ProductID,
+                    ...newProduct
+                };
+                res.json({ status: 'ok', message: 'Product added successfully', product: insertedProduct });
+            }
         }
-      );
-})
+    );
+});
+
 
 app.get('/see', function (req, res, next) {
     connection.query(
       'SELECT * FROM `product`',
+      'SELECT ProductCategoryName FROM `productcategory`',
       function(err, results, fields) {
         res.json(results);
       }
@@ -96,15 +130,175 @@ app.get('/see', function (req, res, next) {
 })
 
 app.get('/see1', jsonParser, function (req, res, next) {
+    const newProduct = {
+        ProductID: ProductID,
+    };
     connection.query(
       'SELECT * FROM `product` WHERE Id = ?',
-      [req.body.Id],
+      [newProduct.ProductID],
       function(err, results, fields) {
           res.json(results);
       }
     )
 })
 
+app.put('/update', jsonParser, function (req, res, next) {
+    const newProduct = {
+        ProductName: req.body.ProductName,
+        Price: req.body.Price,
+        QuantityAvailable: req.body.QuantityAvailable,
+        ProductID: req.body.ProductID
+    };
+
+    connection.query(
+        'UPDATE `product` SET ProductName = ?, Price = ?, QuantityAvailable = ? WHERE ProductID = ?',
+        [newProduct.ProductName, newProduct.Price, newProduct.QuantityAvailable, newProduct.ProductID],
+        function(err, results) {
+            if (err) {
+                res.json({status: 'error', message: err});
+            } else {
+                res.json({status: 'ok', message: 'Product updated successfully'});
+            }
+        }
+    );
+});
+
+app.delete('/delete', jsonParser, function (req, res, next) {
+    const newProduct = {
+        ProductID: ProductID,
+    };
+    connection.query(
+        'DELETE FROM `product` WHERE ProductID = ?',
+        [newProduct.ProductID],
+        function(err, results) {
+            if (err) {
+                res.json({status: 'error', message: err});
+            } else {
+                res.json({status: 'ok', message: 'Product deleted successfully'});
+            }
+        }
+    );
+});
+
 app.listen(3333, jsonParser, function () {
   console.log('CORS-enabled web server listening on port 3333')
 });
+
+// const addProduct = async (name, price, category, count, published) => {
+//   const newProduct = {
+//     ProductID: ProductID,
+//     ProductName: ProductName,
+//     Price: Price,
+//     QuantityAvailable: QuantityAvailable,
+    // inStock: true,
+    // published: published,
+//   };
+
+//   // Send a POST request to the mock API to add the new product
+//   try {
+//     const response = await fetch('http://localhost:3001/products', {
+//       method: 'POST',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(newProduct),
+//     });
+//     if (!response.ok) {
+//       throw new Error('Failed to add product');
+//     }
+    
+//     // Update the local state with the new product
+//     setProducts([...products, newProduct]);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
+
+// Assuming you have already imported necessary modules and set up your server
+
+// // Add a new product
+// app.post('/products', jsonParser, function (req, res, next) {
+//     const newProduct = req.body;
+//     connection.query(
+//         'INSERT INTO `product`(ProductName, Price, QuantityAvailable) VALUES (?, ?, ?)',
+//         [newProduct.name, newProduct.price, newProduct.count],
+//         function(err, results) {
+//             if (err) {
+//                 res.json({status: 'error', message: err});
+//             } else {
+//                 res.json({status: 'ok', message: 'Product added successfully'});
+//             }
+//         }
+//     );
+// });
+
+// // Get all products
+// app.get('/products', function (req, res, next) {
+//     connection.query(
+//         'SELECT * FROM `product`',
+//         function(err, results, fields) {
+//             if (err) {
+//                 res.json({status: 'error', message: err});
+//             } else {
+//                 res.json(results);
+//             }
+//         }
+//     );
+// });
+
+// // Get a single product by ID
+// app.get('/products/:id', function (req, res, next) {
+//     const productId = req.params.id;
+//     connection.query(
+//         'SELECT * FROM `product` WHERE ProductID = ?',
+//         [productId],
+//         function(err, results, fields) {
+//             if (err) {
+//                 res.json({status: 'error', message: err});
+//             } else {
+//                 if (results.length > 0) {
+//                     res.json(results[0]);
+//                 } else {
+//                     res.json({status: 'error', message: 'Product not found'});
+//                 }
+//             }
+//         }
+//     );
+// });
+
+// // Update a product by ID
+// app.put('/products/:id', jsonParser, function (req, res, next) {
+//     const productId = req.params.id;
+//     const updatedProduct = req.body;
+//     connection.query(
+//         'UPDATE `product` SET ProductName = ?, Price = ?, QuantityAvailable = ? WHERE ProductID = ?',
+//         [updatedProduct.name, updatedProduct.price, updatedProduct.count, productId],
+//         function(err, results) {
+//             if (err) {
+//                 res.json({status: 'error', message: err});
+//             } else {
+//                 res.json({status: 'ok', message: 'Product updated successfully'});
+//             }
+//         }
+//     );
+// });
+
+// // Delete a product by ID
+// app.delete('/products/:id', function (req, res, next) {
+//     const productId = req.params.id;
+//     connection.query(
+//         'DELETE FROM `product` WHERE ProductID = ?',
+//         [productId],
+//         function(err, results) {
+//             if (err) {
+//                 res.json({status: 'error', message: err});
+//             } else {
+//                 res.json({status: 'ok', message: 'Product deleted successfully'});
+//             }
+//         }
+//     );
+// });
+
+// // Assuming you already have other routes in your server
+

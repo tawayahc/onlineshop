@@ -1,5 +1,5 @@
 //http://localhost:5173/vendor/products
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../../components/Layout/Layout';
 import productsData from '../../db/products.js';
 //If use data base
@@ -9,7 +9,7 @@ function ProductControlPanelPage() {
   //If use data base
   // const [products, setProducts] = useState(productsData.products);
 
-  const [products, setProducts] = useState(productsData);
+  const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
@@ -24,27 +24,56 @@ function ProductControlPanelPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
 
-  const generateId = () => {
-    return Math.floor(Math.random() * 10000);
+  useEffect(() => {
+    fetch('http://localhost:3333/see')
+      .then(response => response.json())
+      .then(data => setProducts(data))
+      .catch(error => console.error('Error fetching products:', error));
+  }, []);
+
+const addProduct = async (name, price, category, count, published, image) => {
+  const newProduct = {
+    ProductName: name,
+    Price: price,
+    QuantityAvailable: count,
   };
 
-  const addProduct = (name, price, category, count, published, image) => {
-    const inStock = count > 0;
-    const newProduct = {
-      id: generateId(),
-      name: name,
-      price: price,
-      category: category,
-      count: count,
-      inStock: inStock,
-      published: published,
-      image: image,
-    };
-    setProducts([...products, newProduct]);
-  };
+  try {
+    const response = await fetch('http://localhost:3333/add', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newProduct),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to add product');
+    }
+    
+  } catch (error) {
+    console.error(error);
+  }
+  setProducts([...products, newProduct]);
+};
+
+
+  // const addProduct = (name, price, category, count, published, image) => {
+  //   const inStock = count > 0;
+  //   const newProduct = {
+  //     id: generateId(),
+  //     name: name,
+  //     price: price,
+  //     category: category,
+  //     count: count,
+  //     inStock: inStock,
+  //     published: published,
+  //     image: image,
+  //   };
+  //   setProducts([...products, newProduct]);
+  // };
 
   const deleteSelectedProducts = () => {
-    const updatedProducts = products.filter(product => !selectedProducts.includes(product.id));
+    const updatedProducts = products.filter(product => !selectedProducts.includes(product.ProductID));
     setProducts(updatedProducts);
     setSelectedProducts([]);
   };
@@ -59,22 +88,55 @@ function ProductControlPanelPage() {
 
   const toggleProductPublishing = (productId) => {
     setProducts(products.map(product => {
-      if (product.id === productId) {
+      if (product.ProductID === productId) {
         return { ...product, published: !product.published };
       }
       return product;
     }));
   };
 
-  const editProduct = (productId, newName, newPrice, newCategory, newCount, newImage) => {
-    const inStock = newCount > 0;
+  const editProduct = async (productId, newName, newPrice, newCategory, newCount, newImage) => {
+    const updatedProduct = {
+      ProductName: newName,
+      Price: newPrice,
+      QuantityAvailable: newCount,
+      ProductID: productId
+    };
+    console.log(updatedProduct.ProductID);
+  
+    try {
+      const response = await fetch('http://localhost:3333/update', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedProduct),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update product');
+      }
+      
+    } catch (error) {
+      console.error(error);
+    }
+  
     setProducts(products.map(product => {
-      if (product.id === productId) {
-        return { ...product, name: newName, price: newPrice, category: newCategory, count: newCount, inStock: inStock, image: newImage };
+      if (product.ProductID === productId) {
+        return { ...product, ProductName: newName, Price: newPrice, category: newCategory, QuantityAvailable: newCount, image: newImage };
       }
       return product;
     }));
   };
+
+  // const editProduct = (productId, newName, newPrice, newCategory, newCount, newImage) => {
+  //   const inStock = newCount > 0;
+  //   setProducts(products.map(product => {
+  //     if (product.ProductID === productId) {
+  //       return { ...product, ProductName: newName, Price: newPrice, category: newCategory, QuantityAvailable: newCount, inStock: inStock, image: newImage };
+  //     }
+  //     return product;
+  //   }));
+  // };
 
   const openAddModal = () => {
     setModalMode('add');
@@ -118,16 +180,30 @@ function ProductControlPanelPage() {
     setSortBy('default');
   };
 
+  // const filteredProducts = products.filter(product => {
+  //   if (selectedCategory !== 'All' && product.category !== selectedCategory) {
+  //     return false;
+  //   }
+  //   return product.ProductName.toLowerCase().includes(searchTerm.toLowerCase());
+  // }).sort((a, b) => {
+  //   if (sortBy === 'ascending') {
+  //     return a.Price - b.Price;
+  //   } else if (sortBy === 'descending') {
+  //     return b.Price - a.Price;
+  //   }
+  //   return 0;
+  // });
+
   const filteredProducts = products.filter(product => {
     if (selectedCategory !== 'All' && product.category !== selectedCategory) {
       return false;
     }
-    return product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    return product.ProductName && product.ProductName.toLowerCase().includes(searchTerm.toLowerCase());
   }).sort((a, b) => {
     if (sortBy === 'ascending') {
-      return a.price - b.price;
+      return a.Price - b.Price;
     } else if (sortBy === 'descending') {
-      return b.price - a.price;
+      return b.Price - a.Price;
     }
     return 0;
   });
@@ -194,21 +270,21 @@ function ProductControlPanelPage() {
           </thead>
           <tbody>
             {filteredProducts.map(product => (
-              <tr key={product.id} className="hover:bg-gray-100">
+              <tr key={product.ProductID} className="hover:bg-gray-100">
                 <td className="border px-4 py-2">
                   <input
                     type="checkbox"
-                    checked={selectedProducts.includes(product.id)}
-                    onChange={() => toggleProductSelection(product.id)}
+                    checked={selectedProducts.includes(product.ProductID)}
+                    onChange={() => toggleProductSelection(product.ProductID)}
                   />
                 </td>
                 <td className="border px-4 py-2">
-                  <img src={product.image} alt={product.name} className="w-12 h-12" />
+                  <img src={product.image} alt={product.ProductName} className="w-12 h-12" />
                 </td>
-                <td className="border px-4 py-2">{product.name}</td>
+                <td className="border px-4 py-2">{product.ProductName}</td>
                 <td className="border px-4 py-2">{product.category}</td>
-                <td className="border px-4 py-2">{product.price}$</td>
-                <td className="border px-4 py-2">{product.count}</td>
+                <td className="border px-4 py-2">{product.Price}$</td>
+                <td className="border px-4 py-2">{product.QuantityAvailable}</td>
                 <td className="border px-4 py-2">{product.inStock ? 'In Stock' : 'Out of Stock'}</td>
                 <td className="border px-4 py-2">
                   <span className={`badge ${product.inStock ? 'border-green-500 text-green-500' : 'border-red-500 text-red-500'}`}>
@@ -220,11 +296,11 @@ function ProductControlPanelPage() {
                     type="checkbox"
                     className="toggle toggle-success"
                     checked={product.published}
-                    onChange={() => toggleProductPublishing(product.id)}
+                    onChange={() => toggleProductPublishing(product.ProductID)}
                   />
                 </td>
                 <td className="border px-4 py-2">
-                  <button onClick={() => openEditModal(product.id, product.name, product.price, product.category, product.count, product.published, product.image)} className="btn btn-primary">Edit</button>
+                  <button onClick={() => openEditModal(product.ProductID, product.ProductName, product.Price, product.category, product.QuantityAvailable, product.published, product.image)} className="btn btn-primary">Edit</button>
                 </td>
               </tr>
             ))}
