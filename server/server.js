@@ -10,6 +10,7 @@ var app = express();
 
 app.use(cors());
 
+
 // create application/json parser
 var jsonParser = bodyParser.json();
 
@@ -74,7 +75,36 @@ app.post('/authentication', jsonParser, function (req, res, next) {
     }
     
 });
- 
+
+app.post('/add', jsonParser, function (req, res, next) {
+    connection.query(
+        'INSERT INTO `product`(Id, seller, cate, price) VALUES (?, ?, ?, ?)',
+        [req.body.Id, req.body.seller, req.body.cate, req.body.price],
+        function(err, results) {
+          res.json(results);
+        }
+      );
+})
+
+app.get('/see', function (req, res, next) {
+    connection.query(
+      'SELECT * FROM `product`',
+      function(err, results, fields) {
+        res.json(results);
+      }
+    );
+})
+
+app.get('/see1', jsonParser, function (req, res, next) {
+    connection.query(
+      'SELECT * FROM `product` WHERE Id = ?',
+      [req.body.Id],
+      function(err, results, fields) {
+          res.json(results);
+      }
+    )
+})
+
 app.listen(3333, jsonParser, function () {
   console.log('CORS-enabled web server listening on port 3333')
 });
