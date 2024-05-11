@@ -1,7 +1,17 @@
-import React from 'react'
+import React from "react";
+import Layout from "../../components/Layout/Layout";
+import ProductDetailLayout from "../../components/Product/ProductDetailLayout";
 
-export default function ProductDetailPage() {
+function ProductDetailPage() {
   return (
-    <div>ProductDetailPage</div>
-  )
+    <div>
+      <ProductDetailLayout />
+    </div>
+  );
 }
+
+export default () => (
+  <Layout>
+    <ProductDetailPage />
+  </Layout>
+);
