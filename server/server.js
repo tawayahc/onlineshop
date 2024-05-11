@@ -109,7 +109,6 @@ app.post('/add', jsonParser, function (req, res, next) {
             } else {
                 // Return the newly inserted product with its generated ID
                 const insertedProduct = {
-                    ProductID,
                     ...newProduct
                 };
                 res.json({ status: 'ok', message: 'Product added successfully', product: insertedProduct });
@@ -119,17 +118,49 @@ app.post('/add', jsonParser, function (req, res, next) {
 });
 
 
+// app.get('/see', function (req, res, next) {
+//     connection.query(
+//       'SELECT * FROM `product`',
+//       function(err, results, fields) {
+//         res.json(results);
+//       }
+//     );
+// })
+
 app.get('/see', function (req, res, next) {
     connection.query(
-      'SELECT * FROM `product`',
-      'SELECT ProductCategoryName FROM `productcategory`',
+      'SELECT * FROM `product` INNER JOIN `productcategory` ON product.productcategoryid = productcategory.productcategoryid',
       function(err, results, fields) {
-        res.json(results);
+        if (err) {
+          res.json({status: 'error', message: err});
+        } else {
+          res.json(results);
+        }
       }
     );
+  });
+  
+
+// app.get('/see', function (req, res, next) {
+//     connection.query(
+//       'SELECT p.*, c.ProductCategoryName, i.Productimagecode FROM product p, productcategory c, productimage i \
+//        WHERE p.ProductCategoryID = c.ProductCategoryID AND p.ProductID = i.ProductID',
+//       function(err, results, fields) {
+//         res.json(results);
+//       }
+//     );
+// })
+
+app.get('/category-see', function (req, res, next) {
+    connection.query(
+        'SELECT * FROM ProductCategory',
+        function(err, results, fields) {
+          res.json(results);
+        }
+      );
 })
 
-app.get('/see1', jsonParser, function (req, res, next) {
+app.get('/see-one', jsonParser, function (req, res, next) {
     const newProduct = {
         ProductID: ProductID,
     };
@@ -147,8 +178,10 @@ app.put('/update', jsonParser, function (req, res, next) {
         ProductName: req.body.ProductName,
         Price: req.body.Price,
         QuantityAvailable: req.body.QuantityAvailable,
-        ProductID: req.body.ProductID
+        ProductID: req.body.ProductID,
+        ProductCategoryID: req.body.ProductCategoryID
     };
+    console.log(newProduct.ProductCategoryID);
 
     connection.query(
         'UPDATE `product` SET ProductName = ?, Price = ?, QuantityAvailable = ? WHERE ProductID = ?',
@@ -163,22 +196,45 @@ app.put('/update', jsonParser, function (req, res, next) {
     );
 });
 
+
+// app.put('/update', jsonParser, function (req, res, next) {
+//     const newProduct = {
+//         ProductName: req.body.ProductName,
+//         Price: req.body.Price,
+//         QuantityAvailable: req.body.QuantityAvailable,
+//         ProductID: req.body.ProductID
+//     };
+
+//     connection.query(
+//         'UPDATE products p, productcategory c, productimage i \
+//         SET p.ProductName = ?, p.Price = ?, p.QuantityAvailable = ?, c.ProductCategoryName = ?, i.Productimagecode = ? \
+//         WHERE p.ProductCategoryID = c.ProductCategoryID AND p.ProductID = i.ProductID',
+//         [newProduct.ProductName, newProduct.Price, newProduct.QuantityAvailable, newProduct.ProductID],
+//         function(err, results) {
+//             if (err) {
+//                 res.json({status: 'error', message: err});
+//             } else {
+//                 res.json({status: 'ok', message: 'Product updated successfully'});
+//             }
+//         }
+//     );
+// });
+
 app.delete('/delete', jsonParser, function (req, res, next) {
-    const newProduct = {
-        ProductID: ProductID,
-    };
+    const productIDs = req.body.productIDs;
     connection.query(
-        'DELETE FROM `product` WHERE ProductID = ?',
-        [newProduct.ProductID],
-        function(err, results) {
-            if (err) {
-                res.json({status: 'error', message: err});
-            } else {
-                res.json({status: 'ok', message: 'Product deleted successfully'});
-            }
+      'DELETE FROM `product` WHERE ProductID IN (?)',
+      [productIDs],
+      function(err, results) {
+        if (err) {
+          res.json({status: 'error', message: err});
+        } else {
+          res.json({status: 'ok', message: 'Products deleted successfully'});
         }
+      }
     );
-});
+  });
+
 
 app.listen(3333, jsonParser, function () {
   console.log('CORS-enabled web server listening on port 3333')

@@ -24,10 +24,20 @@ function ProductControlPanelPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('default');
 
+  const [productCategories, setProductCategories] = useState([]);
+  const [productCategoryId, setProductCategoryId] = useState(0);
+
   useEffect(() => {
     fetch('http://localhost:3333/see')
       .then(response => response.json())
       .then(data => setProducts(data))
+      .catch(error => console.error('Error fetching products:', error));
+  }, []);
+
+  useEffect(() => {
+    fetch('http://localhost:3333/category-see')
+      .then(response => response.json())
+      .then(data => setProductCategories(data))
       .catch(error => console.error('Error fetching products:', error));
   }, []);
 
@@ -72,10 +82,25 @@ const addProduct = async (name, price, category, count, published, image) => {
   //   setProducts([...products, newProduct]);
   // };
 
-  const deleteSelectedProducts = () => {
-    const updatedProducts = products.filter(product => !selectedProducts.includes(product.ProductID));
-    setProducts(updatedProducts);
-    setSelectedProducts([]);
+  const deleteSelectedProducts = async () => {
+    try {
+      const response = await fetch('http://localhost:3333/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ productIDs: selectedProducts }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete products');
+      }
+      // Update the state after successful deletion
+      const updatedProducts = products.filter(product => !selectedProducts.includes(product.ProductID));
+      setProducts(updatedProducts);
+      setSelectedProducts([]);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const toggleProductSelection = (productId) => {
@@ -95,14 +120,15 @@ const addProduct = async (name, price, category, count, published, image) => {
     }));
   };
 
-  const editProduct = async (productId, newName, newPrice, newCategory, newCount, newImage) => {
+  const editProduct = async (productId, newName, newPrice, newCategory, newCount, newImage, newCategoryId) => {
     const updatedProduct = {
       ProductName: newName,
       Price: newPrice,
       QuantityAvailable: newCount,
-      ProductID: productId
+      ProductID: productId,
+      ProductCategoryID: newCategoryId
     };
-    console.log(updatedProduct.ProductID);
+    console.log(updatedProduct.ProductCategoryID);
   
     try {
       const response = await fetch('http://localhost:3333/update', {
@@ -122,7 +148,7 @@ const addProduct = async (name, price, category, count, published, image) => {
   
     setProducts(products.map(product => {
       if (product.ProductID === productId) {
-        return { ...product, ProductName: newName, Price: newPrice, category: newCategory, QuantityAvailable: newCount, image: newImage };
+        return { ...product, ProductName: newName, Price: newPrice, category: newCategory, QuantityAvailable: newCount, image: newImage, ProductCategoryID: newCategoryId};
       }
       return product;
     }));
@@ -149,7 +175,7 @@ const addProduct = async (name, price, category, count, published, image) => {
     setProductImage('');
   };
 
-  const openEditModal = (productId, productName, productPrice, productCategory, productCount, productPublished, productImage) => {
+  const openEditModal = (productId, productName, productPrice, productCategory, productCount, productPublished, productImage, productCategoryId) => {
     setModalMode('edit');
     setModalOpen(true);
     setProductName(productName);
@@ -159,6 +185,7 @@ const addProduct = async (name, price, category, count, published, image) => {
     setProductId(productId);
     setProductPublished(productPublished);
     setProductImage(productImage);
+    setProductCategoryId(productCategoryId);
   };
 
   const closeModal = () => {
@@ -169,7 +196,7 @@ const addProduct = async (name, price, category, count, published, image) => {
     if (modalMode === 'add') {
       addProduct(productName, productPrice, productCategory, productCount, productPublished, productImage);
     } else if (modalMode === 'edit') {
-      editProduct(productId, productName, productPrice, productCategory, productCount, productImage);
+      editProduct(productId, productName, productPrice, productCategory, productCount, productImage, productCategoryId);
     }
     closeModal();
   };
@@ -195,7 +222,7 @@ const addProduct = async (name, price, category, count, published, image) => {
   // });
 
   const filteredProducts = products.filter(product => {
-    if (selectedCategory !== 'All' && product.category !== selectedCategory) {
+    if (selectedCategory !== 'All' && product.ProductCategoryName !== selectedCategory) {
       return false;
     }
     return product.ProductName && product.ProductName.toLowerCase().includes(searchTerm.toLowerCase());
@@ -208,7 +235,7 @@ const addProduct = async (name, price, category, count, published, image) => {
     return 0;
   });
 
-  const categories = ['All', ...new Set(products.map(product => product.category))];
+  const categories = ['All', ...new Set(products.map(product => product.ProductCategoryName))];
 
   return (
     <div className="p-4">
@@ -282,7 +309,7 @@ const addProduct = async (name, price, category, count, published, image) => {
                   <img src={product.image} alt={product.ProductName} className="w-12 h-12" />
                 </td>
                 <td className="border px-4 py-2">{product.ProductName}</td>
-                <td className="border px-4 py-2">{product.category}</td>
+                <td className="border px-4 py-2">{product.ProductCategoryName}</td>
                 <td className="border px-4 py-2">{product.Price}$</td>
                 <td className="border px-4 py-2">{product.QuantityAvailable}</td>
                 <td className="border px-4 py-2">{product.inStock ? 'In Stock' : 'Out of Stock'}</td>
@@ -300,7 +327,7 @@ const addProduct = async (name, price, category, count, published, image) => {
                   />
                 </td>
                 <td className="border px-4 py-2">
-                  <button onClick={() => openEditModal(product.ProductID, product.ProductName, product.Price, product.category, product.QuantityAvailable, product.published, product.image)} className="btn btn-primary">Edit</button>
+                  <button onClick={() => openEditModal(product.ProductID, product.ProductName, product.Price, product.ProductCategoryName, product.QuantityAvailable, product.published, product.image, product.ProductCategoryID)} className="btn btn-primary">Edit</button>
                 </td>
               </tr>
             ))}
@@ -314,7 +341,15 @@ const addProduct = async (name, price, category, count, published, image) => {
             <h2 className="text-lg font-semibold mb-2">{modalMode === 'add' ? 'Add Product' : 'Edit Product'}</h2>
             <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} className="input mb-2" placeholder="Product Name" />
             <input type="number" value={productPrice} onChange={(e) => setProductPrice(parseFloat(e.target.value))} className="input mb-2" placeholder="Product Price" />
-            <input type="text" value={productCategory} onChange={(e) => setProductCategory(e.target.value)} className="input mb-2" placeholder="Product Category" />
+            <select
+              value={productCategory}
+              onChange={(e) => setProductCategory(e.target.value)}
+              className="input mb-2"
+            >
+              {productCategories.map(category => (
+                <option key={category.ProductCategoryID} value={category.ProductCategoryName}>{category.ProductCategoryName}</option>
+              ))}
+            </select>
             <input type="number" value={productCount} onChange={(e) => setProductCount(parseInt(e.target.value))} className="input mb-2" placeholder="Product Count" />
             <input type="url" value={productImage} onChange={(e) => setProductImage(e.target.value)} className="input mb-2" placeholder="Image URL" />
             <div className="flex items-center mb-4">
