@@ -19,7 +19,7 @@ import UserPayOptionPage from './pages/UserPages/UserPayOptionPage';
 
 import WishlistPage from './pages/UserPages/WishlistPage';
 
-import ProductControlPanelPage from './pages/VendorPage/ProductControlPanelPage';
+import ProductControlPanelPage from './pages/VendorPage/VendorProduct/ProductControlPanelPage';
 import OrderControlPanelPage from './pages/VendorPage/VendorOrder/OrderControlPanelPage';
 
 function App() {

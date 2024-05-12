@@ -98,11 +98,12 @@ app.post('/add', jsonParser, function (req, res, next) {
         ProductName: req.body.ProductName,
         Price: req.body.Price,
         QuantityAvailable: req.body.QuantityAvailable,
+        ProductCategoryID: req.body.ProductCategoryID
     };
 
     connection.query(
-        'INSERT INTO `product`(ProductName, Price, QuantityAvailable) VALUES (?, ?, ?)',
-        [newProduct.ProductName, newProduct.Price, newProduct.QuantityAvailable],
+        'INSERT INTO `product`(ProductName, Price, QuantityAvailable, ProductCategoryID) VALUES (?, ?, ?, ?)',
+        [newProduct.ProductName, newProduct.Price, newProduct.QuantityAvailable, newProduct.ProductCategoryID],
         function(err, results) {
             if (err) {
                 res.json({ status: 'error', message: err });
@@ -128,28 +129,41 @@ app.post('/add', jsonParser, function (req, res, next) {
 // })
 
 app.get('/see', function (req, res, next) {
-    connection.query(
-      'SELECT * FROM `product` INNER JOIN `productcategory` ON product.productcategoryid = productcategory.productcategoryid',
-      function(err, results, fields) {
-        if (err) {
-          res.json({status: 'error', message: err});
-        } else {
-          res.json(results);
-        }
-      }
-    );
-  });
-  
+  connection.query(
+    'SELECT product.*, productcategory.*, productimage.ProductImageID, productimage.ProductimageName, productimage.Productimagecode ' +
+    'FROM product ' +
+    'INNER JOIN productcategory ON product.productcategoryid = productcategory.productcategoryid ' +
+    'LEFT JOIN productimage ON product.productid = productimage.productid ' +
+    'GROUP BY product.productid, productimage.ProductImageID',
+    function(err, results, fields) {
+      if (err) {
+        res.json({status: 'error', message: err});
+      } else {
+        const productsWithImages = results.reduce((acc, row) => {
+          const productId = row.ProductID;
+          if (!acc[productId]) {
+            acc[productId] = {
+              ...row,
+              ProductImages: []
+            };
+          }
+          if (row.ProductImageID) {
+            acc[productId].ProductImages.push({
+              ProductImageID: row.ProductImageID,
+              ProductimageName: row.ProductimageName,
+              Productimagecode: row.Productimagecode
+            });
+          }
+          return acc;
+        }, {});
 
-// app.get('/see', function (req, res, next) {
-//     connection.query(
-//       'SELECT p.*, c.ProductCategoryName, i.Productimagecode FROM product p, productcategory c, productimage i \
-//        WHERE p.ProductCategoryID = c.ProductCategoryID AND p.ProductID = i.ProductID',
-//       function(err, results, fields) {
-//         res.json(results);
-//       }
-//     );
-// })
+        const productList = Object.values(productsWithImages);
+        
+        res.json(productList);
+      }
+    }
+  );
+});
 
 app.get('/category-see', function (req, res, next) {
     connection.query(
@@ -184,8 +198,8 @@ app.put('/update', jsonParser, function (req, res, next) {
     console.log(newProduct.ProductCategoryID);
 
     connection.query(
-        'UPDATE `product` SET ProductName = ?, Price = ?, QuantityAvailable = ? WHERE ProductID = ?',
-        [newProduct.ProductName, newProduct.Price, newProduct.QuantityAvailable, newProduct.ProductID],
+        'UPDATE `product` SET ProductName = ?, Price = ?, QuantityAvailable = ?, ProductCategoryID = ? WHERE ProductID = ?',
+        [newProduct.ProductName, newProduct.Price, newProduct.QuantityAvailable, newProduct.ProductCategoryID, newProduct.ProductID],
         function(err, results) {
             if (err) {
                 res.json({status: 'error', message: err});

@@ -1,14 +1,7 @@
-//http://localhost:5173/vendor/products
 import React, { useState, useEffect } from 'react';
-import Layout from '../../components/Layout/Layout';
-import productsData from '../../db/products.js';
-//If use data base
-// import productsData from '../../db/products.json';
+import Layout from '../../../components/Layout/Layout.jsx';
 
 function ProductControlPanelPage() {
-  //If use data base
-  // const [products, setProducts] = useState(productsData.products);
-
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -27,6 +20,36 @@ function ProductControlPanelPage() {
   const [productCategories, setProductCategories] = useState([]);
   const [productCategoryId, setProductCategoryId] = useState(0);
 
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const ImageModal = ({ images, onClose }) => {
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+    const handleNext = () => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+    };
+  
+    const handlePrev = () => {
+      setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+    };
+  
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50" onClick={onClose}>
+        <div className="bg-white p-4 rounded-lg shadow-lg max-w-screen-md w-full h-screen/2" onClick={(e) => e.stopPropagation()}>
+          <img src={images[currentImageIndex].Productimagecode} alt="Selected Image" className="w-full h-full object-contain" />
+          <div className="flex justify-between mt-4">
+            <button onClick={handlePrev} className="btn btn-secondary">&lt; Prev</button>
+            <button onClick={onClose} className="absolute top-0 right-0 m-4 bg-gray-300 p-2 rounded-full hover:bg-gray-400">&times;</button>
+            <button onClick={handleNext} className="btn btn-secondary">Next &gt;</button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  
+  
+
   useEffect(() => {
     fetch('http://localhost:3333/see')
       .then(response => response.json())
@@ -41,11 +64,13 @@ function ProductControlPanelPage() {
       .catch(error => console.error('Error fetching products:', error));
   }, []);
 
-const addProduct = async (name, price, category, count, published, image) => {
+const addProduct = async (name, price, count, published, image, categoryName, categoryId) => {
   const newProduct = {
     ProductName: name,
     Price: price,
     QuantityAvailable: count,
+    ProductCategoryID: categoryId,
+    ProductCategoryName: categoryName
   };
 
   try {
@@ -66,22 +91,6 @@ const addProduct = async (name, price, category, count, published, image) => {
   setProducts([...products, newProduct]);
 };
 
-
-  // const addProduct = (name, price, category, count, published, image) => {
-  //   const inStock = count > 0;
-  //   const newProduct = {
-  //     id: generateId(),
-  //     name: name,
-  //     price: price,
-  //     category: category,
-  //     count: count,
-  //     inStock: inStock,
-  //     published: published,
-  //     image: image,
-  //   };
-  //   setProducts([...products, newProduct]);
-  // };
-
   const deleteSelectedProducts = async () => {
     try {
       const response = await fetch('http://localhost:3333/delete', {
@@ -94,7 +103,6 @@ const addProduct = async (name, price, category, count, published, image) => {
       if (!response.ok) {
         throw new Error('Failed to delete products');
       }
-      // Update the state after successful deletion
       const updatedProducts = products.filter(product => !selectedProducts.includes(product.ProductID));
       setProducts(updatedProducts);
       setSelectedProducts([]);
@@ -120,7 +128,7 @@ const addProduct = async (name, price, category, count, published, image) => {
     }));
   };
 
-  const editProduct = async (productId, newName, newPrice, newCategory, newCount, newImage, newCategoryId) => {
+  const editProduct = async (productId, newName, newPrice, newCount, newImage, newCategoryName, newCategoryId) => {
     const updatedProduct = {
       ProductName: newName,
       Price: newPrice,
@@ -128,7 +136,6 @@ const addProduct = async (name, price, category, count, published, image) => {
       ProductID: productId,
       ProductCategoryID: newCategoryId
     };
-    console.log(updatedProduct.ProductCategoryID);
   
     try {
       const response = await fetch('http://localhost:3333/update', {
@@ -148,21 +155,11 @@ const addProduct = async (name, price, category, count, published, image) => {
   
     setProducts(products.map(product => {
       if (product.ProductID === productId) {
-        return { ...product, ProductName: newName, Price: newPrice, category: newCategory, QuantityAvailable: newCount, image: newImage, ProductCategoryID: newCategoryId};
+        return { ...product, ProductName: newName, Price: newPrice, QuantityAvailable: newCount, image: newImage, ProductCategoryName: newCategoryName, ProductCategoryID: newCategoryId};
       }
       return product;
     }));
   };
-
-  // const editProduct = (productId, newName, newPrice, newCategory, newCount, newImage) => {
-  //   const inStock = newCount > 0;
-  //   setProducts(products.map(product => {
-  //     if (product.ProductID === productId) {
-  //       return { ...product, ProductName: newName, Price: newPrice, category: newCategory, QuantityAvailable: newCount, inStock: inStock, image: newImage };
-  //     }
-  //     return product;
-  //   }));
-  // };
 
   const openAddModal = () => {
     setModalMode('add');
@@ -173,6 +170,7 @@ const addProduct = async (name, price, category, count, published, image) => {
     setProductCount(0);
     setProductPublished(false);
     setProductImage('');
+    setProductCategoryId(0);
   };
 
   const openEditModal = (productId, productName, productPrice, productCategory, productCount, productPublished, productImage, productCategoryId) => {
@@ -193,10 +191,12 @@ const addProduct = async (name, price, category, count, published, image) => {
   };
 
   const handleSubmit = () => {
+    console.log("Product Category Handle submit:", productCategory);
+
     if (modalMode === 'add') {
-      addProduct(productName, productPrice, productCategory, productCount, productPublished, productImage);
+      addProduct(productName, productPrice, productCount, productPublished, productImage, productCategory, productCategoryId);
     } else if (modalMode === 'edit') {
-      editProduct(productId, productName, productPrice, productCategory, productCount, productImage, productCategoryId);
+      editProduct(productId, productName, productPrice, productCount, productImage, productCategory, productCategoryId);
     }
     closeModal();
   };
@@ -206,20 +206,6 @@ const addProduct = async (name, price, category, count, published, image) => {
     setSelectedCategory('All');
     setSortBy('default');
   };
-
-  // const filteredProducts = products.filter(product => {
-  //   if (selectedCategory !== 'All' && product.category !== selectedCategory) {
-  //     return false;
-  //   }
-  //   return product.ProductName.toLowerCase().includes(searchTerm.toLowerCase());
-  // }).sort((a, b) => {
-  //   if (sortBy === 'ascending') {
-  //     return a.Price - b.Price;
-  //   } else if (sortBy === 'descending') {
-  //     return b.Price - a.Price;
-  //   }
-  //   return 0;
-  // });
 
   const filteredProducts = products.filter(product => {
     if (selectedCategory !== 'All' && product.ProductCategoryName !== selectedCategory) {
@@ -234,8 +220,6 @@ const addProduct = async (name, price, category, count, published, image) => {
     }
     return 0;
   });
-
-  const categories = ['All', ...new Set(products.map(product => product.ProductCategoryName))];
 
   return (
     <div className="p-4">
@@ -254,15 +238,31 @@ const addProduct = async (name, price, category, count, published, image) => {
           placeholder="Search products..."
           className="input mb-2"
         />
+
         <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-          className="input mr-2"
+          value={productCategoryId}
+          onChange={(e) => {
+            const selectedValue = parseInt(e.target.value);
+            if (selectedValue === 0) {
+              setProductCategoryId(selectedValue);
+              setSelectedCategory('All');
+              setProductCategory('');
+            } else {
+              setProductCategoryId(selectedValue);
+              const selectedCategory = productCategories.find(category => category.ProductCategoryID === selectedValue);
+              setSelectedCategory(selectedCategory ? selectedCategory.ProductCategoryName : '');
+            }
+          }}
+          className="input mb-2"
         >
-          {categories.map(category => (
-            <option key={category} value={category}>{category}</option>
+          <option value={0}>All</option>
+          {productCategories.map(category => (
+            <option key={category.ProductCategoryID} value={category.ProductCategoryID}>
+              {category.ProductCategoryName}
+            </option>
           ))}
         </select>
+        
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
@@ -306,8 +306,18 @@ const addProduct = async (name, price, category, count, published, image) => {
                   />
                 </td>
                 <td className="border px-4 py-2">
-                  <img src={product.image} alt={product.ProductName} className="w-12 h-12" />
+                  <img
+                    src={product.ProductImages.length > 0 ? product.ProductImages[0].Productimagecode : ''}
+                    alt={product.ProductImages.length > 0 ? product.ProductImages[0].ProductimageName : ''}
+                    className="w-12 h-12 mr-2"
+                    onClick={() => setSelectedImage(product.ProductImages.length > 0 ? product.ProductImages : '')}
+                  />
                 </td>
+
+                {selectedImage && (
+                  <ImageModal images={selectedImage} onClose={() => setSelectedImage(null)} />
+                )}
+
                 <td className="border px-4 py-2">{product.ProductName}</td>
                 <td className="border px-4 py-2">{product.ProductCategoryName}</td>
                 <td className="border px-4 py-2">{product.Price}$</td>
@@ -342,14 +352,22 @@ const addProduct = async (name, price, category, count, published, image) => {
             <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} className="input mb-2" placeholder="Product Name" />
             <input type="number" value={productPrice} onChange={(e) => setProductPrice(parseFloat(e.target.value))} className="input mb-2" placeholder="Product Price" />
             <select
-              value={productCategory}
-              onChange={(e) => setProductCategory(e.target.value)}
+              value={productCategoryId}
+              onChange={(e) => {
+                setProductCategoryId(parseInt(e.target.value));
+                const selectedCategory = productCategories.find(category => category.ProductCategoryID === parseInt(e.target.value));
+                setProductCategory(selectedCategory ? selectedCategory.ProductCategoryName : '');
+              }}
               className="input mb-2"
             >
+              <option value={0}>Select Category</option>
               {productCategories.map(category => (
-                <option key={category.ProductCategoryID} value={category.ProductCategoryName}>{category.ProductCategoryName}</option>
+                <option key={category.ProductCategoryID} value={category.ProductCategoryID}>
+                  {category.ProductCategoryName}
+                </option>
               ))}
             </select>
+
             <input type="number" value={productCount} onChange={(e) => setProductCount(parseInt(e.target.value))} className="input mb-2" placeholder="Product Count" />
             <input type="url" value={productImage} onChange={(e) => setProductImage(e.target.value)} className="input mb-2" placeholder="Image URL" />
             <div className="flex items-center mb-4">
