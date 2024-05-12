@@ -17,6 +17,8 @@ import UserPayOptionPage from './pages/UserPages/UserPayOptionPage';
 import WishlistPage from './pages/UserPages/WishlistPage';
 
 import ProductControlPanelPage from './pages/VendorPage/ProductControlPanelPage';
+import Register from './pages/Register';
+import Login from './pages/Login';
 
 function App() {
 
@@ -49,6 +51,9 @@ function App() {
           <Route path="payoption" element={<UserPayOptionPage />} />
           <Route path="orders" element={<UserOrder />} />   */}
         </Route>
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
     </>

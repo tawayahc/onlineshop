@@ -6,7 +6,6 @@ function UserSidebar() {
     {
       title: "บัญชีของฉัน",
       svg: "user",
-      path: "/user",
       subItems: [
         { label: "ประวัติ", href: "/user" },
         { label: "ที่อยู่จัดส่ง", href: "/user/address" },
@@ -16,9 +15,8 @@ function UserSidebar() {
     {
       title: "การสั่งซื้อของฉัน",
       svg: "order",
-      path: "/user/order",
-      subItems: [
-        { label: "รายการสั่งซื้อ", href: "/user/order" },
+     subItems: [
+        { label: "รายการสั่งซื้อ", href: "/user/orders" },
         { label: "รายการที่ยกเลิก", href: "/user/ordercancel" },
       ],
     },

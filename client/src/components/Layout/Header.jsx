@@ -1,13 +1,16 @@
 import React from "react";
 // import { FaRegHeart } from "react-icons/fa";
+import LogoBlackSVG from "../../assets/svg/logo-black.svg";
+import logo from "../../assets/png/logo-no-background-white.png";
 
 export default function Header() {
   return (
     <div>
       <div className="navbar bg-accent fixed top-0 z-40">
         <div className="navbar-start">
-          <a className="btn btn-ghost text-xl" href="/">
-            GadgetHouse
+          <a className="btn btn-ghost text-xl text-primary" href="/">
+                <img src={logo} alt="" className="w-8" />
+                GadgetHouse
           </a>
         </div>
         <div className="navbar-center hidden md:flex">
