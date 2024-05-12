@@ -22,7 +22,7 @@ export default {
             "secondary-content": "#141414",
 
             "accent": "#2F84FF",
-            "accent-content": "#010616",
+            "accent-content": "#F4F3F0",
 
             "neutral": "#21232b",
             "neutral-content": "#F4F3F0",

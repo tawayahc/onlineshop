@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Layout from "../../components/Layout/Layout";
-import Modal from "../../components/User/Modal";
+import Modal from "../../components/Modal";
 import PaymentList from "../../components/User/PaymentMethod/PaymentList";
 import NewPaymentModal from "../../components/User/PaymentMethod/NewPaymentModal";
 import AddressList from "../../components/User/Address/AddressList";

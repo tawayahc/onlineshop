@@ -1,14 +1,15 @@
-import React from 'react'
-import Layout from '../../components/Layout/Layout'
+import React from "react";
+import Layout from "../../components/Layout/Layout";
+import UserLayout from "../../components/User/UserLayout";
 
 function UserOrder() {
-  return (
-    <div>UserOrder</div>
-  )
+  return <div>UserOrder</div>;
 }
 
 export default () => (
   <Layout>
-    <UserOrder />
+    <UserLayout>
+      <UserOrder />
+    </UserLayout>
   </Layout>
-)
+);
