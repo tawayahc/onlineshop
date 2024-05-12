@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../../components/Layout/Layout.jsx';
+import Product from './Product.jsx';
 
 function ProductControlPanelPage() {
   const [products, setProducts] = useState([]);
@@ -39,17 +40,14 @@ function ProductControlPanelPage() {
           <img src={images[currentImageIndex].Productimagecode} alt="Selected Image" className="w-full h-full object-contain" />
           <div className="flex justify-between mt-4">
             <button onClick={handlePrev} className="btn btn-secondary">&lt; Prev</button>
-            <button onClick={onClose} className="absolute top-0 right-0 m-4 bg-gray-300 p-2 rounded-full hover:bg-gray-400">&times;</button>
             <button onClick={handleNext} className="btn btn-secondary">Next &gt;</button>
           </div>
+          <button onClick={onClose} className="absolute top-0 right-0 m-4 bg-gray-300 p-2 rounded-full hover:bg-gray-400">&times;</button>
         </div>
       </div>
     );
   };
   
-  
-  
-
   useEffect(() => {
     fetch('http://localhost:3333/see')
       .then(response => response.json())
@@ -64,32 +62,58 @@ function ProductControlPanelPage() {
       .catch(error => console.error('Error fetching products:', error));
   }, []);
 
-const addProduct = async (name, price, count, published, image, categoryName, categoryId) => {
-  const newProduct = {
-    ProductName: name,
-    Price: price,
-    QuantityAvailable: count,
-    ProductCategoryID: categoryId,
-    ProductCategoryName: categoryName
-  };
+  // const addProductImage = async (image) => {
+  //   const newImage = {
+  //     // ProductID: products.length + 1,
+  //     // ProductImageName: productName,
+  //     Productimagecode: image,
+  //   };
 
-  try {
-    const response = await fetch('http://localhost:3333/add', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(newProduct),
-    });
-    if (!response.ok) {
-      throw new Error('Failed to add product');
+  //   try {
+  //     const response = await fetch('http://localhost:3333/add-image', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(newImage),
+  //     });
+  //     if (!response.ok) {
+  //       throw new Error('Failed to add product');
+  //     }
+      
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   setProducts([...productImage, newImage]);
+  // };
+
+  const addProduct = async (name, price, count, published, image, categoryName, categoryId) => {
+    const newProduct = {
+      ProductName: name,
+      Price: price,
+      QuantityAvailable: count,
+      ProductCategoryID: categoryId,
+      ProductCategoryName: categoryName,
+      Productimagecode: image
+    };
+
+    try {
+      const response = await fetch('http://localhost:3333/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newProduct),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to add product');
+      }
+      
+    } catch (error) {
+      console.error(error);
     }
-    
-  } catch (error) {
-    console.error(error);
-  }
-  setProducts([...products, newProduct]);
-};
+    setProducts([...products, newProduct]);
+  };
 
   const deleteSelectedProducts = async () => {
     try {
@@ -191,10 +215,9 @@ const addProduct = async (name, price, count, published, image, categoryName, ca
   };
 
   const handleSubmit = () => {
-    console.log("Product Category Handle submit:", productCategory);
-
     if (modalMode === 'add') {
-      addProduct(productName, productPrice, productCount, productPublished, productImage, productCategory, productCategoryId);
+      addProduct(productName, productPrice, productCount, productPublished, productImage,productCategory, productCategoryId);
+      // addProductImage(productImage);
     } else if (modalMode === 'edit') {
       editProduct(productId, productName, productPrice, productCount, productImage, productCategory, productCategoryId);
     }
@@ -305,12 +328,13 @@ const addProduct = async (name, price, count, published, image, categoryName, ca
                     onChange={() => toggleProductSelection(product.ProductID)}
                   />
                 </td>
+
                 <td className="border px-4 py-2">
                   <img
-                    src={product.ProductImages.length > 0 ? product.ProductImages[0].Productimagecode : ''}
-                    alt={product.ProductImages.length > 0 ? product.ProductImages[0].ProductimageName : ''}
+                    src={product.ProductImages && product.ProductImages.length > 0 ? product.ProductImages[0].Productimagecode : ''}
+                    alt={product.ProductImages && product.ProductImages.length > 0 ? product.ProductImages[0].ProductimageName : ''}
                     className="w-12 h-12 mr-2"
-                    onClick={() => setSelectedImage(product.ProductImages.length > 0 ? product.ProductImages : '')}
+                    onClick={() => setSelectedImage(product.ProductImages && product.ProductImages.length > 0 ? product.ProductImages : '')}
                   />
                 </td>
 

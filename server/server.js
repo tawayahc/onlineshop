@@ -92,14 +92,21 @@ app.post('/authentication', jsonParser, function (req, res, next) {
 //         }
 //       );
 // })
+// 'INSERT INTO `product`(ProductName, Price, QuantityAvailable, ProductCategoryID) VALUES (?, ?, ?, ?)',
+//  [newProduct.ProductName, newProduct.Price, newProduct.QuantityAvailable, newProduct.ProductCategoryID],
+
+
 
 app.post('/add', jsonParser, function (req, res, next) {
     const newProduct = {
         ProductName: req.body.ProductName,
         Price: req.body.Price,
         QuantityAvailable: req.body.QuantityAvailable,
-        ProductCategoryID: req.body.ProductCategoryID
+        ProductCategoryID: req.body.ProductCategoryID,
+        Productimagecode: req.body.Productimagecode
     };
+
+    console.log("Product image name:", newProduct.ProductName);
 
     connection.query(
         'INSERT INTO `product`(ProductName, Price, QuantityAvailable, ProductCategoryID) VALUES (?, ?, ?, ?)',
@@ -117,6 +124,26 @@ app.post('/add', jsonParser, function (req, res, next) {
         }
     );
 });
+
+
+
+app.post('/add-image', jsonParser, function (req, res, next) {
+  const newProduct = {
+    Productimagecode: req.body.Productimagecode
+  };
+
+  connection.query(
+    'INSERT INTO `productimage`(Productimagecode) VALUES (?)',
+    [newProduct.Productimagecode],
+    function(err, results) {
+        if (err) {
+            res.json({ status: 'error', message: err });
+        } else {
+            res.json({ status: 'ok', message: 'Product image added successfully'});
+        }
+    }
+);
+})
 
 
 // app.get('/see', function (req, res, next) {
