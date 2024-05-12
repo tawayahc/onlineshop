@@ -8,8 +8,19 @@ import NewAddressModal from "../../components/User/Address/NewAddressModal";
 
 function CheckoutPage() {
   const handleLinkClick = () => {
-    console.log("Link clicked!");
+    console.log("Submit button clicked");
   };
+  const handleSubmitAddress = (event) => {
+    // event.preventDefault();
+  
+    // const formData = new FormData(event.currentTarget);
+
+    // const data = Object.fromEntries(formData.entries());
+    // console.log("Form Data:", data);
+    // Perform other actions with the data (optional)
+    // setShowNewAddress(false)
+    // console.log(event);
+  }; 
 
   const [showPaymentList, setShowPaymentList] = useState(false);
   const [showNewPayment, setShowNewPayment] = useState(false);
@@ -54,7 +65,7 @@ function CheckoutPage() {
         <div className="flex flex-col gap-4">
           <div
             className="btn btn-outline btn-accent w-[450px] 2xl:w-[800px] h-24 no-animation "
-            onClick={handleLinkClick}
+            onClick={openNewAddress}
           >
             เพิ่มที่อยู่จัดส่ง
           </div>
@@ -95,6 +106,7 @@ function CheckoutPage() {
                 <h1 className="text-xl font-bold text-right">ราคาสินค้า</h1>
               </div>
               <div className="card-actions justify-center ">
+                {/* NOTE */}
                 <button className="btn btn-wide btn-error">
                   ทำการสั่งซื้อ
                 </button>
@@ -125,7 +137,7 @@ function CheckoutPage() {
         onClose={closeAddressList}
         submit={handleLinkClick}
       >
-        <AddressList onClick={openAddressList}/>
+        <AddressList onClick={handleLinkClick}/>
       </Modal>
 
       <Modal
@@ -133,7 +145,7 @@ function CheckoutPage() {
         onClose={closeNewAddress}
         submit={handleLinkClick}
       >
-        <NewAddressModal/>
+        <NewAddressModal handleSubmit={handleLinkClick}/>
       </Modal>
     </div>
   );
