@@ -1,17 +1,10 @@
 import React, { useState, useEffect } from "react";
+import DualSlider from "./DualSlider";
+import { BsStarFill, BsStar } from "react-icons/bs";
 
 function FilterCollapse({ title, type, data, onFilterChange }) {
   const [selectedValues, setSelectedValues] = useState([]);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
 
-  // Function to handle price range change
-  const handlePriceRangeChange = (event) => {
-    const { name, value } = event.target;
-    setPriceRange((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
-  };
   // Function to handle checkbox toggle (category, brand, rating)
   const handleCheckboxChange = (value) => {
     const updatedValues = [...selectedValues];
@@ -23,22 +16,32 @@ function FilterCollapse({ title, type, data, onFilterChange }) {
     setSelectedValues(updatedValues);
     onFilterChange(type, updatedValues);
   };
-  // WARN : Fetch data from database or client side
-  // NOTE: Fetch data from database (is this neccesary?)
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const response = await fetch('your-api-endpoint');
-  //     const data = await response.json();
-  //   };
 
-  //   fetchData();
-  // }, []);
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const emptyStars = Math.max(0, 5 - fullStars);
+
+    return (
+      <>
+        {[...Array(fullStars)].map((_, index) => (
+          <BsStarFill key={index} className="text-warning" />
+        ))}
+
+        {[...Array(emptyStars)].map((_, index) => (
+          <BsStar
+            key={index + fullStars }
+            className="text-gray-400"
+          />
+
+        ))}
+      </>
+    )
+  }
 
   const content = () => {
     switch (type) {
       case "category":
       case "brands":
-      case "review":
         return (
           <div className="flex flex-wrap flex-col">
             {data.map((item) => (
@@ -49,51 +52,35 @@ function FilterCollapse({ title, type, data, onFilterChange }) {
                   checked={selectedValues.includes(item)}
                   onChange={() => handleCheckboxChange(item)}
                 />
-                <div className="ml-2">{item}</div>
+                <div className="ml-2">
+                  {item}
+                </div>
               </div>
             ))}
           </div>
         );
-        //FIX: Change Slider
+        case "review":
+          return (
+            <div className="flex flex-wrap flex-col">
+              {data.map((item) => (
+                <div key={item} className="flex cursor-pointer mr-2 mb-2">
+                  <input
+                    type="checkbox"
+                    className="checkbox checkbox-sm checked:bg-primary"
+                    checked={selectedValues.includes(item)}
+                    onChange={() => handleCheckboxChange(item)}
+                  />
+                  <div className="flex flex-row ml-2">
+                    {renderStars(item)}
+                  </div>
+                </div>
+
+              ))}
+            </div>
+          )
       case "price":
         return (
-          <div className="grid grid-cols-2 gap-2">
-            <div className="form-control">
-              <label className="label">ราคาต่ำสุด</label>
-              <input
-                type="number"
-                name="min"
-                value={priceRange.min}
-                onChange={handlePriceRangeChange}
-                className="input input-bordered"
-              />
-            </div>
-
-            <div className="form-control">
-              <label className="label">ราคาสูงสุด</label>
-              <input
-                type="number"
-                name="max"
-                value={priceRange.max}
-                onChange={handlePriceRangeChange}
-                className="input input-bordered"
-              />
-            </div>
-
-            <div className="form-control col-span-2">
-              <label className="label">Range</label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={priceRange.min}
-                onChange={(e) =>
-                  setPriceRange({ ...priceRange, min: e.target.value })
-                }
-                className="range range-primary range-sm"
-              />
-            </div>
-          </div>
+          <DualSlider />
         );
       default:
         return null;

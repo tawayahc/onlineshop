@@ -31,18 +31,21 @@ function FilterSidebar() {
             onFilterChange={(type, values) => console.log(type, values)}
             data = {categories}
           />
+          <div className="divider mt-0"></div>
           <FilterCollapse
             title="แบรนด์"
             type="brands"
             onFilterChange={(type, values) => console.log(type, values)}
             data = {fakeData.brands}
           />
+          <div className="divider mt-0"></div>
           <FilterCollapse
             title="รีวิว"
             type="review"
             onFilterChange={(type, values) => console.log(type, values)}
             data = {fakeData.review}
           />
+          <div className="divider mt-0"></div>
           <FilterCollapse
             title="ราคา"
             type="price"

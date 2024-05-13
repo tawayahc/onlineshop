@@ -42,36 +42,6 @@ function ProductListPage() {
     indexOfLastProduct
   )
 
-  // Fiter section
-  const handleChange = (event) => {
-    setSelectedCategory(event.target.value);
-  };
-
-  function filteredData(data, selected) {
-    let fileredProducts = data;
-
-    if (selected) {
-      fileredProducts = fileredProducts.filter(
-        ({ category, brand, price, rating }) =>
-          category === selected ||
-          brand === selected ||
-          price === selected ||
-          rating === selected
-      );
-    }
-
-    return fileredProducts.map(({ id, img, title, star, reviews, price }) => (
-      <ProductCard
-        key={id}
-        img={img}
-        title={title}
-        star={star}
-        reviews={reviews}
-        price={price}
-      />
-    ));
-  }
-
   return (
     <div>
       <div className="flex flex-row w-full">
