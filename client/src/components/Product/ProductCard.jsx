@@ -1,8 +1,7 @@
 import React from "react";
 import { BsBagFill, BsStarFill, BsStarHalf, BsStar } from "react-icons/bs";
 
-function ProductCard({ id, img, title, star, reviews, price }) {
-  // TODO : Get data from database
+function ProductCard({ data, isInWishlist, isInCart }) {
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -24,12 +23,11 @@ function ProductCard({ id, img, title, star, reviews, price }) {
     );
   };
   return (
-    // TODO : Add to cart
-    // TODO : `/product/${id}`
+    // TODO : Add to cart & wishlist
     <a href="#" className="group">
       <div className="card card-compact w-60 min-96 shadow-xl">
         <figure className="h-40">
-          <img src={img} alt={title} className="w-full h-full object-cover" />
+          <img src={data.thumbnail} alt={data.name} className="w-full h-full object-cover" />
         </figure>
         <button className="btn btn-circle btn-sm absolute top-2 right-2">
           <svg
@@ -51,15 +49,15 @@ function ProductCard({ id, img, title, star, reviews, price }) {
         </button>
         <div className="card-body flex flex-col">
           <div className="h-12">
-            <h3 className="card-title line-clamp-2">{title}</h3>
+            <h3 className="card-title line-clamp-2">{data.title}</h3>
           </div>
           <div className="card-actions justify-between items-center mt-auto">
             <div className="flex flex-row items-center">
-              {renderStars(star)}
-              <p>{reviews}</p>
+              {renderStars(data.rating)}
+              <p>{data.rating}</p>
             </div>
             <div className="flex flex-row justify-between w-full items-center">
-              <p className="text-xl">${price}</p>
+              <p className="text-xl">${data.price}</p>
               <button className="btn btn-accent btn-sm">
                 <BsBagFill /> Add to cart
               </button>

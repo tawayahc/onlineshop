@@ -1,50 +1,87 @@
 import React, { useState, useEffect } from "react";
 import DualSlider from "./DualSlider";
 import { BsStarFill, BsStar } from "react-icons/bs";
+import { useRecoilState } from "recoil";
+import { selectedFiltersState } from "../../recoil/atom";
+import axios from "axios";
 
-function FilterCollapse({ title, type, data, onFilterChange }) {
+function FilterCollapse({ title, type }) {
   const [selectedValues, setSelectedValues] = useState([]);
+  const [filters, setFilters] = useRecoilState(selectedFiltersState);
+  const [categories, setCategories] = useState([]);
+  const [rating] = useState([5, 4, 3, 2, 1]);
+  
+  //WARN: categories
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch categories
+        const response = await axios.get(
+          "https://dummyjson.com/products/categories"
+        );
+        setCategories(response.data || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setCategories([]);
+      }
+    };
 
-  // Function to handle checkbox toggle (category, brand, rating)
+    fetchData();
+  }, []);
+
   const handleCheckboxChange = (value) => {
-    const updatedValues = [...selectedValues];
-    if (updatedValues.includes(value)) {
-      updatedValues.splice(updatedValues.indexOf(value), 1);
-    } else {
-      updatedValues.push(value);
-    }
+    const updatedValues = selectedValues.includes(value)
+      ? selectedValues.filter((item) => item !== value)
+      : [...selectedValues, value];
+
     setSelectedValues(updatedValues);
-    onFilterChange(type, updatedValues);
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [type]: updatedValues,
+    }));
+  };
+  const handleRatingChange = (newRating) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      rating: [newRating], // Since it's a radio button, only one rating can be selected at a time
+    }));
+
+    // Update the local state to reflect the selected value for the radio buttons
+    setSelectedValues([newRating]);
   };
 
-  const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const emptyStars = Math.max(0, 5 - fullStars);
+  const clearRatings = () => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      rating: [], 
+    }));
+    setSelectedValues([]); 
+  };
 
-    return (
-      <>
-        {[...Array(fullStars)].map((_, index) => (
-          <BsStarFill key={index} className="text-warning" />
-        ))}
-
-        {[...Array(emptyStars)].map((_, index) => (
-          <BsStar
-            key={index + fullStars }
-            className="text-gray-400"
-          />
-
-        ))}
-      </>
-    )
+  const clearPrice = () => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      price: [], 
+    }));
+    setSelectedValues([]); 
   }
+
+  const renderStars = (rating) => {
+    return [...Array(5)].map((_, index) =>
+      index < rating ? (
+        <BsStarFill key={index} className="text-warning" />
+      ) : (
+        <BsStar key={index} className="text-gray-400" />
+      )
+    );
+  };
 
   const content = () => {
     switch (type) {
       case "category":
-      case "brands":
         return (
           <div className="flex flex-wrap flex-col">
-            {data.map((item) => (
+            {categories.map((item) => (
               <div key={item} className="flex cursor-pointer mr-2 mb-2">
                 <input
                   type="checkbox"
@@ -52,36 +89,38 @@ function FilterCollapse({ title, type, data, onFilterChange }) {
                   checked={selectedValues.includes(item)}
                   onChange={() => handleCheckboxChange(item)}
                 />
-                <div className="ml-2">
-                  {item}
-                </div>
+                <div className="ml-2">{item}</div>
               </div>
             ))}
           </div>
         );
-        case "review":
-          return (
-            <div className="flex flex-wrap flex-col">
-              {data.map((item) => (
-                <div key={item} className="flex cursor-pointer mr-2 mb-2">
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-sm checked:bg-primary"
-                    checked={selectedValues.includes(item)}
-                    onChange={() => handleCheckboxChange(item)}
-                  />
-                  <div className="flex flex-row ml-2">
-                    {renderStars(item)}
-                  </div>
-                </div>
-
-              ))}
-            </div>
-          )
-      case "price":
+      case "review":
         return (
-          <DualSlider />
+          <div className="flex flex-wrap flex-col">
+            {rating.map((item) => (
+              <div key={item} className="form-control cursor-pointer mr-2 mb-2">
+                <label className="flex items-center cursor-pointer ">
+                  <input
+                    type="radio"
+                    name="radio-10"
+                    className="radio"
+                    checked={selectedValues.includes(item)}
+                    onChange={() => handleRatingChange(item)}
+                  />
+                  <div className="flex flex-row ml-2">{renderStars(item)}</div>
+                </label>
+              </div>
+            ))}
+            <button
+              className="btn btn-outline btn-accent btn-sm"
+              onClick={clearRatings}
+            >
+              Clear
+            </button>
+          </div>
         );
+      case "price":
+        return <DualSlider />;
       default:
         return null;
     }

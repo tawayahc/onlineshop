@@ -1,43 +1,40 @@
 import React, { useState } from "react";
-// import DynamicBounds from "./DynamicBounds";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import {  useRecoilState } from "recoil";
+import { selectedFiltersState } from "../../recoil/atom";
 
-function DualSlider() {
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
-  const [step, setStep] = useState(1); // Optional step control
+function DualSlider({ maxPrice = 100000 }) {
+  const [selectedFilters, setSelectedFilters] = useRecoilState(selectedFiltersState);
+  const { priceRange } = selectedFilters; // Destructure priceRange from selectedFilters
 
   const handleChange = (newValue) => {
-    setPriceRange({ min: newValue[0], max: newValue[1] });
+    setSelectedFilters((prevFilters) => ({
+      ...prevFilters,
+      priceRange: [newValue[0], newValue[1]],
+    }));
   };
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
-    const parsedValue = Math.max(0, Math.min(100, +value || 0)); // Ensure valid range
-    setPriceRange((prevState) => ({
-      ...prevState,
-      [name]: parsedValue,
+    let newMin = priceRange[0], newMax = priceRange[1];
+
+    if (name === "min" && parseInt(value) <= newMax - 1) {
+      newMin = Math.max(0, parseInt(value));
+    } else if (name === "max" && parseInt(value) >= newMin + 1) {
+      newMax = Math.min(maxPrice, parseInt(value));
+    }
+
+    setSelectedFilters(prevFilters => ({
+      ...prevFilters,
+      priceRange: [newMin, newMax],
     }));
   };
-
-  const handleMinChange = (e) => {
-    const newMin = Math.max(0, +e.target.value || 0); // Ensure non-negative
-    setPriceRange((prevState) => ({
-      ...prevState,
-      min: Math.min(newMin, prevState.max - 5), // Maintain minimum gap of 5
+  const handleResetPriceRange = () => {
+    setSelectedFilters(prevFilters => ({
+      ...prevFilters,
+      priceRange: [0, maxPrice]
     }));
-  };
-
-  const handleMaxChange = (e) => {
-    const newMax = Math.min(100, +e.target.value || 100); // Ensure max <= 100
-    setPriceRange((prevState) => ({
-      ...prevState,
-      max: Math.max(newMax, prevState.min + 5), // Maintain minimum gap of 5
-    }));
-  };
-
-  const handleStepChange = (e) => {
-    setStep(+e.target.value || 1);
   };
 
   const formatValue = (value) => (value < 10 ? `0${value}` : value.toString());
@@ -49,10 +46,9 @@ function DualSlider() {
           range
           step={1}
           allowCross={true}
-          // pushable={10}
           min={0}
-          max={100}
-          value={[priceRange.min, priceRange.max]}
+          max={maxPrice}
+          value={[priceRange[0], priceRange[1]]}
           onChange={handleChange}
           styles={{
             track: {
@@ -77,9 +73,11 @@ function DualSlider() {
             <input
               type="number"
               name="min"
-              value={formatValue(priceRange.min)}
+              value={priceRange[0]}
               onChange={handleInputChange}
               className="input input-bordered"
+              min="0"
+              max={priceRange[1] - 1}
             />
           </div>
 
@@ -88,12 +86,20 @@ function DualSlider() {
             <input
               type="number"
               name="max"
-              value={formatValue(priceRange.max)}
-              onChange={handleInputChange}
-              className="input input-bordered"
+              value={priceRange[1]}
+            onChange={handleInputChange}
+            className="input input-bordered"
+            min={priceRange[0] + 1}
+            max={maxPrice}
             />
           </div>
         </div>
+        <button
+              className="btn btn-outline btn-accent btn-sm mt-2"
+              onClick={handleResetPriceRange}
+            >
+              Clear
+            </button>
       </div>
     </div>
   );

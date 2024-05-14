@@ -106,7 +106,6 @@ function CheckoutPage() {
                 <h1 className="text-xl font-bold text-right">ราคาสินค้า</h1>
               </div>
               <div className="card-actions justify-center ">
-                {/* NOTE */}
                 <button className="btn btn-wide btn-error">
                   ทำการสั่งซื้อ
                 </button>
