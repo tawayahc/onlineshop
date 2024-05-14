@@ -1,6 +1,8 @@
+// src/pages/ProductControlPanelPage/ProductControlPanelPage.jsx
 import React, { useState, useEffect } from 'react';
 import Layout from '../../../components/Layout/Layout.jsx';
-import ImageInput from './ProductImageDisplayModal.jsx';
+import ImageModal from './ImageModal.jsx'
+import AddEditModal from './AddEditModal.jsx';
 
 function ProductControlPanelPage() {
   const [products, setProducts] = useState([]);
@@ -23,31 +25,6 @@ function ProductControlPanelPage() {
 
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const ImageModal = ({ images, onClose }) => {
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
-    const handleNext = () => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    };
-  
-    const handlePrev = () => {
-      setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-    };
-  
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50" onClick={onClose}>
-        <div className="bg-white p-4 rounded-lg shadow-lg max-w-screen-md w-full h-screen/2" onClick={(e) => e.stopPropagation()}>
-          <img src={images[currentImageIndex].Productimagecode} alt="Selected Image" className="w-full h-full object-contain" />
-          <div className="flex justify-between mt-4">
-            <button onClick={handlePrev} className="btn btn-secondary">&lt; Prev</button>
-            <button onClick={handleNext} className="btn btn-secondary">Next &gt;</button>
-          </div>
-          <button onClick={onClose} className="absolute top-0 right-0 m-4 bg-gray-300 p-2 rounded-full hover:bg-gray-400">&times;</button>
-        </div>
-      </div>
-    );
-  };
-  
   useEffect(() => {
     fetch('http://localhost:3333/see')
       .then(response => response.json())
@@ -84,11 +61,13 @@ function ProductControlPanelPage() {
       if (!response.ok) {
         throw new Error('Failed to add product');
       }
-      
+      const result = await response.json();
+      const addedProduct = result.product;
+
+      setProducts([...products, addedProduct]);
     } catch (error) {
       console.error(error);
     }
-    setProducts([...products, newProduct]);
   };
 
   const deleteSelectedProducts = async () => {
@@ -136,7 +115,7 @@ function ProductControlPanelPage() {
       ProductID: productId,
       ProductCategoryID: newCategoryId
     };
-  
+
     try {
       const response = await fetch('http://localhost:3333/update', {
         method: 'PUT',
@@ -148,14 +127,13 @@ function ProductControlPanelPage() {
       if (!response.ok) {
         throw new Error('Failed to update product');
       }
-      
     } catch (error) {
       console.error(error);
     }
-  
+
     setProducts(products.map(product => {
       if (product.ProductID === productId) {
-        return { ...product, ProductName: newName, Price: newPrice, QuantityAvailable: newCount, image: newImage, ProductCategoryName: newCategoryName, ProductCategoryID: newCategoryId};
+        return { ...product, ProductName: newName, Price: newPrice, QuantityAvailable: newCount, image: newImage, ProductCategoryName: newCategoryName, ProductCategoryID: newCategoryId };
       }
       return product;
     }));
@@ -260,7 +238,7 @@ function ProductControlPanelPage() {
             </option>
           ))}
         </select>
-        
+
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value)}
@@ -345,46 +323,24 @@ function ProductControlPanelPage() {
       </div>
 
       {modalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <div className="bg-white p-4 rounded-lg shadow-lg">
-            <h2 className="text-lg font-semibold mb-2">{modalMode === 'add' ? 'Add Product' : 'Edit Product'}</h2>
-            <input type="text" value={productName} onChange={(e) => setProductName(e.target.value)} className="input mb-2" placeholder="Product Name" />
-            <input type="number" value={productPrice} onChange={(e) => setProductPrice(parseFloat(e.target.value))} className="input mb-2" placeholder="Product Price" />
-            <select
-              value={productCategoryId}
-              onChange={(e) => {
-                setProductCategoryId(parseInt(e.target.value));
-                const selectedCategory = productCategories.find(category => category.ProductCategoryID === parseInt(e.target.value));
-                setProductCategory(selectedCategory ? selectedCategory.ProductCategoryName : '');
-              }}
-              className="input mb-2"
-            >
-              <option value={0}>Select Category</option>
-              {productCategories.map(category => (
-                <option key={category.ProductCategoryID} value={category.ProductCategoryID}>
-                  {category.ProductCategoryName}
-                </option>
-              ))}
-            </select>
-
-            <input type="number" value={productCount} onChange={(e) => setProductCount(parseInt(e.target.value))} className="input mb-2" placeholder="Product Count" />
-            <input type="url" value={productImage} onChange={(e) => setProductImage(e.target.value)} className="input mb-2" placeholder="Image URL" />
-            {/* <ImageInput/> */}
-            <div className="flex items-center mb-4">
-              <label className="mr-2">Published:</label>
-              <input
-                type="checkbox"
-                className="toggle toggle-success"
-                checked={productPublished}
-                onChange={() => setProductPublished(!productPublished)}
-              />
-            </div>
-            <div className="flex justify-end">
-              <button onClick={closeModal} className="btn btn-secondary mr-2">Cancel</button>
-              <button onClick={handleSubmit} className="btn btn-primary">{modalMode === 'add' ? 'Add' : 'Save'}</button>
-            </div>
-          </div>
-        </div>
+        <AddEditModal
+          modalMode={modalMode}
+          productName={productName}
+          setProductName={setProductName}
+          productPrice={productPrice}
+          setProductPrice={setProductPrice}
+          productCategoryId={productCategoryId}
+          setProductCategoryId={setProductCategoryId}
+          productCategories={productCategories}
+          productCount={productCount}
+          setProductCount={setProductCount}
+          productImage={productImage}
+          setProductImage={setProductImage}
+          productPublished={productPublished}
+          setProductPublished={setProductPublished}
+          handleSubmit={handleSubmit}
+          closeModal={closeModal}
+        />
       )}
     </div>
   );
