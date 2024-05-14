@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../../components/Layout/Layout.jsx';
-import Product from './Product.jsx';
+import ImageInput from './ProductImageDisplayModal.jsx';
 
 function ProductControlPanelPage() {
   const [products, setProducts] = useState([]);
@@ -62,31 +62,6 @@ function ProductControlPanelPage() {
       .catch(error => console.error('Error fetching products:', error));
   }, []);
 
-  // const addProductImage = async (image) => {
-  //   const newImage = {
-  //     // ProductID: products.length + 1,
-  //     // ProductImageName: productName,
-  //     Productimagecode: image,
-  //   };
-
-  //   try {
-  //     const response = await fetch('http://localhost:3333/add-image', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify(newImage),
-  //     });
-  //     if (!response.ok) {
-  //       throw new Error('Failed to add product');
-  //     }
-      
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  //   setProducts([...productImage, newImage]);
-  // };
-
   const addProduct = async (name, price, count, published, image, categoryName, categoryId) => {
     const newProduct = {
       ProductName: name,
@@ -94,7 +69,8 @@ function ProductControlPanelPage() {
       QuantityAvailable: count,
       ProductCategoryID: categoryId,
       ProductCategoryName: categoryName,
-      Productimagecode: image
+      Productimagecode: image,
+      ProductimageName: name,
     };
 
     try {
@@ -216,8 +192,7 @@ function ProductControlPanelPage() {
 
   const handleSubmit = () => {
     if (modalMode === 'add') {
-      addProduct(productName, productPrice, productCount, productPublished, productImage,productCategory, productCategoryId);
-      // addProductImage(productImage);
+      addProduct(productName, productPrice, productCount, productPublished, productImage, productCategory, productCategoryId);
     } else if (modalMode === 'edit') {
       editProduct(productId, productName, productPrice, productCount, productImage, productCategory, productCategoryId);
     }
@@ -394,6 +369,7 @@ function ProductControlPanelPage() {
 
             <input type="number" value={productCount} onChange={(e) => setProductCount(parseInt(e.target.value))} className="input mb-2" placeholder="Product Count" />
             <input type="url" value={productImage} onChange={(e) => setProductImage(e.target.value)} className="input mb-2" placeholder="Image URL" />
+            {/* <ImageInput/> */}
             <div className="flex items-center mb-4">
               <label className="mr-2">Published:</label>
               <input

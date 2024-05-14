@@ -101,7 +101,8 @@ app.post('/add', jsonParser, function (req, res, next) {
       Price: req.body.Price,
       QuantityAvailable: req.body.QuantityAvailable,
       ProductCategoryID: req.body.ProductCategoryID,
-      Productimagecode: req.body.Productimagecode
+      Productimagecode: req.body.Productimagecode,
+      ProductimageName: req.body.ProductimageName
   };
 
   connection.query(
@@ -111,15 +112,17 @@ app.post('/add', jsonParser, function (req, res, next) {
           if (err) {
               return res.json({ status: 'error', message: err });
           }
+          const insertedProductId = results.insertId;
           connection.query(
-              'INSERT INTO `productimage`(Productimagecode) VALUES (?)',
-              [newProduct.Productimagecode],
+              'INSERT INTO `productimage`(ProductID, Productimagecode, ProductimageName) VALUES (?, ?, ?)',
+              [insertedProductId, newProduct.Productimagecode, newProduct.ProductimageName],
               function(err, results) {
                   if (err) {
                       return res.json({ status: 'error', message: err });
                   }
                   const insertedProduct = {
-                      ...newProduct
+                      ...newProduct,
+                      ProductID: insertedProductId
                   };
                   return res.json({ status: 'ok', message: 'Product added successfully', product: insertedProduct });
               }
@@ -127,34 +130,6 @@ app.post('/add', jsonParser, function (req, res, next) {
       }
   );
 });
-
-app.post('/add-image', jsonParser, function (req, res, next) {
-  const newProduct = {
-    Productimagecode: req.body.Productimagecode
-  };
-
-  connection.query(
-    'INSERT INTO `productimage`(Productimagecode) VALUES (?)',
-    [newProduct.Productimagecode],
-    function(err, results) {
-        if (err) {
-            res.json({ status: 'error', message: err });
-        } else {
-            res.json({ status: 'ok', message: 'Product image added successfully'});
-        }
-    }
-  );
-})
-
-
-// app.get('/see', function (req, res, next) {
-//     connection.query(
-//       'SELECT * FROM `product`',
-//       function(err, results, fields) {
-//         res.json(results);
-//       }
-//     );
-// })
 
 app.get('/see', function (req, res, next) {
   connection.query(
