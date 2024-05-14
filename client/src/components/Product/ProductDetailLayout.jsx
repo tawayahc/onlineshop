@@ -65,26 +65,15 @@ export default function ProductDetailLayout() {
           </div>
 
           <div className="flex flex-col w-full mb-2 row-span-4 ">
-            <div className="flex flex-col">
-              <ProductOptionButton
-                options={options}
-                onOptionSelected={handleOptionSelected}
-                optionsName="Color"
-              />
-              <ProductOptionButton
-                options={options}
-                onOptionSelected={handleOptionSelected}
-                optionsName="Size"
-              />
-            </div>
-            <div className="flex flex-row h-full">
+            
+            <div className="flex flex-col h-full justify-center space-y-4">
               <ProductQuantityCounter
                 initialCount={2}
                 minCount={1}
                 maxCount={100}
               />
-              <div className="flex self-end">
-                <button className="btn btn-accent mx-4">
+              <div className="flex">
+                <button className="btn btn-accent btn-wide mr-4">
                   <BsBagFill /> Add to cart
                 </button>
                 <button className="btn">

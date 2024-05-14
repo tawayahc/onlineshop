@@ -26,7 +26,7 @@ const ProductQuantityCounter = ({ initialCount = 1, minCount = 1, maxCount = 100
   };
 
   return (
-    <div className="flex self-end">
+    <div className="flex">
       <button className="btn no-animation btn-base-300" onClick={handleDecrement}>
         -
       </button>
