@@ -16,10 +16,10 @@ function AboutSeller() {
           <h2 className="card-title">Vendor Name</h2>
           <p>Rating</p>
           <p>Description</p>
-          <p>Contact</p>
-          <div className="card-actions justify-end">
-            <button className="btn bg-red-500">ดูเพิ่มเติม</button>
-          </div>
+          <div className="mt-2">
+              <div className="badge badge-outline mr-2">Fashion</div>
+              <div className="badge badge-outline">Products</div>
+            </div>
         </div>
       </div>
     </div>
