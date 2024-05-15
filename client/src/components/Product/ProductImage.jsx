@@ -8,12 +8,12 @@ const ProductImage = ({ thumbnailImages }) => {
   };
 
   return (
-    <div className="flex flex-col md:w-[450px]">
-      <div id="main" className="mb-4">
+    <div className="flex flex-col md:w-[450px] md:h-[450px]">
+      <div id="main" className="mb-4 h-full w-full overflow-hidden">
         <img
           src={selectedImage}
-          alt="Shoes"
-          className="rounded-xl max-w-full cursor-pointer"
+          alt="image"
+          className="object-contain rounded-xl w-full h-full cursor-pointer "
           onClick={()=>document.getElementById('my_modal_2').showModal()}
         />
       </div>
@@ -22,8 +22,8 @@ const ProductImage = ({ thumbnailImages }) => {
           <picture key={index} className="w-24 h-24">
             <img
               src={image}
-              alt={`Shoes Thumbnail ${index + 1}`}
-              className={`rounded-xl cursor-pointer ${
+              alt={`image ${index + 1}`}
+              className={`object-contain w-full h-full rounded-xl cursor-pointer ${
                 selectedImage === image
                   ? "border-4 border-blue-500"
                   : "opacity-50"

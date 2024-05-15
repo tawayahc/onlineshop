@@ -22,9 +22,13 @@ function ProductCard({ data, isInWishlist, isInCart }) {
       </>
     );
   };
+
+  // const handleCardClick = () => {
+  //   history.push(`/product/${data.id}`); // Navigate to the product detail page
+  // };
   return (
     // TODO : Add to cart & wishlist
-    <a href="#" className="group">
+    <a href={`/products/${data.id}`} className="group">
       <div className="card card-compact w-60 min-96 shadow-xl">
         <figure className="h-40">
           <img src={data.thumbnail} alt={data.name} className="w-full h-full object-cover" />

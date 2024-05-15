@@ -5,7 +5,7 @@ import FilterSidebar from "../../components/Filter/FilterSidebar";
 import Pagination from "../../components/Product/Pagination";
 import { useRecoilValue, useSetRecoilState, useRecoilValueLoadable } from "recoil";
 import { loadingState, productsState } from "../../recoil/atom";
-import { fetchProducts,paginatedProductsState } from "../../recoil/products";
+import { fetchProducts,paginatedProductsState } from "../../recoil/productsList";
 
 function ProductListPage() {
   const setProducts = useSetRecoilState(productsState);

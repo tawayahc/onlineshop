@@ -29,7 +29,7 @@ function App() {
         <Route path="/" element={<Home />} errorElement={<ErrorPage />} />
 
         <Route path="/products" element={<Products />} />
-        <Route path="/product/:productId" element={<ProductDetails />} /> 
+        <Route path="/products/:productId" element={<ProductDetails />} /> 
         <Route path="/checkout" element={<Checkout />} />
 
         {/* User Pages */}

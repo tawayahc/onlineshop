@@ -30,14 +30,11 @@ function WishlistPage() {
       <div className="mt-5">
         {productsCount > 0 ? (
           <div className="grid grid-cols-5 gap-4">
-            {products.map((product, index) => (
+            {products.map((product) => (
               <ProductCard
-              key={index}
-              img={product.thumbnail}
-              title={product.title}
-              star={product.rating}
-              reviews={product.reviews}
-              price={product.price} />
+                key={product.id}
+                data={product}
+              />
             ))}
           </div>
         ) : (

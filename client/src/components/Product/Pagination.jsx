@@ -1,7 +1,7 @@
 import React from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { currentPageState, productsPerPageState,  } from '../../recoil/atom';
-import { filteredProductsSelector } from '../../recoil/products';
+import { filteredProductsSelector } from '../../recoil/productsList';
 
 export default function Pagination() {
   const [currentPage, setCurrentPage] = useRecoilState(currentPageState);

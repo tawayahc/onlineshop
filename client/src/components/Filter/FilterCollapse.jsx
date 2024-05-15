@@ -58,14 +58,6 @@ function FilterCollapse({ title, type }) {
     setSelectedValues([]); 
   };
 
-  const clearPrice = () => {
-    setFilters((prevFilters) => ({
-      ...prevFilters,
-      price: [], 
-    }));
-    setSelectedValues([]); 
-  }
-
   const renderStars = (rating) => {
     return [...Array(5)].map((_, index) =>
       index < rating ? (
