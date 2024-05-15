@@ -3,37 +3,43 @@ import Layout from "../../components/Layout/Layout";
 import ProductCard from "../../components/Product/ProductCard";
 import axios from "axios";
 
-function WishlistPage() {
-  const [productsCount, setProductsCount] = useState(0);
-  const [products, setProducts] = useState([]);
+function WishlistPage({ userId }) {
+  const [wishlist, setWishlist] = useState([]);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(
-          "https://dummyjson.com/products?limit=4"
-        );
-        if (response.data.products && response.data.products.length)
-          setProductsCount(response.data.products.length);
-          setProducts(response.data.products);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
+  //WARN : wishlist fetch database
+  // useEffect(() => {
+  //   const fetchWishlist = async () => {
+  //     try {
+  //       const response = await axios.get(`http://localhost:5000/wishlist/${userId}`);
+  //       setWishlist(response.data.map(item => ({ ...item, isInWishlist: true })));
+  //     } catch (error) {
+  //       console.error("Error fetching wishlist:", error);
+  //     }
+  //   };
 
-    fetchProducts();
-  }, []);
+  //   fetchWishlist();
+  // }, [userId]);
+
+  const handleWishlistChange = (productId, isInWishlist) => {
+    setWishlist(prevWishlist => 
+      prevWishlist.map(item => 
+        item.id === productId ? { ...item, isInWishlist } : item
+      )
+    );
+  };
 
   return (
     <div className="flex flex-col m-10">
       <div className="text-3xl font-noto">สินค้าในรายการโปรด</div>
       <div className="mt-5">
-        {productsCount > 0 ? (
+        {wishlist.length > 0 ? (
           <div className="grid grid-cols-5 gap-4">
-            {products.map((product) => (
+            {wishlist.map((product) => (
               <ProductCard
                 key={product.id}
                 data={product}
+                userId={userId}
+                onWishlistChange={handleWishlistChange}
               />
             ))}
           </div>
@@ -45,8 +51,8 @@ function WishlistPage() {
   );
 }
 
-export default () => (
+export default ({ userId }) => (
   <Layout>
-    <WishlistPage />
+    <WishlistPage userId={userId} />
   </Layout>
 );
