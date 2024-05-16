@@ -1,7 +1,12 @@
 import React from 'react'
 import LoginImage from '../assets/png/login-img.jpg'
+import { useSetRecoilState } from 'recoil';
+import { userIdState } from '../recoil/atom';
 
 export default function Login() {
+    // Store userID after login to use later, I think?
+    const setUserId = useSetRecoilState(userIdState);
+
     const handleSubmit = (event) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -23,6 +28,8 @@ export default function Login() {
                 if (data.status === "ok") {
                     // alert("Login Success");
                     localStorage.setItem('token', data.token);
+                    // WARN : right here
+                    setUserId(result.userId); 
                     window.location = '/';
                 } else {
                     alert("Login Failed");

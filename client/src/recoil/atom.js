@@ -48,17 +48,7 @@ export const currentProductDetailState = atom({
   },
 });
 
-export const userState = atom({
-  key: "userState",
+export const userIdState = atom({
+  key: 'userIdState',
   default: null,
-});
-
-export const cartState = atom({
-  key: "cartState",
-  default: [],
-});
-
-export const wishlistState = atom({
-  key: "wishlistState",
-  default: [],
 });
