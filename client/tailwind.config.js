@@ -22,7 +22,7 @@ export default {
             "secondary-content": "#141414",
 
             "accent": "#2F84FF",
-            "accent-content": "#010616",
+            "accent-content": "#F4F3F0",
 
             "neutral": "#21232b",
             "neutral-content": "#F4F3F0",
@@ -32,16 +32,12 @@ export default {
             "base-300": "#b5b4b2",
             "base-content": "#141414",
 
-            "info": "#22d3ee",
             "info-content": "#001014",
 
-            "success": "#00bc68",
             "success-content": "#000d04",
 
-            "warning": "#d39900",
             "warning-content": "#100800",
             
-            "error": "#cf284c",
             "error-content": "#fcd8d9",
           }
         },
