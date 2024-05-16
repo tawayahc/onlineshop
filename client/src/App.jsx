@@ -1,9 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/HomePage';
 
-import Login from './pages/Login'
-import Register from './pages/Register'
-
 import Products from './pages/ProductPages/ProductListPage';
 import ProductDetails from './pages/ProductPages/ProductDetailPage';
 
@@ -57,9 +54,6 @@ function App() {
           <Route path="payoption" element={<UserPayOptionPage />} />
           <Route path="orders" element={<UserOrder />} />   */}
         </Route>
-
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
       </Routes>
     </BrowserRouter>
     </>

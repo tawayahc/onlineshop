@@ -47,6 +47,12 @@ export default function Register() {
                     <p className='text-xl'>Enter your details below</p><br /><hr /><br />
 
                     <form onSubmit={ handleSubmit }>
+                    <div className="form-control">
+                            <label className="label">
+                                <span className="label-text">Name</span>
+                            </label>
+                            <input name="naem" type="text" placeholder="Name" className="input input-bordered" required />
+                        </div>
                         <div className="form-control">
                             <label className="label">
                                 <span className="label-text">Email</span>
