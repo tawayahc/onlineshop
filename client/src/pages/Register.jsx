@@ -1,8 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import LoginImage from "../assets/png/login-img.jpg";
+import axios from "axios";
 
 export default function Register() {
-  const handleSubmit = (event) => {
+  const [error, setError] = useState(null);
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     const jsonData = {
@@ -13,23 +16,26 @@ export default function Register() {
     };
 
     try {
-      fetch("http://localhost:3333/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(jsonData),
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.status === "ok") {
-            alert("Register Success");
-          } else {
-            alert("Register Failed");
-          }
-        });
+      const response = await axios.post(
+        "http://localhost:3333/register",
+        jsonData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response);
+
+      if (response.data.status === "ok") {
+        alert("Register Success");
+        window.location = "/login";
+      } else {
+        setError(response.data.message);
+      }
     } catch (error) {
       console.error("Error:", error);
+      setError("An error occurred during registration");
     }
   };
 
@@ -86,6 +92,9 @@ export default function Register() {
                   className="input input-bordered"
                   required
                 />
+                <span className="label-text-alt mt-2 text-red-500">
+                {error}
+                </span>
               </div>
 
               <div className="form-control">

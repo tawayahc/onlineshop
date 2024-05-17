@@ -1,16 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import logo from "../../assets/png/logo-no-background-white.png";
-import { useRecoilState } from "recoil";
-import { userIdState } from "../../recoil/atom";
 
 export default function Header() {
-  const [userId, setUserId] = useRecoilState(userIdState);
+  const [userId, setUserId] = useState(localStorage.getItem('userId'));
 
   const handleLogout = (event) => {
     event.preventDefault();
     localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     window.location = "/";
   };
+
+  
 
   return (
     <div>
@@ -39,9 +40,6 @@ export default function Header() {
           </label>
         </div>
         <div className="navbar-end mr-4">
-          {/* 
-          NOTE: Cart and Profile > Auth buttn 
-          */}
           {userId ? (
             <div className="flex">
               <a

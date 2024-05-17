@@ -1,41 +1,20 @@
-import React, { useEffect } from 'react'
-import Layout from '../components/Layout/Layout'
+import React, { useEffect, useState } from "react";
+import Layout from "../components/Layout/Layout";
+import axios from "axios";
 
 function HomePage() {
-  useEffect(() => {
-    const token = localStorage.getItem('token')
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
 
-    try {
-      fetch("http://localhost:3333/authentication", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json",
-              "Authorization": 'Bearer ' + token
-          }
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.status === "ok") {
-              // alert("Authentication Success");
-          } else {
-              // alert("Authentication Failed");
-              localStorage.removeItem('token')
-              window.location = '/login';
-          }
-      })
-      
-    } catch (error) {
-        console.error("Error:", error);
-    }
-  })
-  
   return (
-    <div>HomePage</div>
-  )
+    <div>
+      HomePage
+      {userId}
+    </div>
+  );
 }
 
 export default () => (
   <Layout>
-    <HomePage /> 
+    <HomePage />
   </Layout>
 );
