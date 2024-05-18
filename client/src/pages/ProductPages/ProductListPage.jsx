@@ -1,76 +1,30 @@
 import React, { useState, useEffect } from "react";
 import Layout from "../../components/Layout/Layout";
 import ProductCard from "../../components/Product/ProductCard";
-// import data from "../../db/data";
 import FilterSidebar from "../../components/Filter/FilterSidebar";
 import Pagination from "../../components/Product/Pagination";
-import axios from "axios";
+import { useRecoilValue, useSetRecoilState, useRecoilValueLoadable } from "recoil";
+import { loadingState, productsState } from "../../recoil/atom";
+import { fetchProducts,paginatedProductsState } from "../../recoil/productsList";
 
 function ProductListPage() {
-  const [selectedFilters, setSelectedFilters] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage, setProductsPerPage] = useState(20);
+  const setProducts = useSetRecoilState(productsState);
+  const setLoading = useSetRecoilState(loadingState);
+  const productsLoadable = useRecoilValueLoadable(fetchProducts);
+  const displayedProducts = useRecoilValue(paginatedProductsState);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        //NOTE : Fetch data from database
-        setLoading(true);
-        const response = await axios.get("https://dummyjson.com/products?limit=100");
-        if (response.data.products && response.data.products.length)
-          setProducts(response.data.products);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  // Pagination
-  const handlePagination = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-  
-  const indexOfLastProduct = currentPage * productsPerPage;
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(
-    indexOfFirstProduct,
-    indexOfLastProduct
-  )
-
-  // Fiter section
-  const handleChange = (event) => {
-    setSelectedCategory(event.target.value);
-  };
-
-  function filteredData(data, selected) {
-    let fileredProducts = data;
-
-    if (selected) {
-      fileredProducts = fileredProducts.filter(
-        ({ category, brand, price, rating }) =>
-          category === selected ||
-          brand === selected ||
-          price === selected ||
-          rating === selected
-      );
+    if (productsLoadable.state === "loading") {
+      setLoading(true);
+    } else if (productsLoadable.state === "hasValue") {
+      setProducts(productsLoadable.contents);
+      setLoading(false);
+    } else if (productsLoadable.state === "hasError") {
+      console.error(productsLoadable.contents);
+      setLoading(false);
     }
+  }, [productsLoadable, setProducts, setLoading]);
 
-    return fileredProducts.map(({ id, img, title, star, reviews, price }) => (
-      <ProductCard
-        key={id}
-        img={img}
-        title={title}
-        star={star}
-        reviews={reviews}
-        price={price}
-      />
-    ));
-  }
 
   return (
     <div>
@@ -83,30 +37,22 @@ function ProductListPage() {
           <div>
             <h2 className="text-3xl font-bold">รายการสินค้า</h2>
           </div>
-          {loading ? (
+          {productsLoadable.state === "loading" ? (
             <div className="flex justify-center h-96">
               <span className="loading loading-spinner loading-lg"></span>
             </div>
           ) : (
             <div className="grid grid-auto-fit-[15rem] gap-4 my-4">
-              {currentProducts.map((product, index) => (
+              {displayedProducts.map((product) => (
                 <ProductCard
-                  key={index}
-                  img={product.thumbnail}
-                  title={product.title}
-                  star={product.rating}
-                  reviews={product.reviews}
-                  price={product.price}
+                  key={product.id}
+                  data={product}
                 />
               ))}
             </div>
           )}
-            <Pagination
-              length={products.length}
-              productsPerPage={productsPerPage}
-              handlePagination={handlePagination}
-              currentPage={currentPage}
-            />
+          <Pagination
+          />
         </div>
       </div>
     </div>

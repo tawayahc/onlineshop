@@ -1,47 +1,79 @@
 import React, { useState, useEffect } from "react";
+import DualSlider from "./DualSlider";
+import { BsStarFill, BsStar } from "react-icons/bs";
+import { useRecoilState } from "recoil";
+import { selectedFiltersState } from "../../recoil/atom";
+import axios from "axios";
 
-function FilterCollapse({ title, type, data, onFilterChange }) {
+function FilterCollapse({ title, type }) {
   const [selectedValues, setSelectedValues] = useState([]);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
+  const [filters, setFilters] = useRecoilState(selectedFiltersState);
+  const [categories, setCategories] = useState([]);
+  const [rating] = useState([5, 4, 3, 2, 1]);
+  
+  //WARN: categories
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch categories
+        const response = await axios.get(
+          "https://dummyjson.com/products/categories"
+        );
+        setCategories(response.data || []);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setCategories([]);
+      }
+    };
 
-  // Function to handle price range change
-  const handlePriceRangeChange = (event) => {
-    const { name, value } = event.target;
-    setPriceRange((prevState) => ({
-      ...prevState,
-      [name]: value,
+    fetchData();
+  }, []);
+
+  const handleCheckboxChange = (value) => {
+    const updatedValues = selectedValues.includes(value)
+      ? selectedValues.filter((item) => item !== value)
+      : [...selectedValues, value];
+
+    setSelectedValues(updatedValues);
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [type]: updatedValues,
     }));
   };
-  // Function to handle checkbox toggle (category, brand, rating)
-  const handleCheckboxChange = (value) => {
-    const updatedValues = [...selectedValues];
-    if (updatedValues.includes(value)) {
-      updatedValues.splice(updatedValues.indexOf(value), 1);
-    } else {
-      updatedValues.push(value);
-    }
-    setSelectedValues(updatedValues);
-    onFilterChange(type, updatedValues);
-  };
-  // WARN : Fetch data from database or client side
-  // NOTE: Fetch data from database (is this neccesary?)
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     const response = await fetch('your-api-endpoint');
-  //     const data = await response.json();
-  //   };
+  const handleRatingChange = (newRating) => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      rating: [newRating], // Since it's a radio button, only one rating can be selected at a time
+    }));
 
-  //   fetchData();
-  // }, []);
+    // Update the local state to reflect the selected value for the radio buttons
+    setSelectedValues([newRating]);
+  };
+
+  const clearRatings = () => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      rating: [], 
+    }));
+    setSelectedValues([]); 
+  };
+
+  const renderStars = (rating) => {
+    return [...Array(5)].map((_, index) =>
+      index < rating ? (
+        <BsStarFill key={index} className="text-warning" />
+      ) : (
+        <BsStar key={index} className="text-gray-400" />
+      )
+    );
+  };
 
   const content = () => {
     switch (type) {
       case "category":
-      case "brands":
-      case "review":
         return (
           <div className="flex flex-wrap flex-col">
-            {data.map((item) => (
+            {categories.map((item) => (
               <div key={item} className="flex cursor-pointer mr-2 mb-2">
                 <input
                   type="checkbox"
@@ -54,47 +86,33 @@ function FilterCollapse({ title, type, data, onFilterChange }) {
             ))}
           </div>
         );
-        //FIX: Change Slider
-      case "price":
+      case "review":
         return (
-          <div className="grid grid-cols-2 gap-2">
-            <div className="form-control">
-              <label className="label">ราคาต่ำสุด</label>
-              <input
-                type="number"
-                name="min"
-                value={priceRange.min}
-                onChange={handlePriceRangeChange}
-                className="input input-bordered"
-              />
-            </div>
-
-            <div className="form-control">
-              <label className="label">ราคาสูงสุด</label>
-              <input
-                type="number"
-                name="max"
-                value={priceRange.max}
-                onChange={handlePriceRangeChange}
-                className="input input-bordered"
-              />
-            </div>
-
-            <div className="form-control col-span-2">
-              <label className="label">Range</label>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={priceRange.min}
-                onChange={(e) =>
-                  setPriceRange({ ...priceRange, min: e.target.value })
-                }
-                className="range range-primary range-sm"
-              />
-            </div>
+          <div className="flex flex-wrap flex-col">
+            {rating.map((item) => (
+              <div key={item} className="form-control cursor-pointer mr-2 mb-2">
+                <label className="flex items-center cursor-pointer ">
+                  <input
+                    type="radio"
+                    name="radio-10"
+                    className="radio"
+                    checked={selectedValues.includes(item)}
+                    onChange={() => handleRatingChange(item)}
+                  />
+                  <div className="flex flex-row ml-2">{renderStars(item)}</div>
+                </label>
+              </div>
+            ))}
+            <button
+              className="btn btn-outline btn-accent btn-sm"
+              onClick={clearRatings}
+            >
+              Clear
+            </button>
           </div>
         );
+      case "price":
+        return <DualSlider />;
       default:
         return null;
     }
