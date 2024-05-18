@@ -17,7 +17,7 @@ export default function Register() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3333/register",
+        "http://localhost:3333/auth/register",
         jsonData,
         {
           headers: {

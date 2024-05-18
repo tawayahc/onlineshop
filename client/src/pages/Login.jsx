@@ -1,15 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import LoginImage from "../assets/png/login-img.jpg";
-import { useSetRecoilState, useRecoilValue } from "recoil";
-import { userIdState } from "../recoil/atom";
 import axios from "axios";
 
 export default function Login() {
-  // Store userID after login to use later, I think?
-  const setUserId = useSetRecoilState(userIdState);
-  const userId = useRecoilValue(userIdState);
-  console.log("Before Login:",userId);
-
+  const [error, setError] = useState(null);
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -20,7 +14,7 @@ export default function Login() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3333/login",
+        "http://localhost:3333/auth/login",
         jsonData,
         {
           headers: {
@@ -28,17 +22,18 @@ export default function Login() {
           },
         }
       );
-    //   console.log(response);
+      //   console.log(response);
       if (response.data.status === "ok") {
         alert("Login Success");
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("userId", response.data.userId); 
+        localStorage.setItem("userId", response.data.userId);
         // WARN : right here
         // setUserId(response.data.userId);
         // console.log("After Login:",userId);
         window.location = "/";
       } else {
-        alert("Login Failed");
+        // alert("Login Failed");
+        setError(response.data.message);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -85,11 +80,17 @@ export default function Login() {
                   className="input input-bordered"
                   required
                 />
-                <label className="label">
-                  <a href="#" className="label-text-alt link link-hover">
-                    Forgot password?
-                  </a>
-                </label>
+
+                <div className="label">
+                  <span className="label-text-alt">
+                    <a href="#" className="label-text-alt link link-hover">
+                      Forgot password?
+                    </a>
+                  </span>
+                  <span className="label-text-alt text-red-500 ">
+                    {error}
+                  </span>
+                </div>
               </div>
 
               <div className="form-control mt-8">
@@ -104,7 +105,6 @@ export default function Login() {
                 </label>
               </div>
             </form>
-            
           </div>
         </div>
       </div>
