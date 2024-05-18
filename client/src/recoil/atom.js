@@ -52,3 +52,13 @@ export const userIdState = atom({
   key: 'userIdState',
   default: null,
 });
+
+export const cartState = atom({
+  key: 'cartState',
+  default: [],
+});
+
+export const wishlistState = atom({
+  key: 'wishlistState',
+  default: [],
+});

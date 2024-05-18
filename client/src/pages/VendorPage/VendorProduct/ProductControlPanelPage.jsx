@@ -26,14 +26,14 @@ function ProductControlPanelPage() {
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    fetch('http://localhost:3333/see')
+    fetch('http://localhost:3333/admin/see')
       .then(response => response.json())
       .then(data => setProducts(data))
       .catch(error => console.error('Error fetching products:', error));
   }, []);
 
   useEffect(() => {
-    fetch('http://localhost:3333/category-see')
+    fetch('http://localhost:3333/admin/category-see')
       .then(response => response.json())
       .then(data => setProductCategories(data))
       .catch(error => console.error('Error fetching products:', error));
@@ -51,7 +51,7 @@ function ProductControlPanelPage() {
     };
 
     try {
-      const response = await fetch('http://localhost:3333/add', {
+      const response = await fetch('http://localhost:3333/admin/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,7 +72,7 @@ function ProductControlPanelPage() {
 
   const deleteSelectedProducts = async () => {
     try {
-      const response = await fetch('http://localhost:3333/delete', {
+      const response = await fetch('http://localhost:3333/admin/delete', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ function ProductControlPanelPage() {
     };
 
     try {
-      const response = await fetch('http://localhost:3333/update', {
+      const response = await fetch('http://localhost:3333/admin/update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
