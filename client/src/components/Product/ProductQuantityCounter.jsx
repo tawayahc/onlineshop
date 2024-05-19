@@ -32,7 +32,7 @@ const ProductQuantityCounter = ({ initialCount = 1, minCount = 1, maxCount = 100
       </button>
       <input
         type="text"
-        className="input w-12 mx-2 text-center border border-gray-300 rounded-md "
+        className="input w-16 mx-2 text-center border border-gray-300 rounded-md "
         value={count}
         onChange={handleChange}
       />

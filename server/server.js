@@ -12,10 +12,12 @@ var connection = require("./db");
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const productRoutes = require('./routes/products');
+const cartRoutes = require('./routes/cart');
 
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/products', productRoutes);
+app.use('/cart', cartRoutes);
 
 // NOTE : get categories, I try to call this route in products but nothing happen
 // I need to reorder the routes, WTF just happen it works now but

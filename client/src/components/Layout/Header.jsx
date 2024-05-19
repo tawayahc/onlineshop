@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import logo from "../../assets/png/logo-no-background-white.png";
+import { totalPriceState, totalQuantityState } from "../../recoil/cart";
+import { useRecoilValue } from "recoil";
 
 export default function Header() {
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
-
+  const totalPrice  = useRecoilValue(totalPriceState);
+  const totalQuantity = useRecoilValue(totalQuantityState);
   const handleLogout = (event) => {
     event.preventDefault();
     localStorage.removeItem("token");
@@ -87,7 +90,7 @@ export default function Header() {
                         d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
                       />
                     </svg>
-                    <span className="badge badge-sm indicator-item">8</span>
+                    <span className="badge badge-sm indicator-item">{totalQuantity}</span>
                   </div>
                 </summary>
                 <div
@@ -96,9 +99,9 @@ export default function Header() {
                 >
                   <div className="card-body">
                     <span className="font-bold text-lg text-primary">
-                      8 Items
+                      {totalQuantity} Items
                     </span>
-                    <span className="text-info">Subtotal: $999</span>
+                    <span className="text-info">Subtotal: ฿{totalPrice}</span>
                     <div className="card-actions">
                       <a className="btn btn-accent btn-block" href="/cart">
                         ดูตะกร้า

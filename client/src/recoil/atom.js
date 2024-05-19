@@ -47,8 +47,3 @@ export const currentProductDetailState = atom({
     productImages: [],
   },
 });
-
-export const userIdState = atom({
-  key: 'userIdState',
-  default: null,
-});
