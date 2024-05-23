@@ -1,5 +1,6 @@
 import React from "react";
 import { LogoSVG } from "../../assets/images"
+
 export default function Footer() {
   return (
     <div>

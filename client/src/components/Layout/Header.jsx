@@ -129,6 +129,8 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <hr className="border-t border-gray-600" /> {/* Add horizontal line */}
+      <div className="w-px bg-gray-600 h-80 mx-3" style={{ position: "absolute", top: 83, bottom: 0, left: 400 }}></div> {/* Add vertical line */}
     </div>
   );
 }
