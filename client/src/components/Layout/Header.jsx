@@ -3,8 +3,8 @@ import React from "react";
 export default function Header() {
   return (
     <div>
-      <div className="navbar bg-base-100">
-        <div className="navbar-start">
+      <div className="navbar bg-base-100" style={{ marginTop: '10px' }}>
+        <div className="navbar-start"  style={{ marginLeft: '150px' }}>
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
               <svg
@@ -24,13 +24,13 @@ export default function Header() {
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52"
+              className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52" 
             >
               <li>
-                <a>Item 1</a>
+                <a className="text-2xl">Home</a>
               </li>
               <li>
-                <a>Parent</a>
+                <a>Contact</a>
                 <ul className="p-2">
                   <li>
                     <a>Submenu 1</a>
@@ -41,20 +41,23 @@ export default function Header() {
                 </ul>
               </li>
               <li>
-                <a>Item 3</a>
+                <a>About</a>
+              </li>
+              <li>
+                <a>Sign Up</a>
               </li>
             </ul>
           </div>
-          <a className="btn btn-ghost text-xl">GadgetHouse</a>
+          <a className="btn btn-ghost text-2xl">GadgetHouse</a>
         </div>
         <div className="navbar-center hidden lg:flex">
-          <ul className="menu menu-horizontal px-1">
+          <ul className="menu menu-horizontal px-1" style={{ marginRight: '500px' }}>
             <li>
-              <a>Item 1</a>
+              <a className="text-base">Home</a>
             </li>
             <li>
               <details>
-                <summary>Parent</summary>
+                <summary className="text-base ms-6">Contact</summary>
                 <ul className="p-2">
                   <li>
                     <a>Submenu 1</a>
@@ -66,19 +69,22 @@ export default function Header() {
               </details>
             </li>
             <li>
-              <a>Item 3</a>
+              <a className="text-base ms-6">About</a>
+            </li>
+            <li>
+              <a className="text-base ms-6">Sign Up</a>
             </li>
           </ul>
         </div>
-        <div className="navbar-end">
+        <div className="navbar-end " style={{ marginRight: '165px' }}>
           <div className="form-control">
             <input
               type="text"
               placeholder="Search"
-              className="input input-bordered w-24 md:w-auto"
+              className="input input-bordered w-24 h-8 md:w-64 md:h-10 rounded-md"
             />
           </div>
-          <div className="dropdown dropdown-end">
+          <div className="dropdown dropdown-end ms-">
             <div
               tabIndex={0}
               role="button"
@@ -118,7 +124,7 @@ export default function Header() {
             </div>
           </div>
 
-          <div className="dropdown dropdown-end">
+          <div className="dropdown dropdown-end ms-2">
             <div
               tabIndex={0}
               role="button"
@@ -151,6 +157,8 @@ export default function Header() {
           </div>
         </div>
       </div>
+      <hr className="border-t border-gray-600" /> {/* Add horizontal line */}
+      <div className="w-px bg-gray-600 h-80 mx-3" style={{ position: "absolute", top: 83, bottom: 0, left: 400 }}></div> {/* Add vertical line */}
     </div>
   );
 }
