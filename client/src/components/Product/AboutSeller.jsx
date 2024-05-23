@@ -2,8 +2,7 @@ import React from "react";
 
 function AboutSeller() {
   return (
-    // TODO : Get data from database
-    // NOTE: ต้องแยกด้วยว่าเป็น official ไหม
+    // TODO : Get data from database Seller
     <div className="p-4">
       <div className="card card-side bg-base-100 shadow-xl">
         <figure>
