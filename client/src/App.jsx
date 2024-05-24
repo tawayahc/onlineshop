@@ -17,8 +17,9 @@ import UserPayOptionPage from './pages/UserPages/UserPayOptionPage';
 import WishlistPage from './pages/UserPages/WishlistPage';
 
 import ProductControlPanelPage from './pages/VendorPage/ProductControlPanelPage';
-import Register from './pages/Register';
-import Login from './pages/Login';
+import Register from './pages/Auth/Register';
+import Login from './pages/Auth/Login';
+import AdminLogin from './pages/Auth/AdminLogin';
 
 function App() {
 
@@ -30,6 +31,8 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        <Route path="/admin" element={<AdminLogin />} />
 
         <Route path="/products" element={<Products />} />
         <Route path="/products/:productId" element={<ProductDetails />} /> 

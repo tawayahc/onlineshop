@@ -11,11 +11,11 @@ import {
 import ProductQuantityCounter from "./ProductQuantityCounter";
 import ProductImage from "./ProductImage";
 import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
-import {
-  currentProductDetailState,
-} from "../../recoil/productDetail";
+import { currentProductDetailState } from "../../recoil/productDetail";
 import axios from "axios";
 import useCartActions from "../../API/userCartActions";
+import { cartStatusState } from "../../recoil/cart";
+import Toast from "../../components/Toast";
 
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
@@ -40,7 +40,7 @@ const renderStars = (rating) => {
 
 function debounce(func, wait) {
   let timeout;
-  return function(...args) {
+  return function (...args) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
@@ -52,9 +52,12 @@ function ProductDetailLayout({ productId }) {
   const [productDetail, setProductDetail] = useRecoilState(
     currentProductDetailState
   );
-  const { addToCart } = useCartActions(userId);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+
+  const { addToCart } = useCartActions(userId);
+  const status = useRecoilValue(cartStatusState);
+  const setStatus = useSetRecoilState(cartStatusState);
 
   const handleClick = (buttonName) => {
     setActiveButton(buttonName);
@@ -62,12 +65,12 @@ function ProductDetailLayout({ productId }) {
 
   const debouncedAddToCart = debounce((value) => {
     addToCart(productDetail.ProductID, value);
-  }, 300); 
-  
+  }, 300);
+
   const handleAddToCart = (value) => {
     debouncedAddToCart(value);
   };
-  
+
   useEffect(() => {
     const fetchData = async () => {
       if (!productId) return;
@@ -88,6 +91,17 @@ function ProductDetailLayout({ productId }) {
     fetchData();
   }, [productId, setProductDetail, setLoading]);
 
+  useEffect(() => {
+    if (status.visible) {
+      const timer = setTimeout(() => {
+        setStatus({ visible: false, message: "", type: "" });
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [status, setStatus]);
+
+  console.log(status.type);
   // const thumbnailImages =
   //   productDetail?.ProductImages.map((image) => (
   //     <img
@@ -106,6 +120,11 @@ function ProductDetailLayout({ productId }) {
   //WARN : properties name
   return (
     <div className="flex flex-col">
+      <Toast
+        message={status.message}
+        type={status.type}
+        onClose={() => setStatus({ visible: false, message: "", type: "" })}
+      />
       {loading ? (
         <div className="flex justify-center h-96">
           <span className="loading loading-spinner loading-lg"></span>
@@ -146,7 +165,8 @@ function ProductDetailLayout({ productId }) {
                   }}
                 />
                 <div className="flex">
-                  <button className="btn btn-accent btn-wide mr-4"
+                  <button
+                    className="btn btn-accent btn-wide mr-4"
                     onClick={() => handleAddToCart(quantity)}
                   >
                     <BsBagFill /> Add to cart
@@ -186,7 +206,9 @@ function ProductDetailLayout({ productId }) {
               </button>
             </div>
             {activeButton === "Description" && (
-             <div className="p-4 bg-gray-200 rounded">{productDetail.ProductDescription}</div>
+              <div className="p-4 bg-gray-200 rounded">
+                {productDetail.ProductDescription}
+              </div>
             )}
             {activeButton === "Review" && <Review />}
             {activeButton === "AboutSeller" && <AboutSeller />}

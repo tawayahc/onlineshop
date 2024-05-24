@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import LoginImage from "../assets/png/login-img.jpg";
+import LoginImage from "../../assets/png/login-img.jpg";
 import axios from "axios";
 
 export default function Login() {

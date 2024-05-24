@@ -13,7 +13,7 @@ export const cartStatusState = atom({
 export const totalQuantityState = selector({
   key: "totalQuantityState",
   get: ({ get }) => {
-    const cart = get(cartState) || [];
+    const cart = get(cartState);
     return cart.reduce(
       (total, item) =>
         total +
@@ -26,7 +26,7 @@ export const totalQuantityState = selector({
 export const totalPriceState = selector({
   key: "totalPriceState",
   get: ({ get }) => {
-    const cart = get(cartState) || [];
+    const cart = get(cartState);
     return cart.reduce(
       (total, item) =>
         total +

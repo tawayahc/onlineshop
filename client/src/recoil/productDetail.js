@@ -4,6 +4,3 @@ export const currentProductDetailState = atom({
   key: 'currentProductDetail',
   default: [],
 })
-
-console.log(currentProductDetailState);
-
