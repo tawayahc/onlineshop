@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const ProductQuantityCounter = ({ initialCount = 1, minCount = 1, maxCount = 100, onQuantityChange }) => {
+const ProductQuantityCounter = ({ initialCount, minCount, maxCount, onQuantityChange }) => {
   const [count, setCount] = useState(initialCount);
 
   const handleDecrement = () => {

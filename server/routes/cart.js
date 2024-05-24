@@ -77,10 +77,11 @@ router.get("/:userId", async (req, res) => {
 
 // Add a product to the cart
 router.post("/", async (req, res) => {
-  const { userId, productId } = req.body;
+  const { userId, productId, quantity } = req.body;
+  console.log(productId, quantity);
   db.execute(
-    "INSERT INTO cart (ClientID, ProductID, Quantity) VALUES (?, ?, 1) ON DUPLICATE KEY UPDATE Quantity = Quantity + 1",
-    [userId, productId],
+    "INSERT INTO cart (ClientID, ProductID, Quantity) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE Quantity = Quantity + VALUES(Quantity)",
+    [userId, productId, quantity],
     function (err, results, fields) {
       if (err) {
         res.json({ status: "error", message: err });

@@ -15,16 +15,6 @@ export const categoriesState = atom({
   default: [],
 });
 
-export const currentPageState = atom({
-  key: "currentPageState",
-  default: 1,
-});
-
-export const productsPerPageState = atom({
-  key: "productsPerPageState",
-  default: 20,
-});
-
 export const selectedFiltersState = atom({
   key: "selectedFiltersState",
   default: {
@@ -34,21 +24,3 @@ export const selectedFiltersState = atom({
   },
 });
 
-export const currentProductDetailState = atom({
-  key: "currentProductDetail",
-  default: {
-    id: null,
-    name: "Default Product Name",
-    description: "Default Product Description",
-    price: 0,
-    quantityAvailable: 0,
-    ratingAvg: 0,
-    category: "Default Category",
-    shop: {
-      ShopName: "Default Shop Name",
-      ShopDescription: "Default Shop Description",
-      RatingAvg: 0,
-    },
-    productImages: [],
-  },
-});

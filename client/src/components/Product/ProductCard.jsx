@@ -1,10 +1,13 @@
 import React from "react";
 import { BsBagFill, BsStarFill, BsStarHalf, BsStar } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import useCartActions from "../../API/userCartActions";
+import GenericImagePlaceholder from "../../assets/svg/generic-image-placeholder.svg";
 
 function ProductCard({ data, onWishlistChange }) {
   const navigate = useNavigate();
+  const userId = localStorage.getItem("userId");
+  const { addToCart } = useCartActions(userId);
   const isInWishlist = data.isInWishlist;
 
   const renderStars = (rating) => {
@@ -21,7 +24,6 @@ function ProductCard({ data, onWishlistChange }) {
         {[...Array(emptyStars)].map((_, index) => (
           <BsStar
             key={index + fullStars + (hasHalfStar ? 1 : 0)}
-          
             className="text-gray-400"
           />
         ))}
@@ -30,7 +32,11 @@ function ProductCard({ data, onWishlistChange }) {
   };
 
   const handleCardClick = () => {
-    navigate(`/products/${data.id}`);
+    navigate(`/products/${data.ProductID}`);
+  };
+
+  const handleAddToCart = () => {
+    addToCart(data.ProductID, 1);
   };
   return (
     // TODO : Add to cart & wishlist
@@ -38,7 +44,7 @@ function ProductCard({ data, onWishlistChange }) {
       <div className="card card-compact w-60 min-96 shadow-xl">
         <figure className="h-40">
           <img
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.jpg"
+            src={GenericImagePlaceholder}
             alt={data.name}
             className="w-full h-full object-cover cursor-pointer"
             onClick={handleCardClick}
@@ -84,7 +90,10 @@ function ProductCard({ data, onWishlistChange }) {
             </div>
             <div className="flex flex-row justify-between w-full items-center">
               <p className="text-xl">${data.Price}</p>
-              <button className="btn btn-accent btn-sm">
+              <button
+                className="btn btn-accent btn-sm"
+                onClick={handleAddToCart}
+              >
                 <BsBagFill /> Add to cart
               </button>
             </div>

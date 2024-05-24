@@ -1,17 +1,17 @@
 // useCartActions.js
 import { useRecoilState } from "recoil";
 import axios from "axios";
-import { cartState } from "../recoil/cart";
+import { cartState,cartStatusState } from "../recoil/cart";
 
 const url = "http://localhost:3333/";
 const useCartActions = (userId) => {
   const [cart, setCart] = useRecoilState(cartState);
+  const [status, setStatus] = useRecoilState(cartStatusState);
   const fetchCart = async () => {
     try {
       const response = await axios.get(url + "cart/" + userId);
       if (response.data.status === "ok") {
         setCart(response.data.data);
-        // console.log("Cart data fetched successfully:", response.data.data);
       } else {
         console.error("Error fetching cart data:", response.data.message);
       }
@@ -20,14 +20,17 @@ const useCartActions = (userId) => {
     }
   };
 
-  const addToCart = async (product) => {
+  const addToCart = async (product, quantity) => {
     try {
       await axios.post(url + "cart", {
         userId,
-        productId: product.ProductID,
+        productId: product,
+        quantity,
       });
+      setStatus({visible: true, type: 'success', message: 'เพิ่มสินค้าลงตะกร้าแล้ว'});
       await fetchCart();
     } catch (error) {
+      setStatus({ visible: true, type: 'error', message: 'Error adding to cart.' });
       console.error("Error adding to cart:", error);
     }
   };

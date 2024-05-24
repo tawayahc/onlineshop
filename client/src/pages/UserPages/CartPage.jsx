@@ -7,7 +7,7 @@ import {
   cartState,
   totalPriceState,
 } from "../../recoil/cart";
-import { useRecoilValue, useRecoilValueLoadable } from "recoil";
+import { useRecoilValue } from "recoil";
 
 function CartPage() {
   const userId = useState(localStorage.getItem("userId"));
@@ -40,17 +40,22 @@ function CartPage() {
           Back to Shop
         </button>
       </div>
-      <div className="flex flex-row justify-between mx-10 2xl:mx-48 ">
-        <div className="overflow-x-auto mt-4 w-[843px]">
+      {cart.length === 0 ? (
+        <div className="flex flex-col justify-center content-center items-center w-1/3 mx-auto">
+          <h1 className="text-3xl mt-10">Your Cart is Empty</h1>
+        </div>
+      ): (
+        <div className="flex flex-row justify-between mx-10 2xl:mx-48 ">
+        <div className="overflow-x-auto mt-4">
           <table className="table ">
             {/* head */}
             <thead>
               <tr>
-                <th className="w-[390px]">สินค้า</th>
-                <th className="w-[85px]">ราคา</th>
-                <th className="w-[193px]">จำนวน</th>
-                <th className="w-[95px]">ราคาทั้งหมด</th>
-                <th className="w-[80px]"></th>
+                <th >สินค้า</th>
+                <th >ราคา</th>
+                <th >จำนวน</th>
+                <th >ราคาทั้งหมด</th>
+                <th ></th>
               </tr>
             </thead>
             <tbody>
@@ -115,6 +120,7 @@ function CartPage() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }

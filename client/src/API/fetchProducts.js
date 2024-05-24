@@ -22,7 +22,7 @@ const fetchProductsList = () => {
   }, [setProducts]);
 
   const fetchProductWithCategories = useCallback(async ({ filters }) => {
-    console.log(filters);
+    // console.log(filters);
     try {
       const response = await axios.get(url + "products/category", {
         params: filters,

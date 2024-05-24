@@ -3,10 +3,15 @@ import Layout from "../../components/Layout/Layout";
 import ProductCard from "../../components/Product/ProductCard";
 import FilterSidebar from "../../components/Filter/FilterSidebar";
 import Pagination from "../../components/Product/Pagination";
-import { useRecoilValue, useSetRecoilState,useRecoilState } from "recoil";
-import { productsState,selectedFiltersState } from "../../recoil/atom";
-import { paginatedProductsState,filteredProductsSelector } from "../../recoil/productsList";
+import { useRecoilValue, useSetRecoilState, useRecoilState } from "recoil";
+import { productsState, selectedFiltersState } from "../../recoil/atom";
+import {
+  paginatedProductsState,
+  filteredProductsSelector,
+} from "../../recoil/productsList";
 import fetchProductsList from "../../API/fetchProducts";
+import { cartStatusState } from "../../recoil/cart";
+import Toast from "../../components/Toast";
 
 function ProductListPage() {
   // const displayedProducts = useRecoilValue(paginatedProductsState);
@@ -17,10 +22,13 @@ function ProductListPage() {
 
   const [categories] = useRecoilState(selectedFiltersState);
 
+  const status = useRecoilValue(cartStatusState);
+  const setStatus = useSetRecoilState(cartStatusState);
+
   useEffect(() => {
     setLoading(true);
     fetchProducts().finally(() => setLoading(false));
-  },[]);
+  }, []);
 
   useEffect(() => {
     const fetchFilteredProducts = async () => {
@@ -32,10 +40,28 @@ function ProductListPage() {
 
     fetchFilteredProducts();
   }, [categories, fetchProductWithCategories, setProducts]);
-  
+
+  useEffect(() => {
+    if (status.visible) {
+      const timer = setTimeout(() => {
+        setStatus({ visible: false, message: "", type: "" });
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [status, setStatus]);
+
   return (
     <div>
+      {status.visible && (
+          <Toast
+            message={status.message}
+            type={status.type}
+            onClose={() => setStatus({ visible: false, message: "", type: "" })}
+          />
+        )}
       <div className="flex flex-row w-full">
+        
         <div>
           <h1 className="text-3xl font-bold p-3 font-noto">ตั้งค่าการค้นหา</h1>
           <FilterSidebar />
@@ -51,16 +77,11 @@ function ProductListPage() {
           ) : (
             <div className="grid grid-auto-fit-[15rem] gap-4 my-4">
               {products.map((product, index) => (
-                <ProductCard
-                  index={index}
-                  key={product.id}
-                  data={product}
-                />
+                <ProductCard index={index} key={product.id} data={product} />
               ))}
             </div>
           )}
-          <Pagination
-          />
+          <Pagination />
         </div>
       </div>
     </div>

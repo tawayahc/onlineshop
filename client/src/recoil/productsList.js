@@ -1,11 +1,17 @@
-import { selector } from "recoil";
+import { selector,atom } from "recoil";
 import {
   productsState,
   selectedFiltersState,
-  currentPageState,
-  productsPerPageState,
 } from "./atom";
 
+export const currentPageState = atom({
+  key: "currentPageState",
+  default: 1,
+});
+export const productsPerPageState = atom({
+  key: "productsPerPageState",
+  default: 9,
+})
 // WARN: code below is not used.
 export const filteredProductsSelector = selector({
   key: "filteredProductsSelector",

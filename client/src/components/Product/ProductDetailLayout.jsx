@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import AboutSeller from "./AboutSeller";
 import Review from "./Review";
 import {
@@ -10,20 +10,12 @@ import {
 } from "react-icons/bs";
 import ProductQuantityCounter from "./ProductQuantityCounter";
 import ProductImage from "./ProductImage";
+import { useRecoilValue, useRecoilState, useSetRecoilState } from "recoil";
 import {
-  useRecoilValue,
-  useRecoilState,
-} from "recoil";
-import { currentProductDetailState } from "../../recoil/atom";
-import {
-  productDetailSelector,
-  loadingCurrentProductDetail,
+  currentProductDetailState,
 } from "../../recoil/productDetail";
 import axios from "axios";
-
-const Description = ({ descriptionDetail }) => {
-  return <div className="p-4 bg-gray-200 rounded">{descriptionDetail}</div>;
-};
+import useCartActions from "../../API/userCartActions";
 
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
@@ -46,56 +38,71 @@ const renderStars = (rating) => {
   );
 };
 
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
 function ProductDetailLayout({ productId }) {
+  const userId = localStorage.getItem("userId");
   const [activeButton, setActiveButton] = useState("Description");
-  const [productDetail, setProductDetail] = useRecoilState(currentProductDetailState);
-  const [loading, setLoading] = useRecoilState(loadingCurrentProductDetail);
+  const [productDetail, setProductDetail] = useRecoilState(
+    currentProductDetailState
+  );
+  const { addToCart } = useCartActions(userId);
+  const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
 
   const handleClick = (buttonName) => {
     setActiveButton(buttonName);
-  }
-// WARN : API
+  };
+
+  const debouncedAddToCart = debounce((value) => {
+    addToCart(productDetail.ProductID, value);
+  }, 300); 
+  
+  const handleAddToCart = (value) => {
+    debouncedAddToCart(value);
+  };
+  
   useEffect(() => {
     const fetchData = async () => {
       if (!productId) return;
       setLoading(true);
       try {
-        const response = await axios.get(`https://dummyjson.com/products/${productId}`);
-        setProductDetail(prevState => ({
-          ...prevState,
-          name: response.data.title,
-          description: response.data.description,
-          price: response.data.price,
-          quantityAvailable: response.data.stock,
-          ratingAvg: response.data.rating,
-          shopName: response.data.brand,
-          productImages: response.data.images,
-        }));
+        const response = await axios.get(
+          `http://localhost:3333/products/${productId}`
+        );
+        setProductDetail(response.data.data[0]);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching product details:", error);
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchData();
   }, [productId, setProductDetail, setLoading]);
 
-  const product = useRecoilValue(productDetailSelector);
+  // const thumbnailImages =
+  //   productDetail?.ProductImages.map((image) => (
+  //     <img
+  //       key={image.ProductimageID}
+  //       src={image.Productimagecode}
+  //       alt={image.ProductimageName}
+  //     />
+  //   )) || [];
 
-  //NOTE : it shhould suit with our db
-  // const thumbnailImages = product?.productImages?.map(image => image.Productimagecode) || [];
-  const thumbnailImages = product?.productImages || [];
-
-  /*
-  name
-  ratingAvg
-  price
-  quantityAvailable
-  productImages
-  description
-  */
-
+  const imageData = [
+    "https://picsum.photos/id/237/200/300",
+    "https://picsum.photos/id/1025/200/300",
+    "https://picsum.photos/id/847/200/300",
+    "https://picsum.photos/id/1074/200/300",
+  ];
   //WARN : properties name
   return (
     <div className="flex flex-col">
@@ -105,34 +112,43 @@ function ProductDetailLayout({ productId }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-center mx-auto">
-          <ProductImage thumbnailImages={thumbnailImages} />
+          <ProductImage thumbnailImages={imageData} />
           <div className="grid grid-rows-6 max-w-[450px] max-h-[450px] gap-2 px-4">
             <div className="flex flex-col w-full py-2">
-              <h1 className="text-3xl max-w-[418px]">{product.name}</h1>
+              <h1 className="text-3xl max-w-[418px]">
+                {productDetail.ProductName}
+              </h1>
             </div>
-            <div className="flex flex-col w-full ">
+            <div className="flex flex-col w-full row-span-2 space-y-4 mt-4">
               <div className="flex w-full items-center">
-                {renderStars(product.ratingAvg)}
-                <div className="ml-2">{product.ratingAvg}</div>
+                {renderStars(productDetail.RatingAvg)}
+                <div className="ml-2">{productDetail.RatingAvg}</div>
                 <div className="divider divider-horizontal mx-2"></div>
                 <div>
-                  {product.quantityAvailable > 0 ? "In Stock" : "Out of Stock"}
+                  {productDetail.QuantityAvailable > 0
+                    ? "In Stock"
+                    : "Out of Stock"}
                 </div>
               </div>
-              <div className="flex w-full items-center mt-4 h-full">
-                <h1 className="text-4xl">${product.price}</h1>
+              <div className="flex w-full items-center h-full">
+                <h1 className="text-4xl">${productDetail.Price}</h1>
               </div>
             </div>
 
-            <div className="flex flex-col w-full mb-2 row-span-4 ">
+            <div className="flex flex-col w-full mb-2 row-span-3 ">
               <div className="flex flex-col h-full justify-center space-y-4">
                 <ProductQuantityCounter
                   initialCount={1}
                   minCount={1}
                   maxCount={100}
+                  onQuantityChange={(handleQuantityChange) => {
+                    setQuantity(handleQuantityChange);
+                  }}
                 />
                 <div className="flex">
-                  <button className="btn btn-accent btn-wide mr-4">
+                  <button className="btn btn-accent btn-wide mr-4"
+                    onClick={() => handleAddToCart(quantity)}
+                  >
                     <BsBagFill /> Add to cart
                   </button>
                   <button className="btn">
@@ -170,7 +186,7 @@ function ProductDetailLayout({ productId }) {
               </button>
             </div>
             {activeButton === "Description" && (
-              <Description descriptionDetail={product.description} />
+             <div className="p-4 bg-gray-200 rounded">{productDetail.ProductDescription}</div>
             )}
             {activeButton === "Review" && <Review />}
             {activeButton === "AboutSeller" && <AboutSeller />}

@@ -5,6 +5,11 @@ export const cartState = atom({
   default: [],
 });
 
+export const cartStatusState = atom({
+  key: 'cartStatusState',
+  default: { visible: false, message: '', type: '' },
+});
+
 export const totalQuantityState = selector({
   key: "totalQuantityState",
   get: ({ get }) => {
