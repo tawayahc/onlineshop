@@ -12,6 +12,7 @@ import {
 import fetchProductsList from "../../API/fetchProducts";
 import { cartStatusState } from "../../recoil/cart";
 import Toast from "../../components/Toast";
+import CategorySelectSection from "../../components/CategorySelectSection";
 
 function ProductListPage() {
   // const displayedProducts = useRecoilValue(paginatedProductsState);
@@ -29,7 +30,7 @@ function ProductListPage() {
     setLoading(true);
     fetchProducts().finally(() => setLoading(false));
   }, []);
-
+  console.log(products);
   useEffect(() => {
     const fetchFilteredProducts = async () => {
       setLoading(true);
@@ -67,6 +68,7 @@ function ProductListPage() {
           <FilterSidebar />
         </div>
         <div className="flex flex-col p-3 w-full">
+          <CategorySelectSection />
           <div>
             <h2 className="text-3xl font-bold">รายการสินค้า</h2>
           </div>
@@ -77,7 +79,7 @@ function ProductListPage() {
           ) : (
             <div className="grid grid-auto-fit-[15rem] gap-4 my-4">
               {products.map((product, index) => (
-                <ProductCard index={index} key={product.id} data={product} />
+                <ProductCard index={index} key={product.ProductID} data={product} />
               ))}
             </div>
           )}

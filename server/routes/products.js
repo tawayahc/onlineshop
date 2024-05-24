@@ -6,9 +6,10 @@ const router = express.Router();
 router.get("/", function (req, res, next) {
   connection.execute(
     `
-    SELECT p.*, pc.ProductCategoryName
+    SELECT p.*, pc.ProductCategoryName, pi.Productimagecode
     FROM product p
     LEFT JOIN productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+    LEFT JOIN productimage pi ON p.ProductID = pi.ProductID
     `,
     function (err, results, fields) {
       if (err) {
@@ -171,7 +172,7 @@ router.get("/:id", function (req, res, next) {
         // images
         if (row.Productimagecode) {
           const productImage = acc[productId].ProductImages.find(
-            (pi) => pi.Productimagecode === row.Productimagecode
+            (pi) => pi.ProductimageID === row.ProductimageID
           );
           if (!productImage) {
             acc[productId].ProductImages.push({
@@ -208,6 +209,7 @@ router.get("/:id", function (req, res, next) {
       }, {});
 
       const products = Object.values(productDetail);
+      console.log(products.ProductImages);
       res.json({ status: "ok", data: products });
     }
   );
