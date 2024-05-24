@@ -4,6 +4,7 @@ const db = require("../db");
 const router = express.Router();
 
 // Get cart items for a user
+// 3 tables
 router.get("/:userId", async (req, res) => {
   const { userId } = req.params;
   const query = `
@@ -11,13 +12,9 @@ router.get("/:userId", async (req, res) => {
       cart.CartID,
       cart.Quantity,
       cart.ProductID,
-      cart.ClientID,
       product.ProductName,
       product.Price,
       product.QuantityAvailable,
-      product.RatingAvg,
-      productimage.ProductimageID,
-      productimage.ProductimageName,
       productimage.Productimagecode
     FROM 
       cart

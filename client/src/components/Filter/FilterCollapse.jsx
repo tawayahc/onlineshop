@@ -1,32 +1,23 @@
 import React, { useState, useEffect } from "react";
 import DualSlider from "./DualSlider";
 import { BsStarFill, BsStar } from "react-icons/bs";
-import { useRecoilState } from "recoil";
-import { selectedFiltersState } from "../../recoil/atom";
-import axios from "axios";
+import { useRecoilState, useRecoilValue } from "recoil";
+import { selectedFiltersState, categoriesState } from "../../recoil/atom";
+import fetchProductsList from "../../API/fetchProducts";
 
 function FilterCollapse({ title, type }) {
   const [selectedValues, setSelectedValues] = useState([]);
   const [filters, setFilters] = useRecoilState(selectedFiltersState);
-  const [categories, setCategories] = useState([]);
   const [rating] = useState([5, 4, 3, 2, 1]);
-  
-  //WARN: categories
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch categories
-        const response = await axios.get(
-          "https://dummyjson.com/products/categories"
-        );
-        setCategories(response.data || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setCategories([]);
-      }
-    };
+  const [loading, setLoading] = useState(true);
+  const categories = useRecoilValue(categoriesState);
+  const { fetchCategories } = fetchProductsList();
 
-    fetchData();
+  // console.log(filters);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchCategories().finally(() => setLoading(false));
   }, []);
 
   const handleCheckboxChange = (value) => {
@@ -53,9 +44,9 @@ function FilterCollapse({ title, type }) {
   const clearRatings = () => {
     setFilters((prevFilters) => ({
       ...prevFilters,
-      rating: [], 
+      rating: [],
     }));
-    setSelectedValues([]); 
+    setSelectedValues([]);
   };
 
   const renderStars = (rating) => {
@@ -73,15 +64,17 @@ function FilterCollapse({ title, type }) {
       case "category":
         return (
           <div className="flex flex-wrap flex-col">
-            {categories.map((item) => (
-              <div key={item} className="flex cursor-pointer mr-2 mb-2">
+            {categories.map((item, index) => (
+              <div key={index} className="flex cursor-pointer mr-2 mb-2">
                 <input
                   type="checkbox"
                   className="checkbox checkbox-sm checked:bg-primary"
-                  checked={selectedValues.includes(item)}
-                  onChange={() => handleCheckboxChange(item)}
+                  checked={selectedValues.includes(item.ProductCategoryName)}
+                  onChange={() =>
+                    handleCheckboxChange(item.ProductCategoryName)
+                  }
                 />
-                <div className="ml-2">{item}</div>
+                <div className="ml-2">{item.ProductCategoryName}</div>
               </div>
             ))}
           </div>
@@ -119,11 +112,15 @@ function FilterCollapse({ title, type }) {
   };
   return (
     <div>
-      <div className="collapse collapse-arrow">
-        <input type="checkbox" />
-        <div className="collapse-title font-bold font-noto">{title}</div>
-        <div className="collapse-content">{content()}</div>
-      </div>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="collapse collapse-arrow">
+          <input type="checkbox" />
+          <div className="collapse-title font-bold font-noto">{title}</div>
+          <div className="collapse-content">{content()}</div>
+        </div>
+      )}
     </div>
   );
 }

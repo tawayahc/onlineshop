@@ -3,29 +3,36 @@ import Layout from "../../components/Layout/Layout";
 import ProductCard from "../../components/Product/ProductCard";
 import FilterSidebar from "../../components/Filter/FilterSidebar";
 import Pagination from "../../components/Product/Pagination";
-import { useRecoilValue, useSetRecoilState, useRecoilValueLoadable } from "recoil";
-import { loadingState, productsState } from "../../recoil/atom";
-import { fetchProducts,paginatedProductsState } from "../../recoil/productsList";
+import { useRecoilValue, useSetRecoilState,useRecoilState } from "recoil";
+import { productsState,selectedFiltersState } from "../../recoil/atom";
+import { paginatedProductsState,filteredProductsSelector } from "../../recoil/productsList";
+import fetchProductsList from "../../API/fetchProducts";
 
 function ProductListPage() {
+  // const displayedProducts = useRecoilValue(paginatedProductsState);
+  const [loading, setLoading] = useState(true);
+  const { fetchProducts, fetchProductWithCategories } = fetchProductsList();
   const setProducts = useSetRecoilState(productsState);
-  const setLoading = useSetRecoilState(loadingState);
-  const productsLoadable = useRecoilValueLoadable(fetchProducts);
-  const displayedProducts = useRecoilValue(paginatedProductsState);
+  const products = useRecoilValue(productsState);
+
+  const [categories] = useRecoilState(selectedFiltersState);
 
   useEffect(() => {
-    if (productsLoadable.state === "loading") {
+    setLoading(true);
+    fetchProducts().finally(() => setLoading(false));
+  },[]);
+
+  useEffect(() => {
+    const fetchFilteredProducts = async () => {
       setLoading(true);
-    } else if (productsLoadable.state === "hasValue") {
-      setProducts(productsLoadable.contents);
+      const data = await fetchProductWithCategories({ filters: categories });
+      setProducts(data);
       setLoading(false);
-    } else if (productsLoadable.state === "hasError") {
-      console.error(productsLoadable.contents);
-      setLoading(false);
-    }
-  }, [productsLoadable, setProducts, setLoading]);
+    };
 
-
+    fetchFilteredProducts();
+  }, [categories, fetchProductWithCategories, setProducts]);
+  
   return (
     <div>
       <div className="flex flex-row w-full">
@@ -37,14 +44,15 @@ function ProductListPage() {
           <div>
             <h2 className="text-3xl font-bold">รายการสินค้า</h2>
           </div>
-          {productsLoadable.state === "loading" ? (
+          {loading ? (
             <div className="flex justify-center h-96">
               <span className="loading loading-spinner loading-lg"></span>
             </div>
           ) : (
             <div className="grid grid-auto-fit-[15rem] gap-4 my-4">
-              {displayedProducts.map((product) => (
+              {products.map((product, index) => (
                 <ProductCard
+                  index={index}
                   key={product.id}
                   data={product}
                 />

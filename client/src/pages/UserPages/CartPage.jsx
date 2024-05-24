@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import Layout from "../../components/Layout/Layout";
 import ProductCart from "../../components/User/ProductCart";
 import { useNavigate } from "react-router-dom";
-import useCartActions from "../../utils/userCartActions";
+import useCartActions from "../../API/userCartActions";
 import {
   cartState,
   totalPriceState,
-  // totalQuantityState,
 } from "../../recoil/cart";
 import { useRecoilValue, useRecoilValueLoadable } from "recoil";
 
@@ -15,7 +14,9 @@ function CartPage() {
   const cart = useRecoilValue(cartState);
   const totalPrice = useRecoilValue(totalPriceState);
   const [loading, setLoading] = useState(true);
-  const { fetchCart, updateCartQuantity, removeFromCart } = useCartActions(userId[0]);
+  const { fetchCart, updateCartQuantity, removeFromCart } = useCartActions(
+    userId[0]
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,16 +41,16 @@ function CartPage() {
         </button>
       </div>
       <div className="flex flex-row justify-between mx-10 2xl:mx-48 ">
-        <div className="overflow-x-auto mt-4  ">
+        <div className="overflow-x-auto mt-4 w-[843px]">
           <table className="table ">
             {/* head */}
             <thead>
               <tr>
-                <th className="">สินค้า</th>
-                <th>ราคา</th>
-                <th>จำนวน</th>
-                <th>ราคาทั้งหมด</th>
-                <th></th>
+                <th className="w-[390px]">สินค้า</th>
+                <th className="w-[85px]">ราคา</th>
+                <th className="w-[193px]">จำนวน</th>
+                <th className="w-[95px]">ราคาทั้งหมด</th>
+                <th className="w-[80px]"></th>
               </tr>
             </thead>
             <tbody>

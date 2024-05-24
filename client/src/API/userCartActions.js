@@ -3,11 +3,12 @@ import { useRecoilState } from "recoil";
 import axios from "axios";
 import { cartState } from "../recoil/cart";
 
+const url = "http://localhost:3333/";
 const useCartActions = (userId) => {
   const [cart, setCart] = useRecoilState(cartState);
   const fetchCart = async () => {
     try {
-      const response = await axios.get(`http://localhost:3333/cart/${userId}`);
+      const response = await axios.get(url + "cart/" + userId);
       if (response.data.status === "ok") {
         setCart(response.data.data);
         // console.log("Cart data fetched successfully:", response.data.data);
@@ -21,7 +22,7 @@ const useCartActions = (userId) => {
 
   const addToCart = async (product) => {
     try {
-      await axios.post("http://localhost:3333/cart", {
+      await axios.post(url + "cart", {
         userId,
         productId: product.ProductID,
       });
@@ -33,7 +34,7 @@ const useCartActions = (userId) => {
 
   const removeFromCart = async (productId) => {
     try {
-      await axios.delete("http://localhost:3333/cart", {
+      await axios.delete(url + "cart", {
         data: { userId, productId },
       });
       await fetchCart();
@@ -44,7 +45,7 @@ const useCartActions = (userId) => {
 
   const updateCartQuantity = async (productId, quantity) => {
     try {
-      await axios.patch("http://localhost:3333/cart", {
+      await axios.patch(url + "cart", {
         userId,
         productId,
         quantity,
@@ -57,8 +58,6 @@ const useCartActions = (userId) => {
 
   return {
     cart,
-    // totalQuantity,
-    // totalPrice,
     fetchCart,
     addToCart,
     removeFromCart,

@@ -1,42 +1,30 @@
 import { selector } from "recoil";
-import axios from "axios";
 import {
   productsState,
   selectedFiltersState,
-  loadingState,
   currentPageState,
   productsPerPageState,
 } from "./atom";
 
-//WARN: fetchProducts
-const url = "https://dummyjson.com/products?limit=100";
-
-export const fetchProducts = selector({
-  key: "fetchProducts",
-  get: async ({ get }) => {
-    get(loadingState); // Accessing loadingState to include it in the dependency graph
-    try {
-      const response = await axios.get(
-        url
-      );
-      return response.data.products;
-    } catch (error) {
-      console.error("Error fetching products:", error);
-      return [];
-    }
-  },
-});
-
+// WARN: code below is not used.
 export const filteredProductsSelector = selector({
   key: "filteredProductsSelector",
   get: ({ get }) => {
     const products = get(productsState);
+    // console.log(products);
     const filters = get(selectedFiltersState);
-
-    return products.filter(product => {
-      return (!filters.category.length || filters.category.includes(product.category)) &&
-             (product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]) &&
-             (!filters.rating.length || filters.rating.some(rating => Math.floor(product.rating) >= rating));
+    // console.log(filters);
+    return products.filter((product) => {
+      return (
+        (!filters.category.length ||
+          filters.category.includes(product.ProductCategoryName)) &&
+        product.price >= filters.priceRange[0] &&
+        product.price <= filters.priceRange[1] &&
+        (!filters.rating.length ||
+          filters.rating.some(
+            (rating) => Math.floor(product.ratingAvg) >= rating
+          ))
+      );
     });
   },
 });
@@ -45,6 +33,7 @@ export const paginatedProductsState = selector({
   key: "paginatedProductsState",
   get: ({ get }) => {
     const filteredProducts = get(filteredProductsSelector);
+    // console.log(filteredProducts);
     const currentPage = get(currentPageState);
     const productsPerPage = get(productsPerPageState);
     const startIndex = (currentPage - 1) * productsPerPage;

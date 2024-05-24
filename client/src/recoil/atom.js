@@ -10,6 +10,11 @@ export const productsState = atom({
   default: [],
 });
 
+export const categoriesState = atom({
+  key: "categoriesState",
+  default: [],
+});
+
 export const currentPageState = atom({
   key: "currentPageState",
   default: 1,
