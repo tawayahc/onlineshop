@@ -6,7 +6,6 @@ import useCartActions from "../../API/userCartActions";
 
 export default function Header() {
   const userId = localStorage.getItem("userId");
-  console.log(userId);
   const totalPrice = useRecoilValue(totalPriceState);
   const totalQuantity = useRecoilValue(totalQuantityState);
   const { fetchCart } = useCartActions(userId);

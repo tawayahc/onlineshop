@@ -6,17 +6,57 @@ const router = express.Router();
 router.get("/", function (req, res, next) {
   connection.execute(
     `
-    SELECT p.*, pc.ProductCategoryName, pi.Productimagecode
+    SELECT 
+      p.ProductID,
+      p.ProductName,
+      p.RatingAvg,
+      p.Price,  
+      pc.ProductCategoryName, 
+      pi.ProductimageID,
+      pi.ProductimageName,
+      pi.Productimagecode
     FROM product p
-    LEFT JOIN productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
-    LEFT JOIN productimage pi ON p.ProductID = pi.ProductID
+    LEFT JOIN 
+      productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+    LEFT JOIN 
+      productimage pi ON p.ProductID = pi.ProductID
     `,
     function (err, results, fields) {
       if (err) {
         res.json({ status: "error", message: err });
         return;
       }
-      res.json({ status: "ok", data: results });
+      const productlist = results.reduce((acc, row) => {
+        const productId = row.ProductID;
+        if (!acc[productId]) {
+          acc[productId] = {
+            ProductID: productId,
+            ProductName: row.ProductName,
+            RatingAvg: row.RatingAvg,
+            Price: row.Price,
+            ProductImages: [],
+          };
+        }
+
+        // images
+        if (row.ProductimageID) {
+          const productImage = acc[productId].ProductImages.find(
+            (pi) => pi.ProductimageID === row.ProductimageID
+          );
+          if (!productImage) {
+            acc[productId].ProductImages.push({
+              ProductimageID: row.ProductimageID,
+              ProductimageName: row.ProductimageName,
+              Productimagecode: row.Productimagecode,
+            });
+          }
+        }
+
+        return acc;
+      }, {});
+
+      const products = Object.values(productlist);
+      res.json({ status: "ok", data: products });
     }
   );
 });
@@ -209,7 +249,6 @@ router.get("/:id", function (req, res, next) {
       }, {});
 
       const products = Object.values(productDetail);
-      console.log(products.ProductImages);
       res.json({ status: "ok", data: products });
     }
   );

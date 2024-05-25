@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+// import { useCallback } from "react";
 import { useRecoilState } from "recoil";
 import axios from "axios";
 import { productsState, categoriesState } from "../recoil/atom";
@@ -11,7 +11,9 @@ const fetchProductsList = () => {
     try {
       const response = await axios.get(url + "products");
       if (response.data.status === "ok") {
+        console.log(response.data.data);
         setProducts(response.data.data);
+        console.log(products);
         return response.data.data;
       } else {
         console.error("Error fetching products:", response.data.message);
