@@ -22,7 +22,6 @@ export default function Login() {
           },
         }
       );
-      //   console.log(response);
       if (response.data.status === "ok") {
         alert("Login Success");
         localStorage.setItem("token", response.data.token);
