@@ -54,7 +54,19 @@ router.post('/add', function (req, res, next) {
             const productId = row.ProductID;
             if (!acc[productId]) {
               acc[productId] = {
-                ...row,
+                ProductID: row.ProductID,
+                ProductName: row.ProductName,
+                ProductDescription: row.ProductDescription,
+                Price: row.Price,
+                QuantityAvailable: row.QuantityAvailable,
+                RatingAvg: row.RatingAvg,
+                Date: row.Date,
+                ProductCategoryID: row.ProductCategoryID,
+                ShopID: row.ShopID,
+                PromotionID: row.PromotionID,
+                StaffID: row.StaffID,
+                ProductCategoryName: row.ProductCategoryName,
+                ProductCategoryDescription: row.ProductCategoryDescription,
                 ProductImages: []
               };
             }

@@ -1,43 +1,46 @@
 // src/pages/ProductControlPanelPage/ProductControlPanelPage.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import Layout from '../../../components/Layout/Layout.jsx';
-import ImageModal from './ImageModal.jsx'
+import ImageModal from './ImageModal.jsx';
 import AddEditModal from './AddEditModal.jsx';
+import {
+  productListState,
+  selectedProductIdsState,
+  productModalState,
+  productCategoriesState,
+  searchTermState,
+  selectedCategoryState,
+  sortByState,
+  filteredProductsState,
+  selectedImageState,
+} from '../../../recoil/productControlPanel.js';
 
 function ProductControlPanelPage() {
-  const [products, setProducts] = useState([]);
-  const [selectedProducts, setSelectedProducts] = useState([]);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState('add');
-  const [productName, setProductName] = useState('');
-  const [productPrice, setProductPrice] = useState(0);
-  const [productCategory, setProductCategory] = useState('');
-  const [productCount, setProductCount] = useState(0);
-  const [productId, setProductId] = useState(null);
-  const [productPublished, setProductPublished] = useState(false);
-  const [productImage, setProductImage] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [sortBy, setSortBy] = useState('default');
-
-  const [productCategories, setProductCategories] = useState([]);
-  const [productCategoryId, setProductCategoryId] = useState(0);
-
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [products, setProducts] = useRecoilState(productListState);
+  const [selectedProducts, setSelectedProducts] = useRecoilState(selectedProductIdsState);
+  const [modalState, setModalState] = useRecoilState(productModalState);
+  const [productCategories, setProductCategories] = useRecoilState(productCategoriesState);
+  const [searchTerm, setSearchTerm] = useRecoilState(searchTermState);
+  const [selectedCategory, setSelectedCategory] = useRecoilState(selectedCategoryState);
+  const [sortBy, setSortBy] = useRecoilState(sortByState);
+  const filteredProducts = useRecoilValue(filteredProductsState);
+  const [selectedImage, setSelectedImage] = useRecoilState(selectedImageState);
+  const setModalOpen = (isOpen) => setModalState((prev) => ({ ...prev, isOpen }));
 
   useEffect(() => {
     fetch('http://localhost:3333/admin/see')
       .then(response => response.json())
       .then(data => setProducts(data))
       .catch(error => console.error('Error fetching products:', error));
-  }, []);
+  }, [setProducts]);
 
   useEffect(() => {
     fetch('http://localhost:3333/admin/category-see')
       .then(response => response.json())
       .then(data => setProductCategories(data))
-      .catch(error => console.error('Error fetching products:', error));
-  }, []);
+      .catch(error => console.error('Error fetching categories:', error));
+  }, [setProductCategories]);
 
   const addProduct = async (name, price, count, published, image, categoryName, categoryId) => {
     const newProduct = {
@@ -64,7 +67,7 @@ function ProductControlPanelPage() {
       const result = await response.json();
       const addedProduct = result.product;
 
-      setProducts([...products, addedProduct]);
+      setProducts((prevProducts) => [...prevProducts, addedProduct]);
     } catch (error) {
       console.error(error);
     }
@@ -91,20 +94,26 @@ function ProductControlPanelPage() {
   };
 
   const toggleProductSelection = (productId) => {
-    if (selectedProducts.includes(productId)) {
-      setSelectedProducts(selectedProducts.filter(id => id !== productId));
-    } else {
-      setSelectedProducts([...selectedProducts, productId]);
-    }
+    setSelectedProducts((prevSelected) => {
+      if (prevSelected.includes(productId)) {
+        return prevSelected.filter(id => id !== productId);
+      } else {
+        return [...prevSelected, productId];
+      }
+    });
+
+    console.log(selectedProducts);
   };
 
   const toggleProductPublishing = (productId) => {
-    setProducts(products.map(product => {
-      if (product.ProductID === productId) {
-        return { ...product, published: !product.published };
-      }
-      return product;
-    }));
+    setProducts((prevProducts) =>
+      prevProducts.map(product => {
+        if (product.ProductID === productId) {
+          return { ...product, published: !product.published };
+        }
+        return product;
+      })
+    );
   };
 
   const editProduct = async (productId, newName, newPrice, newCount, newImage, newCategoryName, newCategoryId) => {
@@ -131,48 +140,59 @@ function ProductControlPanelPage() {
       console.error(error);
     }
 
-    setProducts(products.map(product => {
-      if (product.ProductID === productId) {
-        return { ...product, ProductName: newName, Price: newPrice, QuantityAvailable: newCount, image: newImage, ProductCategoryName: newCategoryName, ProductCategoryID: newCategoryId };
-      }
-      return product;
-    }));
+    setProducts((prevProducts) =>
+      prevProducts.map(product => {
+        if (product.ProductID === productId) {
+          return { ...product, ProductName: newName, Price: newPrice, QuantityAvailable: newCount, image: newImage, ProductCategoryName: newCategoryName, ProductCategoryID: newCategoryId };
+        }
+        return product;
+      })
+    );
   };
 
   const openAddModal = () => {
-    setModalMode('add');
-    setModalOpen(true);
-    setProductName('');
-    setProductPrice(0);
-    setProductCategory('');
-    setProductCount(0);
-    setProductPublished(false);
-    setProductImage('');
-    setProductCategoryId(0);
+    setModalState({
+      isOpen: true,
+      mode: 'add',
+      product: {
+        ProductName: '',
+        Price: 0,
+        ProductCategoryName: '',
+        QuantityAvailable: 0,
+        published: false,
+        image: '',
+        ProductCategoryID: 0,
+      },
+    });
   };
 
   const openEditModal = (productId, productName, productPrice, productCategory, productCount, productPublished, productImage, productCategoryId) => {
-    setModalMode('edit');
-    setModalOpen(true);
-    setProductName(productName);
-    setProductPrice(productPrice);
-    setProductCategory(productCategory);
-    setProductCount(productCount);
-    setProductId(productId);
-    setProductPublished(productPublished);
-    setProductImage(productImage);
-    setProductCategoryId(productCategoryId);
+    setModalState({
+      isOpen: true,
+      mode: 'edit',
+      product: {
+        ProductID: productId,
+        ProductName: productName,
+        Price: productPrice,
+        ProductCategoryName: productCategory,
+        QuantityAvailable: productCount,
+        published: productPublished,
+        image: productImage,
+        ProductCategoryID: productCategoryId,
+      },
+    });
   };
 
   const closeModal = () => {
-    setModalOpen(false);
+    setModalState((prev) => ({ ...prev, isOpen: false }));
   };
 
   const handleSubmit = () => {
-    if (modalMode === 'add') {
-      addProduct(productName, productPrice, productCount, productPublished, productImage, productCategory, productCategoryId);
-    } else if (modalMode === 'edit') {
-      editProduct(productId, productName, productPrice, productCount, productImage, productCategory, productCategoryId);
+    const { product } = modalState;
+    if (modalState.mode === 'add') {
+      addProduct(product.ProductName, product.Price, product.QuantityAvailable, product.published, product.image, product.ProductCategoryName, product.ProductCategoryID);
+    } else if (modalState.mode === 'edit') {
+      editProduct(product.ProductID, product.ProductName, product.Price, product.QuantityAvailable, product.image, product.ProductCategoryName, product.ProductCategoryID);
     }
     closeModal();
   };
@@ -182,20 +202,6 @@ function ProductControlPanelPage() {
     setSelectedCategory('All');
     setSortBy('default');
   };
-
-  const filteredProducts = products.filter(product => {
-    if (selectedCategory !== 'All' && product.ProductCategoryName !== selectedCategory) {
-      return false;
-    }
-    return product.ProductName && product.ProductName.toLowerCase().includes(searchTerm.toLowerCase());
-  }).sort((a, b) => {
-    if (sortBy === 'ascending') {
-      return a.Price - b.Price;
-    } else if (sortBy === 'descending') {
-      return b.Price - a.Price;
-    }
-    return 0;
-  });
 
   return (
     <div className="p-4">
@@ -216,24 +222,17 @@ function ProductControlPanelPage() {
         />
 
         <select
-          value={productCategoryId}
+          value={selectedCategory}
           onChange={(e) => {
-            const selectedValue = parseInt(e.target.value);
-            if (selectedValue === 0) {
-              setProductCategoryId(selectedValue);
-              setSelectedCategory('All');
-              setProductCategory('');
-            } else {
-              setProductCategoryId(selectedValue);
-              const selectedCategory = productCategories.find(category => category.ProductCategoryID === selectedValue);
-              setSelectedCategory(selectedCategory ? selectedCategory.ProductCategoryName : '');
-            }
+            const selectedValue = e.target.value;
+            setSelectedCategory(selectedValue);
+            setProductCategoryId(selectedValue === 'All' ? 0 : productCategories.find(category => category.ProductCategoryName === selectedValue)?.ProductCategoryID || 0);
           }}
           className="input mb-2"
         >
-          <option value={0}>All</option>
+          <option value="All">All</option>
           {productCategories.map(category => (
-            <option key={category.ProductCategoryID} value={category.ProductCategoryID}>
+            <option key={category.ProductCategoryID} value={category.ProductCategoryName}>
               {category.ProductCategoryName}
             </option>
           ))}
@@ -322,22 +321,17 @@ function ProductControlPanelPage() {
         </table>
       </div>
 
-      {modalOpen && (
+      {modalState.isOpen && (
         <AddEditModal
-          modalMode={modalMode}
-          productName={productName}
-          setProductName={setProductName}
-          productPrice={productPrice}
-          setProductPrice={setProductPrice}
-          productCategoryId={productCategoryId}
-          setProductCategoryId={setProductCategoryId}
-          productCategories={productCategories}
-          productCount={productCount}
-          setProductCount={setProductCount}
-          productImage={productImage}
-          setProductImage={setProductImage}
-          productPublished={productPublished}
-          setProductPublished={setProductPublished}
+          modalMode={modalState.mode}
+          product={modalState.product}
+          setProductName={(name) => setModalState((prev) => ({ ...prev, product: { ...prev.product, ProductName: name } }))}
+          setProductPrice={(price) => setModalState((prev) => ({ ...prev, product: { ...prev.product, Price: parseFloat(price) } }))}
+          setProductCategoryId={(categoryId) => setModalState((prev) => ({ ...prev, product: { ...prev.product, ProductCategoryID: parseInt(categoryId) } }))}
+          setProductCategory={(category) => setModalState((prev) => ({ ...prev, product: { ...prev.product, ProductCategoryName: category } }))}
+          setProductCount={(count) => setModalState((prev) => ({ ...prev, product: { ...prev.product, QuantityAvailable: parseInt(count) } }))}
+          setProductImage={(image) => setModalState((prev) => ({ ...prev, product: { ...prev.product, image } }))}
+          setProductPublished={(published) => setModalState((prev) => ({ ...prev, product: { ...prev.product, published } }))}
           handleSubmit={handleSubmit}
           closeModal={closeModal}
         />
