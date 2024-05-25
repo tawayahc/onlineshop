@@ -16,10 +16,12 @@ import UserPayOptionPage from './pages/UserPages/UserPayOptionPage';
 
 import WishlistPage from './pages/UserPages/WishlistPage';
 
-import ProductControlPanelPage from './pages/VendorPage/ProductControlPanelPage';
+import ProductControlPanelPage from './pages/VendorPage/VendorProduct/ProductControlPanelPage';
+import OrderControlPanelPage from './pages/VendorPage/VendorOrder/OrderControlPanelPage';
 import Register from './pages/Auth/Register';
 import Login from './pages/Auth/Login';
 import AdminLogin from './pages/Auth/AdminLogin';
+import AdminRegister from './pages/Auth/AdminRegister';
 
 function App() {
 
@@ -32,7 +34,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin">
+          <Route index element={<AdminLogin />} />
+          <Route path="register" element={<AdminRegister />} />
+        </Route>
+        
 
         <Route path="/products" element={<Products />} />
         <Route path="/products/:productId" element={<ProductDetails />} /> 
@@ -52,6 +58,7 @@ function App() {
 
         <Route path="/vendor">
           <Route path="products" element={<ProductControlPanelPage />} />
+          <Route path="orders" element={<OrderControlPanelPage />} />
           {/* <Route index element={<UserProfilePage />} />
           <Route path="address" element={<UserAddressPage />} />
           <Route path="payoption" element={<UserPayOptionPage />} />
