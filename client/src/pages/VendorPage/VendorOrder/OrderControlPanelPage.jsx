@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../../../components/Layout/Layout';
-import ordersData from '../../../db/orders';
-import productsData from '../../../db/products';
+import { fetchOrders, updateOrderStatus as updateOrderStatusAPI, deleteOrders } from '../../../API/vendorOrders';
 import OrderDetailsModal from './OrderDetailsModal';
 
 function OrderControlPanelPage() {
-  const [orders, setOrders] = useState(ordersData);
+  const [orders, setOrders] = useState([]);
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('All');
@@ -16,6 +15,19 @@ function OrderControlPanelPage() {
   // Modal state
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Fetch orders from the backend
+  useEffect(() => {
+    const fetchAllOrders = async () => {
+      try {
+        const data = await fetchOrders();
+        setOrders(data);
+      } catch (error) {
+        console.error('Failed to fetch orders:', error);
+      }
+    };
+    fetchAllOrders();
+  }, []);
 
   // Function to open the modal and set selected order details
   const openOrderDetailsModal = (orderId) => {
@@ -38,7 +50,6 @@ function OrderControlPanelPage() {
       if (searchTerm && !order.customer.toLowerCase().includes(searchTerm.toLowerCase())) {
         return false;
       }
-      // Additional filtering logic based on date range can be added here
       return true;
     }).sort((a, b) => {
       if (sortBy === 'ascending') {
@@ -64,10 +75,15 @@ function OrderControlPanelPage() {
   const startOrderIndex = indexOfFirstOrder + 1;
   const endOrderIndex = Math.min(indexOfLastOrder, filterOrders().length);
 
-  const deleteSelectedOrders = () => {
-    const updatedOrders = orders.filter(order => !selectedOrders.includes(order.id));
-    setOrders(updatedOrders);
-    setSelectedOrders([]);
+  const deleteSelectedOrders = async () => {
+    try {
+      await deleteOrders(selectedOrders);
+      const updatedOrders = orders.filter(order => !selectedOrders.includes(order.id));
+      setOrders(updatedOrders);
+      setSelectedOrders([]);
+    } catch (error) {
+      console.error('Failed to delete orders:', error);
+    }
   };
 
   const toggleOrderSelection = (orderId) => {
@@ -84,13 +100,18 @@ function OrderControlPanelPage() {
     setSortBy('default');
   };
 
-  const updateOrderStatus = (orderId, newStatus) => {
-    setOrders(orders.map(order => {
-      if (order.id === orderId) {
-        return { ...order, status: newStatus };
-      }
-      return order;
-    }));
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await updateOrderStatusAPI(orderId, newStatus);
+      setOrders(orders.map(order => {
+        if (order.id === orderId) {
+          return { ...order, status: newStatus };
+        }
+        return order;
+      }));
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+    }
   };
 
   return (
@@ -135,44 +156,37 @@ function OrderControlPanelPage() {
       {/* Order List */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold mb-2">Order List</h2>
-          <div className="flex items-center mb-2">
-            <button onClick={deleteSelectedOrders} className="btn btn-danger mr-2">Delete Selected</button>
-          </div>
-  <table className="table-auto w-full">
-    <thead>
-      <tr>
-      <th className="border px-4 py-2"></th>
-        <th className="border px-4 py-2">Order ID</th>
-        <th className="border px-4 py-2">Customer</th>
-        <th className="border px-4 py-2">Total</th>
-        <th className="border px-4 py-2">Status</th>
-        <th className="border px-4 py-2">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {currentOrders.map(order => {
-        // Calculate total for each order
-        const orderTotal = order.products.reduce((acc, product) => {
-          const productDetails = productsData.find(p => p.id === product.id);
-          return acc + productDetails.price * product.count;
-        }, 0);
-
-        return (
-          <tr key={order.id} className="hover:bg-gray-100">
-            <td className="border px-4 py-2">
+        <div className="flex items-center mb-2">
+          <button onClick={deleteSelectedOrders} className="btn btn-danger mr-2">Delete Selected</button>
+        </div>
+        <table className="table-auto w-full">
+          <thead>
+            <tr>
+              <th className="border px-4 py-2"></th>
+              <th className="border px-4 py-2">Order ID</th>
+              <th className="border px-4 py-2">Expected Date</th>
+              <th className="border px-4 py-2">Total</th>
+              <th className="border px-4 py-2">Status</th>
+              <th className="border px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentOrders.map(order => (
+              <tr key={order.id} className="hover:bg-gray-100">
+                <td className="border px-4 py-2">
                   <input
                     type="checkbox"
                     checked={selectedOrders.includes(order.id)}
                     onChange={() => toggleOrderSelection(order.id)}
                   />
                 </td>
-            <td className="border px-4 py-2">{order.id}</td>
-            <td className="border px-4 py-2">{order.customer}</td>
-            <td className="border px-4 py-2">{orderTotal}$</td>
-            <td className="border px-4 py-2">
+                <td className="border px-4 py-2">{order.id}</td>
+                <td className="border px-4 py-2">{order.expectedDate}</td>
+                <td className="border px-4 py-2">{order.products.reduce((acc, product) => acc + product.price * product.count, 0)}$</td>
+                <td className="border px-4 py-2">
                   <select
                     value={order.status}
-                    onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                    onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
                     className="input"
                   >
                     {statuses.map(status => (
@@ -180,29 +194,28 @@ function OrderControlPanelPage() {
                     ))}
                   </select>
                 </td>
-            <td className="border px-4 py-2">
-              <button onClick={() => openOrderDetailsModal(order.id)} className="btn btn-primary">View Details</button>
-            </td>
-          </tr>
-        );
-      })}
-    </tbody>
-  </table>
-  
-  {/* Pagination and Order Range */}
-  <div className="flex justify-between items-center mt-4">
-    <div>
-      Showing {startOrderIndex} - {endOrderIndex} of {filterOrders().length} orders
-    </div>
-    <ul className="flex">
-      {Array.from({ length: Math.ceil(filterOrders().length / ordersPerPage) }, (_, i) => (
-        <li key={i} className="mx-1">
-          <button onClick={() => paginate(i + 1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700">{i + 1}</button>
-        </li>
-      ))}
-    </ul>
-  </div>
-</div>
+                <td className="border px-4 py-2">
+                  <button onClick={() => openOrderDetailsModal(order.id)} className="btn btn-primary">View Details</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        
+        {/* Pagination and Order Range */}
+        <div className="flex justify-between items-center mt-4">
+          <div>
+            Showing {startOrderIndex} - {endOrderIndex} of {filterOrders().length} orders
+          </div>
+          <ul className="flex">
+            {Array.from({ length: Math.ceil(filterOrders().length / ordersPerPage) }, (_, i) => (
+              <li key={i} className="mx-1">
+                <button onClick={() => paginate(i + 1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700">{i + 1}</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
