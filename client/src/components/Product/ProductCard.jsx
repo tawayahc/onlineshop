@@ -1,17 +1,15 @@
 import React from "react";
 import { BsBagFill, BsStarFill, BsStarHalf, BsStar } from "react-icons/bs";
-import { useRecoilState } from "recoil";
-import { cartState, wishlistState } from "../../recoil/atom";
-import { useNavigate } from 'react-router-dom';
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import useCartActions from "../../API/userCartActions";
+import GenericImagePlaceholder from "../../assets/svg/generic-image-placeholder.svg";
 
-function ProductCard({ data }) {
-  const [cart, setCart] = useRecoilState(cartState);
-  const [wishlist, setWishlist] = useRecoilState(wishlistState);
+function ProductCard({ data, onWishlistChange }) {
   const navigate = useNavigate();
+  const userId = localStorage.getItem("userId");
+  const { addToCart } = useCartActions(userId);
+  const isInWishlist = data.isInWishlist;
 
-  const isInWishlist = wishlist.some(item => item.id === data.id);
-  const isInCart = cart.some(item => item.id === data.id);
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
     const hasHalfStar = rating % 1 !== 0;
@@ -33,48 +31,33 @@ function ProductCard({ data }) {
     );
   };
 
-  const handleAddToCart = () => {
-    if (!isInCart) {
-      setCart([...cart, data]);
-    } else {
-      setCart(cart.filter(item => item.id !== data.id));
-    }
-  };
-
-  const handleAddToWishlist = async () => {
-    if (!isInWishlist) {
-      try {
-        // await axios.post('http://localhost:5000/wishlist', { userId, productId: data.id });
-        setWishlist([...wishlist, data]);
-      } catch (error) {
-        console.error("Error adding to wishlist:", error);
-      }
-    } else {
-      try {
-        // await axios.delete('http://localhost:5000/wishlist', { data: { userId, productId: data.id } });
-        setWishlist(wishlist.filter(item => item.id !== data.id));
-      } catch (error) {
-        console.error("Error removing from wishlist:", error);
-      }
-    }
-  };
-
-
   const handleCardClick = () => {
-    navigate(`/products/${data.id}`);
-    console.log("Card clicked");
+    navigate(`/products/${data.ProductID}`);
+  };
+
+  const handleAddToCart = () => {
+    addToCart(data.ProductID, 1);
   };
   return (
     // TODO : Add to cart & wishlist
     <div className="group">
       <div className="card card-compact w-60 min-96 shadow-xl">
         <figure className="h-40">
-          <img src={data.thumbnail} alt={data.name} className="w-full h-full object-cover cursor-pointer" onClick={handleCardClick} />
+          <img
+            src={GenericImagePlaceholder}
+            alt={data.name}
+            className="w-full h-full object-cover cursor-pointer"
+            onClick={handleCardClick}
+          />
         </figure>
-        <button 
-         onClick={handleAddToWishlist}
-         className={isInWishlist ? "btn btn-circle btn-sm absolute top-2 right-2 btn-error" : "btn btn-circle btn-sm absolute top-2 right-2"}
-         >
+        <button
+          onClick={() => onWishlistChange(data.id)}
+          className={
+            isInWishlist
+              ? "btn btn-circle btn-sm absolute top-2 right-2 btn-error"
+              : "btn btn-circle btn-sm absolute top-2 right-2"
+          }
+        >
           <svg
             className="h-8 w-8"
             viewBox="0 0 24 24"
@@ -95,26 +78,33 @@ function ProductCard({ data }) {
         <div className="card-body flex flex-col">
           <div className="h-12">
             <button onClick={handleCardClick}>
-            <h3 className="card-title line-clamp-2">{data.title}</h3>
-
+              <h3 className="card-title line-clamp-2 text-left">
+                {data.ProductName}
+              </h3>
             </button>
           </div>
           <div className="card-actions justify-between items-center mt-auto">
             <div className="flex flex-row items-center">
-              {renderStars(data.rating)}
-              <p>{data.rating}</p>
+              {renderStars(data.RatingAvg)}
+              <p>{data.RatingAvg}</p>
             </div>
             <div className="flex flex-row justify-between w-full items-center">
-              <p className="text-xl">${data.price}</p>
-              <button className="btn btn-accent btn-sm">
-                <BsBagFill /> {isInCart ? 'Remove from cart' : 'Add to cart'}
+              <p className="text-xl">${data.Price}</p>
+              <button
+                className="btn btn-accent btn-sm"
+                onClick={handleAddToCart}
+              >
+                <BsBagFill /> Add to cart
               </button>
             </div>
 
-            <div className="mt-2">
-              <div className="badge badge-outline mr-2">Fashion</div>
-              <div className="badge badge-outline">Products</div>
-            </div>
+            {data.ProductCategoryName ? (
+              <div className="mt-2">
+                <div className="badge badge-outline">
+                  {data.ProductCategoryName}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

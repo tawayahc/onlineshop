@@ -2,14 +2,15 @@ import React from "react";
 import ProductQuantityCounter from "../Product/ProductQuantityCounter";
 
 
-function ProductCart({ avatar, name, price, quantity }) {
+function ProductCart({avatar, name, price, quantity, onRemove, onQuantityChange }) {
+  const total = price * quantity;
+  const handleQuantityChange = (newQuantity) => {
+    onQuantityChange(newQuantity);
+  };
+
+
   return (
     <tr>
-      <th>
-        <label>
-          <input type="checkbox" className="checkbox" />
-        </label>
-      </th>
       <td>
         <div className="flex grow-0 items-center gap-3">
           <div className="avatar">
@@ -22,17 +23,18 @@ function ProductCart({ avatar, name, price, quantity }) {
           </div>
         </div>
       </td>
-      <td>{price}</td>
+      <td>${price}</td>
       <td>
         <ProductQuantityCounter
           initialCount={quantity}
           minCount={1}
           maxCount={100}
+          onQuantityChange={handleQuantityChange}
         />
       </td>
-      <td>total</td>
+      <td>${total.toFixed(2)}</td>
       <th>
-        <button className="btn btn-circle hover:btn-error">
+        <button className="btn btn-circle hover:btn-error" onClick={onRemove}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-6 w-6"

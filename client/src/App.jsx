@@ -18,8 +18,9 @@ import WishlistPage from './pages/UserPages/WishlistPage';
 
 import ProductControlPanelPage from './pages/VendorPage/VendorProduct/ProductControlPanelPage';
 import OrderControlPanelPage from './pages/VendorPage/VendorOrder/OrderControlPanelPage';
-import Register from './pages/Register';
-import Login from './pages/Login';
+import Register from './pages/Auth/Register';
+import Login from './pages/Auth/Login';
+import AdminLogin from './pages/Auth/AdminLogin';
 
 function App() {
 
@@ -31,6 +32,8 @@ function App() {
 
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        <Route path="/admin" element={<AdminLogin />} />
 
         <Route path="/products" element={<Products />} />
         <Route path="/products/:productId" element={<ProductDetails />} /> 

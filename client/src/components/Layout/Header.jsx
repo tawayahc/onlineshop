@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import logo from "../../assets/png/logo-no-background-white.png";
+import { totalPriceState, totalQuantityState } from "../../recoil/cart";
+import { useRecoilValue } from "recoil";
+import useCartActions from "../../API/userCartActions";
 
 export default function Header() {
-  const [userId, setUserId] = useState(localStorage.getItem('userId'));
-
+  const userId = localStorage.getItem("userId");
+  console.log(userId);
+  const totalPrice = useRecoilValue(totalPriceState);
+  const totalQuantity = useRecoilValue(totalQuantityState);
+  const { fetchCart } = useCartActions(userId);
   const handleLogout = (event) => {
     event.preventDefault();
     localStorage.removeItem("token");
@@ -11,7 +17,9 @@ export default function Header() {
     window.location = "/";
   };
 
-  
+  useEffect(() => {
+    fetchCart();
+  }, []);
 
   return (
     <div>
@@ -66,47 +74,50 @@ export default function Header() {
                   </svg>
                 </div>
               </a>
-              <details className="dropdown dropdown-end">
-                <summary
-                  role="button"
-                  className="btn btn-ghost btn-circle mr-4"
-                >
-                  <div className="indicator">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-8 w-8"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        stroke="#FFFFFF"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-                      />
-                    </svg>
-                    <span className="badge badge-sm indicator-item">8</span>
-                  </div>
-                </summary>
-                <div
-                  tabIndex={0}
-                  className="mt-3 z-[1] card card-compact dropdown-content w-52 bg-neutral shadow"
-                >
-                  <div className="card-body">
-                    <span className="font-bold text-lg text-primary">
-                      8 Items
-                    </span>
-                    <span className="text-info">Subtotal: $999</span>
-                    <div className="card-actions">
-                      <a className="btn btn-accent btn-block" href="/cart">
-                        ดูตะกร้า
-                      </a>
+                <details className="dropdown dropdown-end">
+                  <summary
+                    role="button"
+                    className="btn btn-ghost btn-circle mr-4"
+                  >
+                    <div className="indicator">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-8 w-8"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          stroke="#FFFFFF"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+                        />
+                      </svg>
+                      <span className="badge badge-sm indicator-item">
+                        {totalQuantity}
+                      </span>
+                    </div>
+                  </summary>
+                  <div
+                    tabIndex={0}
+                    className="mt-3 z-[1] card card-compact dropdown-content w-52 bg-neutral shadow"
+                  >
+                    <div className="card-body">
+                      <span className="font-bold text-lg text-primary">
+                        {totalQuantity} Items
+                      </span>
+                      <span className="text-info">Subtotal: ฿{totalPrice}</span>
+                      <div className="card-actions">
+                        <a className="btn btn-accent btn-block" href="/cart">
+                          ดูตะกร้า
+                        </a>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </details>
+                </details>
+              
 
               <div className="dropdown dropdown-end">
                 <div
@@ -145,7 +156,9 @@ export default function Header() {
               >
                 Login
               </a>
-              <a href="/register" className="btn btn-primary w-24">Register</a>
+              <a href="/register" className="btn btn-primary w-24">
+                Register
+              </a>
             </div>
           )}
         </div>

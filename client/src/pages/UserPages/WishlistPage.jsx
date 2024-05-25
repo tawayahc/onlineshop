@@ -3,22 +3,24 @@ import Layout from "../../components/Layout/Layout";
 import ProductCard from "../../components/Product/ProductCard";
 import axios from "axios";
 
-function WishlistPage({ userId }) {
+function WishlistPage() {
   const [wishlist, setWishlist] = useState([]);
+  const userId = localStorage.getItem("userId");
 
   //WARN : wishlist fetch database
-  // useEffect(() => {
-  //   const fetchWishlist = async () => {
-  //     try {
-  //       const response = await axios.get(`http://localhost:5000/wishlist/${userId}`);
-  //       setWishlist(response.data.map(item => ({ ...item, isInWishlist: true })));
-  //     } catch (error) {
-  //       console.error("Error fetching wishlist:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3333/wishlist/${userId}`);
+        setWishlist(response.data.data);
+        console.log(response.data.data);
+      } catch (error) {
+        console.error("Error fetching wishlist:", error);
+      }
+    };
 
-  //   fetchWishlist();
-  // }, [userId]);
+    fetchWishlist();
+  }, [userId]);
 
   const handleWishlistChange = (productId, isInWishlist) => {
     setWishlist(prevWishlist => 
