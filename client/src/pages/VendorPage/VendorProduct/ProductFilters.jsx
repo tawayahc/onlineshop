@@ -1,16 +1,16 @@
 import React from 'react';
 import { useRecoilState } from 'recoil';
 import {
-  searchTermState,
+  productSearchTermState,
   selectedCategoryState,
-  sortByState,
+  productSortByState,
   productCategoriesState,
 } from '../../../recoil/productControlPanel.js';
 
 function ProductFilters() {
-  const [searchTerm, setSearchTerm] = useRecoilState(searchTermState);
+  const [searchTerm, setSearchTerm] = useRecoilState(productSearchTermState);
   const [selectedCategory, setSelectedCategory] = useRecoilState(selectedCategoryState);
-  const [sortBy, setSortBy] = useRecoilState(sortByState);
+  const [sortBy, setSortBy] = useRecoilState(productSortByState);
   const [productCategories] = useRecoilState(productCategoriesState);
 
   const resetFilters = () => {

@@ -21,6 +21,7 @@ import OrderControlPanelPage from './pages/VendorPage/VendorOrder/OrderControlPa
 import Register from './pages/Auth/Register';
 import Login from './pages/Auth/Login';
 import AdminLogin from './pages/Auth/AdminLogin';
+import AdminRegister from './pages/Auth/AdminRegister';
 
 function App() {
 
@@ -33,7 +34,11 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin">
+          <Route index element={<AdminLogin />} />
+          <Route path="register" element={<AdminRegister />} />
+        </Route>
+        
 
         <Route path="/products" element={<Products />} />
         <Route path="/products/:productId" element={<ProductDetails />} /> 

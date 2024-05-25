@@ -24,8 +24,8 @@ export const productCategoriesState = atom({
   default: [],
 });
 
-export const searchTermState = atom({
-  key: 'searchTermState',
+export const productSearchTermState = atom({
+  key: 'productSearchTermState',
   default: '',
 });
 
@@ -34,8 +34,8 @@ export const selectedCategoryState = atom({
   default: 'All',
 });
 
-export const sortByState = atom({
-  key: 'sortByState',
+export const productSortByState = atom({
+  key: 'productSortByState',
   default: 'default',
 });
 
@@ -48,9 +48,9 @@ export const filteredProductsState = selector({
   key: 'filteredProductsState',
   get: ({ get }) => {
     const products = get(productListState);
-    const searchTerm = get(searchTermState).toLowerCase();
+    const searchTerm = get(productSearchTermState).toLowerCase();
     const selectedCategory = get(selectedCategoryState);
-    const sortBy = get(sortByState);
+    const sortBy = get(productSortByState);
 
     return products
       .filter(product => {

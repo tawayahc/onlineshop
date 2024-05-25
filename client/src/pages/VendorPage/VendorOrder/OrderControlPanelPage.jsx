@@ -1,20 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../../../components/Layout/Layout';
-import { fetchOrders, updateOrderStatus as updateOrderStatusAPI, deleteOrders } from '../../../API/vendorOrders';
+import { fetchOrders, updateOrderStatus as updateOrderStatusAPI } from '../../../API/vendorOrders';
 import OrderDetailsModal from './OrderDetailsModal';
+import OrderFilters from './OrderFilters';
+import OrderActions from './OrderActions';
+import OrderList from './OrderList';
+import OrderPagination from './OrderPagination';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { ordersState, selectedOrdersState, orderCurrentPageState } from '../../../recoil/orderControlPanel';
 
 function OrderControlPanelPage() {
-  const [orders, setOrders] = useState([]);
-  const [selectedOrders, setSelectedOrders] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('All');
-  const [sortBy, setSortBy] = useState('default');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(20);
-
-  // Modal state
   const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [orders, setOrders] = useRecoilState(ordersState);
+  const [selectedOrders, setSelectedOrders] = useRecoilState(selectedOrdersState);
+  const setCurrentPage = useSetRecoilState(orderCurrentPageState);
 
   // Fetch orders from the backend
   useEffect(() => {
@@ -27,77 +28,31 @@ function OrderControlPanelPage() {
       }
     };
     fetchAllOrders();
-  }, []);
+  }, [setOrders]);
 
-  // Function to open the modal and set selected order details
   const openOrderDetailsModal = (orderId) => {
     const order = orders.find(order => order.id === orderId);
     setSelectedOrderDetails(order);
     setIsModalOpen(true);
   };
 
-  // Function to close the modal
   const closeOrderDetailsModal = () => {
     setIsModalOpen(false);
   };
 
-  // Function to filter orders based on search term, status, and date range
-  const filterOrders = () => {
-    return orders.filter(order => {
-      if (selectedStatus !== 'All' && order.status !== selectedStatus) {
-        return false;
+  const toggleOrderSelection = (orderId) => {
+    setSelectedOrders(prevSelectedOrders => {
+      if (prevSelectedOrders.includes(orderId)) {
+        return prevSelectedOrders.filter(id => id !== orderId);
+      } else {
+        return [...prevSelectedOrders, orderId];
       }
-      if (searchTerm && !order.customer.toLowerCase().includes(searchTerm.toLowerCase())) {
-        return false;
-      }
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === 'ascending') {
-        return a.total - b.total;
-      } else if (sortBy === 'descending') {
-        return b.total - a.total;
-      }
-      return 0;
     });
   };
 
-  // Pagination logic
-  const indexOfLastOrder = currentPage * ordersPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = filterOrders().slice(indexOfFirstOrder, indexOfLastOrder);
-
-  // Change page
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const statuses = ['All', 'Processing', 'Shipped', 'Delivered'];
-
-  // Calculate order range
-  const startOrderIndex = indexOfFirstOrder + 1;
-  const endOrderIndex = Math.min(indexOfLastOrder, filterOrders().length);
-
-  const deleteSelectedOrders = async () => {
-    try {
-      await deleteOrders(selectedOrders);
-      const updatedOrders = orders.filter(order => !selectedOrders.includes(order.id));
-      setOrders(updatedOrders);
-      setSelectedOrders([]);
-    } catch (error) {
-      console.error('Failed to delete orders:', error);
-    }
-  };
-
-  const toggleOrderSelection = (orderId) => {
-    if (selectedOrders.includes(orderId)) {
-      setSelectedOrders(selectedOrders.filter(id => id !== orderId));
-    } else {
-      setSelectedOrders([...selectedOrders, orderId]);
-    }
-  };
-
   const resetFilters = () => {
-    setSearchTerm('');
-    setSelectedStatus('All');
-    setSortBy('default');
+    setSelectedOrders([]);
+    setCurrentPage(1);
   };
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
@@ -123,99 +78,14 @@ function OrderControlPanelPage() {
         <OrderDetailsModal order={selectedOrderDetails} closeModal={closeOrderDetailsModal} />
       )}
 
-      {/* Filter Options */}
-      <div className="mb-8">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search orders..."
-          className="input mb-2"
-        />
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="input mr-2"
-        >
-          {statuses.map(status => (
-            <option key={status} value={status}>{status}</option>
-          ))}
-        </select>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="input mr-2"
-        >
-          <option value="default">Order ID</option>
-          <option value="ascending">Total: Low to High</option>
-          <option value="descending">Total: High to Low</option>
-        </select>
-        <button onClick={resetFilters} className="btn btn-secondary">Reset Filters</button>
-      </div>
-
-      {/* Order List */}
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold mb-2">Order List</h2>
-        <div className="flex items-center mb-2">
-          <button onClick={deleteSelectedOrders} className="btn btn-danger mr-2">Delete Selected</button>
-        </div>
-        <table className="table-auto w-full">
-          <thead>
-            <tr>
-              <th className="border px-4 py-2"></th>
-              <th className="border px-4 py-2">Order ID</th>
-              <th className="border px-4 py-2">Expected Date</th>
-              <th className="border px-4 py-2">Total</th>
-              <th className="border px-4 py-2">Status</th>
-              <th className="border px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentOrders.map(order => (
-              <tr key={order.id} className="hover:bg-gray-100">
-                <td className="border px-4 py-2">
-                  <input
-                    type="checkbox"
-                    checked={selectedOrders.includes(order.id)}
-                    onChange={() => toggleOrderSelection(order.id)}
-                  />
-                </td>
-                <td className="border px-4 py-2">{order.id}</td>
-                <td className="border px-4 py-2">{order.expectedDate}</td>
-                <td className="border px-4 py-2">{order.products.reduce((acc, product) => acc + product.price * product.count, 0)}$</td>
-                <td className="border px-4 py-2">
-                  <select
-                    value={order.status}
-                    onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
-                    className="input"
-                  >
-                    {statuses.map(status => (
-                      <option key={status} value={status}>{status}</option>
-                    ))}
-                  </select>
-                </td>
-                <td className="border px-4 py-2">
-                  <button onClick={() => openOrderDetailsModal(order.id)} className="btn btn-primary">View Details</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        
-        {/* Pagination and Order Range */}
-        <div className="flex justify-between items-center mt-4">
-          <div>
-            Showing {startOrderIndex} - {endOrderIndex} of {filterOrders().length} orders
-          </div>
-          <ul className="flex">
-            {Array.from({ length: Math.ceil(filterOrders().length / ordersPerPage) }, (_, i) => (
-              <li key={i} className="mx-1">
-                <button onClick={() => paginate(i + 1)} className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-700">{i + 1}</button>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      <OrderFilters resetFilters={resetFilters} />
+      <OrderActions />
+      <OrderList
+        toggleOrderSelection={toggleOrderSelection}
+        openOrderDetailsModal={openOrderDetailsModal}
+        handleUpdateOrderStatus={handleUpdateOrderStatus}
+      />
+      <OrderPagination />
     </div>
   );
 }
