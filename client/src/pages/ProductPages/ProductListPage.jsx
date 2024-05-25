@@ -12,7 +12,7 @@ import {
 import fetchProductsList from "../../API/fetchProducts";
 import { cartStatusState } from "../../recoil/cart";
 import Toast from "../../components/Toast";
-import CategorySelectSection from "../../components/CategorySelectSection";
+import CategorySelectSection from "../../components/Home/BrowseByCategory/CategorySelect";
 
 function ProductListPage() {
   // const displayedProducts = useRecoilValue(paginatedProductsState);
@@ -30,6 +30,7 @@ function ProductListPage() {
     setLoading(true);
     fetchProducts().finally(() => setLoading(false));
   }, []);
+  
   console.log(products);
   useEffect(() => {
     const fetchFilteredProducts = async () => {

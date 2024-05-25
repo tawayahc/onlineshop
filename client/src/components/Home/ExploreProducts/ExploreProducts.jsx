@@ -58,17 +58,19 @@ const ExploreProducts = () => {
 
   return (
     <div style={styles.container}>
-      <CategorySelect
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
-      />
+      
+      
       <div className="flex items-center mb-4">
         <div className="bg-blue-500 h-8 w-2 mr-2"></div>
         <h2 className="text-blue-500 text-xl font-bold">Our Products</h2>
       </div>
       <h3 className="text-2xl font-bold mb-4 text-left">
-        {selectedCategory === 'All' ? 'Explore Our Products' : selectedCategory}
+       Explore by Category
       </h3>
+      <CategorySelect
+        selectedCategory={selectedCategory}
+        onSelectCategory={setSelectedCategory}
+      />
       <div style={styles.productListContainer}>
         <div style={styles.scrollButtonContainer}>
           <button onClick={() => scroll('left')} style={styles.scrollButton}>
