@@ -27,12 +27,9 @@ export default function Login() {
         alert("Login Success");
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("userId", response.data.userId);
-        // WARN : right here
-        // setUserId(response.data.userId);
-        // console.log("After Login:",userId);
         window.location = "/";
       } else {
-        // alert("Login Failed");
+        alert("Login Failed");
         setError(response.data.message);
       }
     } catch (error) {

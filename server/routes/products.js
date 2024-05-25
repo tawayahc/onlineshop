@@ -158,11 +158,12 @@ router.get("/:id", function (req, res, next) {
     s.ShopName,
     s.ShopDescription,
     s.RatingAvg AS ShopRatingAvg,
+    s.ShopImage,
     pr.Comment AS ReviewComment,
     pr.Rating AS ReviewRating,
     c.FirstName,
     c.LastName,
-    c.Image AS ClientImage
+    c.Image_code AS ClientImage
   FROM product p
   LEFT JOIN 
     productimage pi ON p.ProductID = pi.ProductID
@@ -205,6 +206,7 @@ router.get("/:id", function (req, res, next) {
               ShopName: row.ShopName,
               ShopDescription: row.ShopDescription,
               RatingAvg: row.ShopRatingAvg,
+              ShopImage: row.ShopImage,
             });
           }
         }

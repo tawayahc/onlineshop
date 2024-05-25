@@ -2,6 +2,7 @@
 import { useRecoilState } from "recoil";
 import axios from "axios";
 import { productsState, categoriesState } from "../recoil/atom";
+import { useCallback } from "react";
 
 const url = "http://localhost:3333/";
 const fetchProductsList = () => {

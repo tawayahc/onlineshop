@@ -16,6 +16,8 @@ import axios from "axios";
 import useCartActions from "../../API/userCartActions";
 import { cartStatusState } from "../../recoil/cart";
 import Toast from "../../components/Toast";
+import useWishActions from "../../API/userWishAction";
+import { wishlistState } from "../../recoil/wishlist";
 
 const renderStars = (rating) => {
   const fullStars = Math.floor(rating);
@@ -55,10 +57,27 @@ function ProductDetailLayout({ productId }) {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
 
+  // cart
   const { addToCart } = useCartActions(userId);
   const status = useRecoilValue(cartStatusState);
   const setStatus = useSetRecoilState(cartStatusState);
 
+  //wishlist
+  const { addToWishlist, removeFromWishlist, fetchWishlist } = useWishActions(userId);
+  const wishlist = useRecoilValue(wishlistState);
+  const isInWishlist = wishlist.map((item) => item.ProductID);
+
+  const checkProductIsinwishlist = (productID) => {
+    return isInWishlist.includes(productID);
+  };
+
+  const handleAddToWishlist = (productID) => {
+    if (checkProductIsinwishlist(productID)) {
+      removeFromWishlist(productID);
+    } else {
+      addToWishlist(productID);
+    }
+  };
   const handleClick = (buttonName) => {
     setActiveButton(buttonName);
   };
@@ -101,6 +120,11 @@ function ProductDetailLayout({ productId }) {
     }
   }, [status, setStatus]);
 
+  useEffect(() => {
+    setLoading(true);
+    fetchWishlist().finally(() => setLoading(false));
+  }, []);
+
   console.log(status.type);
   // const thumbnailImages =
   //   productDetail?.ProductImages.map((image) => (
@@ -117,14 +141,16 @@ function ProductDetailLayout({ productId }) {
     "https://picsum.photos/id/847/200/300",
     "https://picsum.photos/id/1074/200/300",
   ];
-  //WARN : properties name
+  //WARN : change Image Source
   return (
     <div className="flex flex-col">
-      <Toast
-        message={status.message}
-        type={status.type}
-        onClose={() => setStatus({ visible: false, message: "", type: "" })}
-      />
+      {status.visible && (
+        <Toast
+          message={status.message}
+          type={status.type}
+          onClose={() => setStatus({ visible: false, message: "", type: "" })}
+        />
+      )}
       {loading ? (
         <div className="flex justify-center h-96">
           <span className="loading loading-spinner loading-lg"></span>
@@ -171,7 +197,14 @@ function ProductDetailLayout({ productId }) {
                   >
                     <BsBagFill /> Add to cart
                   </button>
-                  <button className="btn">
+                  <button
+                    className={
+                      checkProductIsinwishlist(productDetail.ProductID)
+                        ? "btn btn-error"
+                        : "btn"
+                    }
+                    onClick={() => handleAddToWishlist(productDetail.ProductID)}
+                  >
                     <BsHeart />
                   </button>
                 </div>

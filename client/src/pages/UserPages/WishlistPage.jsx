@@ -18,19 +18,6 @@ function WishlistPage() {
     fetchWishlist().finally(() => setLoading(false));
   }, []);
 
-
-  // const handleWishlistChange = (productId, isInWishlist) => {
-  //   setWishlist(prevWishlist => 
-  //     prevWishlist.map(item => 
-  //       item.id === productId ? { ...item, isInWishlist } : item
-  //     )
-  //   );
-  // };
-
-  const handleWishlistChange = () => {
-    console.log("Wishlist changed");
-  }
-
   return (
     <div className="flex flex-col m-10">
       <div className="text-3xl font-noto">สินค้าในรายการโปรด</div>
@@ -41,8 +28,6 @@ function WishlistPage() {
               <ProductCard
                 key={product.ProductID}
                 data={product}
-                userId={userId}
-                onWishlistChange={handleWishlistChange}
               />
             ))}
           </div>

@@ -57,11 +57,10 @@ function ProductCard({ data }) {
       removeFromWishlist(productID);
     } else {
       addToWishlist(productID);
-      console.log(productID);
     }
   };
   return (
-    // TODO : Add to cart & wishlist
+    // FIX : Add to cart / Change to cartitem
     <div className="group">
       <div className="card card-compact w-60 min-96 shadow-xl">
         <figure className="h-40">

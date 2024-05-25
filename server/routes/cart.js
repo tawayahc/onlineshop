@@ -3,6 +3,7 @@ const db = require("../db");
 
 const router = express.Router();
 
+// FIX: cart + cartitem
 // Get cart items for a user
 // 3 tables
 router.get("/:userId", async (req, res) => {
