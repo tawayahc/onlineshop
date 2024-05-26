@@ -2,11 +2,9 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3333/admin/products';
 
-export const fetchProducts = async (search = '', sortBy = '', sortOrder = 'asc') => {
+export const fetchProducts = async () => {
   try {
-    const response = await axios.get(`${API_URL}/see`, {
-      params: { search, sortBy, sortOrder }
-    });
+    const response = await axios.get(`${API_URL}/see`);
     return response.data;
   } catch (error) {
     console.error('Error fetching products:', error);
@@ -53,24 +51,23 @@ export const deleteProducts = async (productIDs) => {
 };
 
 export const updateProduct = async (product) => {
-  try {
-    await axios.put(`${API_URL}/update`, product, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-  } catch (error) {
-    console.error('Failed to update product:', error);
-    throw error;
-  }
-};
+    try {
+      await axios.put(`${API_URL}/update`, product, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.error('Failed to update product:', error);
+      throw error;
+    }
+};  
 
-export const addProductImage = async (productId, imageUrl, imageBlob) => {
+export const addProductImage = async (productId, imageUrl) => {
   try {
     const response = await axios.post(`${API_URL}/add-image`, {
       productId,
       imageUrl,
-      imageBlob,
     }, {
       headers: {
         'Content-Type': 'application/json',
@@ -93,16 +90,6 @@ export const removeProductImage = async (imageId) => {
     });
   } catch (error) {
     console.error('Failed to remove image:', error);
-    throw error;
-  }
-};
-
-export const fetchProductSummary = async () => {
-  try {
-    const response = await axios.get(`${API_URL}/summary`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching summary data:', error);
     throw error;
   }
 };

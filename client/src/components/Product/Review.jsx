@@ -61,7 +61,7 @@ function Review() {
                 key={
                   reviewItem.id || Math.random().toString(36).substring(2, 15)
                 } // Unique key
-                img={handleImage(reviewItem.Client.Image)}
+                img={handleImage(reviewItem.Client.Image_Code)}
                 name={
                   reviewItem.Client.FirstName +
                     " " +

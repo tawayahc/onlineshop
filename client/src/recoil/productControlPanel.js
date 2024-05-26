@@ -39,14 +39,9 @@ export const productSortByState = atom({
   default: 'default',
 });
 
-export const productSortOrderState = atom({
-  key: 'productSortOrderState',
-  default: 'asc',
-});
-
 export const selectedImageState = atom({
-  key: 'selectedImageState',
-  default: null,
+    key: 'selectedImageState',
+    default: null,
 });
 
 export const filteredProductsState = selector({
@@ -56,7 +51,6 @@ export const filteredProductsState = selector({
     const searchTerm = get(productSearchTermState).toLowerCase();
     const selectedCategory = get(selectedCategoryState);
     const sortBy = get(productSortByState);
-    const sortOrder = get(productSortOrderState);
 
     return products
       .filter(product => {
@@ -66,10 +60,10 @@ export const filteredProductsState = selector({
         return product.ProductName.toLowerCase().includes(searchTerm);
       })
       .sort((a, b) => {
-        if (sortBy === 'Price') {
-          return sortOrder === 'asc' ? a.Price - b.Price : b.Price - a.Price;
-        } else if (sortBy === 'ProductName') {
-          return sortOrder === 'asc' ? a.ProductName.localeCompare(b.ProductName) : b.ProductName.localeCompare(a.ProductName);
+        if (sortBy === 'ascending') {
+          return a.Price - b.Price;
+        } else if (sortBy === 'descending') {
+          return b.Price - a.Price;
         }
         return 0;
       });

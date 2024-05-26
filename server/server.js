@@ -5,21 +5,21 @@ var bodyParser = require("body-parser");
 var app = express();
 
 app.use(cors());
-
-app.use(bodyParser.json({ limit: '50mb' })); // Increase limit to 50MB
-app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+app.use(bodyParser.json());
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const productRoutes = require('./routes/products');
 const adminRoutes = require('./routes/admin');
 const cartRoutes = require('./routes/cart');
+const wishlistRoutes = require('./routes/wishlist');
 
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
 app.use('/products', productRoutes);
 app.use('/admin', adminRoutes);
 app.use('/cart', cartRoutes);
+app.use('/wishlist', wishlistRoutes);
 
 app.listen(3333, function () {
   console.log("CORS-enabled web server listening on port 3333");

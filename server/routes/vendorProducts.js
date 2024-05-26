@@ -10,6 +10,7 @@ router.post('/add', function (req, res, next) {
         QuantityAvailable: req.body.QuantityAvailable,
         ProductCategoryID: req.body.ProductCategoryID,
         Productimagecode: req.body.Productimagecode,
+        ProductimageName: req.body.ProductimageName
     };
   
     connection.query(
@@ -20,82 +21,73 @@ router.post('/add', function (req, res, next) {
                 return res.json({ status: 'error', message: err });
             }
             const insertedProductId = results.insertId;
-            const insertedProduct = {
-                ...newProduct,
-                ProductID: insertedProductId
-            };
-            return res.json({ status: 'ok', message: 'Product added successfully', product: insertedProduct });
+            connection.query(
+                'INSERT INTO `productimage`(ProductID, Productimagecode, ProductimageName) VALUES (?, ?, ?)',
+                [insertedProductId, newProduct.Productimagecode, newProduct.ProductimageName],
+                function(err, results) {
+                    if (err) {
+                        return res.json({ status: 'error', message: err });
+                    }
+                    const insertedProduct = {
+                        ...newProduct,
+                        ProductID: insertedProductId
+                    };
+                    return res.json({ status: 'ok', message: 'Product added successfully', product: insertedProduct });
+                }
+            );
         }
     );
 });
 
 router.get('/see', function (req, res, next) {
   connection.query(
-    'SELECT p.*, pc.ProductCategoryName, pi.ProductImageID, pi.ProductImageBlob ' +
-    'FROM product p ' +
-    'INNER JOIN productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID ' +
-    'LEFT JOIN productimage pi ON p.ProductID = pi.ProductID ' +
-    'GROUP BY p.ProductID, pi.ProductImageID',
-    function (err, results, fields) {
+    'SELECT product.*, productcategory.*, productimage.ProductImageID, productimage.ProductimageName, productimage.Productimagecode ' +
+    'FROM product ' +
+    'INNER JOIN productcategory ON product.productcategoryid = productcategory.productcategoryid ' +
+    'LEFT JOIN productimage ON product.productid = productimage.productid ' +
+    'GROUP BY product.productid, productimage.ProductImageID',
+    function(err, results, fields) {
       if (err) {
-        return res.json({ status: 'error', message: err });
-      }
-      const productsWithImages = results.reduce((acc, row) => {
-        const productId = row.ProductID;
-        if (!acc[productId]) {
-          acc[productId] = {
-            ProductID: row.ProductID,
-            ProductName: row.ProductName,
-            ProductDescription: row.ProductDescription,
-            Price: row.Price,
-            QuantityAvailable: row.QuantityAvailable,
-            RatingAvg: row.RatingAvg,
-            Date: row.Date,
-            ProductCategoryID: row.ProductCategoryID,
-            ShopID: row.ShopID,
-            PromotionID: row.PromotionID,
-            StaffID: row.StaffID,
-            ProductCategoryName: row.ProductCategoryName,
-            Published: row.Published,
-            ProductImages: []
-          };
-        }
-        if (row.ProductImageID) {
-          acc[productId].ProductImages.push({
-            ProductImageID: row.ProductImageID,
-            ProductImageBlob: row.ProductImageBlob ? row.ProductImageBlob.toString('base64') : null
-          });
-        }
-        return acc;
-      }, {});
+        res.json({status: 'error', message: err});
+      } else {
+        const productsWithImages = results.reduce((acc, row) => {
+          const productId = row.ProductID;
+          if (!acc[productId]) {
+            acc[productId] = {
+              ProductID: row.ProductID,
+              ProductName: row.ProductName,
+              ProductDescription: row.ProductDescription,
+              Price: row.Price,
+              QuantityAvailable: row.QuantityAvailable,
+              RatingAvg: row.RatingAvg,
+              Date: row.Date,
+              ProductCategoryID: row.ProductCategoryID,
+              ShopID: row.ShopID,
+              PromotionID: row.PromotionID,
+              StaffID: row.StaffID,
+              ProductCategoryName: row.ProductCategoryName,
+              ProductCategoryDescription: row.ProductCategoryDescription,
+              Published: row.Published,
+              ProductImages: []
+            };
+          }
+          if (row.ProductImageID) {
+            acc[productId].ProductImages.push({
+              ProductImageID: row.ProductImageID,
+              ProductimageName: row.ProductimageName,
+              Productimagecode: row.Productimagecode
+            });
+          }
+          return acc;
+        }, {});
 
-      const productList = Object.values(productsWithImages);
-      res.json(productList);
+        const productList = Object.values(productsWithImages);
+        
+        res.json(productList);
+      }
     }
   );
 });
-
-router.get('/summary', function (req, res, next) {
-  connection.query(
-    `SELECT 
-      pc.ProductCategoryName, 
-      COUNT(p.ProductID) AS productCount, 
-      COALESCE(SUM(p.Price), 0) AS totalPrice, 
-      COALESCE(AVG(p.Price), 0) AS avgPrice,
-      COUNT(o.OrderID) AS totalOrders
-    FROM product p
-    INNER JOIN productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
-    LEFT JOIN orderitem o ON p.ProductID = o.ProductID
-    GROUP BY pc.ProductCategoryName`,
-    function (err, results, fields) {
-      if (err) {
-        return res.json({ status: 'error', message: err });
-      }
-      res.json(results);
-    }
-  );
-});
-
 
 router.get('/category-see', function (req, res, next) {
     connection.query(
@@ -144,53 +136,41 @@ router.put('/update', function (req, res, next) {
 
 router.delete('/delete', function (req, res, next) {
     const productIDs = req.body.productIDs;
-    console.log('Deleting products with IDs:', productIDs);
     connection.query(
-      'DELETE FROM `product` WHERE ProductID IN (?)',
-      [productIDs],
-      function (err, results) {
-        if (err) {
-          console.error('Error deleting products:', err);
-          res.json({ status: 'error', message: err });
-        } else {
-          console.log('Delete results:', results);
-          res.json({ status: 'ok', message: 'Products deleted successfully' });
+        'DELETE FROM `product` WHERE ProductID IN (?)',
+        [productIDs],
+        function(err, results) {
+            if (err) {
+                res.json({ status: 'error', message: err });
+            } else {
+                res.json({ status: 'ok', message: 'Products deleted successfully' });
+            }
         }
-      }
     );
-  });
-  
-  router.post('/add-image', function (req, res, next) {
-    const { productId, imageUrl, imageBlob } = req.body;
-  
-    if (!productId || !imageBlob) {
-      return res.status(400).json({ status: 'error', message: 'Missing required fields' });
-    }
-  
-    try {
-      const imageBuffer = Buffer.from(imageBlob, 'base64');
-      connection.query(
-        'INSERT INTO `productimage` (ProductID, ProductImageBlob) VALUES (?, ?)',
-        [productId, imageBuffer],
-        function (err, results) {
-          if (err) {
-            console.error('Database error:', err);
-            return res.status(500).json({ status: 'error', message: err.message });
-          }
-          const insertedImage = {
-            ProductImageID: results.insertId,
-            ProductID: productId,
-            ProductImageBlob: imageBlob,
-          };
-          return res.json({ status: 'ok', message: 'Image added successfully', image: insertedImage });
-        }
-      );
-    } catch (error) {
-      console.error('Error processing image:', error);
-      return res.status(500).json({ status: 'error', message: 'Failed to process image' });
-    }
-  });
+});
 
+// Add Image Route
+router.post('/add-image', function (req, res, next) {
+    const { productId, imageUrl } = req.body;
+    console.log('add-image', productId, imageUrl);
+    connection.query(
+        'INSERT INTO `productimage` (ProductID, Productimagecode) VALUES (?, ?)',
+        [productId, imageUrl],
+        function(err, results) {
+            if (err) {
+                return res.json({ status: 'error', message: err });
+            }
+            const insertedImage = {
+                ProductImageID: results.insertId,
+                ProductID: productId,
+                Productimagecode: imageUrl,
+            };
+            return res.json({ status: 'ok', message: 'Image added successfully', image: insertedImage });
+        }
+    );
+});
+
+// Remove Image Route
 router.delete('/remove-image', function (req, res, next) {
     const { imageId } = req.body;
     connection.query(

@@ -17,7 +17,7 @@ export const totalQuantityState = selector({
     return cart.reduce(
       (total, item) =>
         total +
-        item.Products.reduce((productTotal, product) => productTotal + item.Quantity, 0),
+        item.Products.reduce((productTotal, product) => productTotal + product.Quantity, 0),
       0
     );
   },
@@ -31,7 +31,7 @@ export const totalPriceState = selector({
       (total, item) =>
         total +
         item.Products.reduce(
-          (productTotal, product) => productTotal + product.Price * item.Quantity,
+          (productTotal, product) => productTotal + product.Price * product.Quantity,
           0
         ),
       0

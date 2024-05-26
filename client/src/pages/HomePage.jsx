@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from 'react';
 import Layout from "../components/Layout/Layout";
-import axios from "axios";
+import Banner from "../components/Home/Banner/Banner";
+import ExploreProducts from "../components/Home/ExploreProducts/ExploreProducts";
+import FlashSale from "../components/Home/FlashSale/FlashSale";
+import NewArrival from '../components/Home/NewArrival/NewArrival';
 
-function HomePage() {
-  const [userId, setUserId] = useState(localStorage.getItem("userId"));
-
+export default function HomePage() {
   return (
     <div className="w-full mx-auto">
       <Layout>
@@ -20,9 +21,3 @@ function HomePage() {
     </div>
   );
 }
-
-export default () => (
-  <Layout>
-    <HomePage />
-  </Layout>
-);

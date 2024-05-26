@@ -61,24 +61,24 @@ function FilterCollapse({ title, type }) {
 
   const content = () => {
     switch (type) {
-      case "category":
-        return (
-          <div className="flex flex-wrap flex-col">
-            {categories.map((item, index) => (
-              <div key={index} className="flex cursor-pointer mr-2 mb-2">
-                <input
-                  type="checkbox"
-                  className="checkbox checkbox-sm checked:bg-primary"
-                  checked={selectedValues.includes(item.ProductCategoryName)}
-                  onChange={() =>
-                    handleCheckboxChange(item.ProductCategoryName)
-                  }
-                />
-                <div className="ml-2">{item.ProductCategoryName}</div>
-              </div>
-            ))}
-          </div>
-        );
+      // case "category":
+      //   return (
+      //     <div className="flex flex-wrap flex-col">
+      //       {categories.map((item, index) => (
+      //         <div key={index} className="flex cursor-pointer mr-2 mb-2">
+      //           <input
+      //             type="checkbox"
+      //             className="checkbox checkbox-sm checked:bg-primary"
+      //             checked={selectedValues.includes(item.ProductCategoryName)}
+      //             onChange={() =>
+      //               handleCheckboxChange(item.ProductCategoryName)
+      //             }
+      //           />
+      //           <div className="ml-2">{item.ProductCategoryName}</div>
+      //         </div>
+      //       ))}
+      //     </div>
+      //   );
       case "review":
         return (
           <div className="flex flex-wrap flex-col">

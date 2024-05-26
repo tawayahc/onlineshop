@@ -89,16 +89,16 @@ function ProductTable() {
                   onChange={() => toggleProductSelection(product.ProductID)}
                 />
               </td>
+
               <td className="border px-4 py-2">
                 <img
-                  src={product.ProductImages && product.ProductImages.length > 0 && product.ProductImages[0].ProductImageBlob
-                    ? `data:image/jpeg;base64,${product.ProductImages[0].ProductImageBlob}`
-                    : ''}
+                  src={product.ProductImages && product.ProductImages.length > 0 ? product.ProductImages[0].Productimagecode : ''}
                   alt={product.ProductImages && product.ProductImages.length > 0 ? product.ProductImages[0].ProductimageName : ''}
                   className="w-12 h-12 mr-2"
                   onClick={() => openImageModal(product)}
                 />
               </td>
+
               <td className="border px-4 py-2">{product.ProductName}</td>
               <td className="border px-4 py-2">{product.ProductCategoryName}</td>
               <td className="border px-4 py-2">{product.Price}$</td>

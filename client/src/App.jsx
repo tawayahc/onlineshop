@@ -24,8 +24,6 @@ import AdminLogin from './pages/Auth/AdminLogin';
 import AdminRegister from './pages/Auth/AdminRegister';
 import CompletePage from './pages/CompletePage';
 
-import CustomerManagementPage from './pages/CustomerManagementPage/CustomerManagementPage';
-
 function App() {
 
   return (
@@ -40,7 +38,6 @@ function App() {
         <Route path="/admin">
           <Route index element={<AdminLogin />} />
           <Route path="register" element={<AdminRegister />} />
-          <Route path="customer" element={<CustomerManagementPage />} />
         </Route>
         
 
