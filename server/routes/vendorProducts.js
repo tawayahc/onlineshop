@@ -39,55 +39,66 @@ router.post('/add', function (req, res, next) {
     );
 });
 
-router.get('/see', function (req, res, next) {
-  connection.query(
-    'SELECT product.*, productcategory.*, productimage.ProductImageID, productimage.ProductimageName, productimage.Productimagecode ' +
-    'FROM product ' +
-    'INNER JOIN productcategory ON product.productcategoryid = productcategory.productcategoryid ' +
-    'LEFT JOIN productimage ON product.productid = productimage.productid ' +
-    'GROUP BY product.productid, productimage.ProductImageID',
-    function(err, results, fields) {
-      if (err) {
-        res.json({status: 'error', message: err});
-      } else {
-        const productsWithImages = results.reduce((acc, row) => {
-          const productId = row.ProductID;
-          if (!acc[productId]) {
-            acc[productId] = {
-              ProductID: row.ProductID,
-              ProductName: row.ProductName,
-              ProductDescription: row.ProductDescription,
-              Price: row.Price,
-              QuantityAvailable: row.QuantityAvailable,
-              RatingAvg: row.RatingAvg,
-              Date: row.Date,
-              ProductCategoryID: row.ProductCategoryID,
-              ShopID: row.ShopID,
-              PromotionID: row.PromotionID,
-              StaffID: row.StaffID,
-              ProductCategoryName: row.ProductCategoryName,
-              ProductCategoryDescription: row.ProductCategoryDescription,
-              Published: row.Published,
-              ProductImages: []
-            };
-          }
-          if (row.ProductImageID) {
-            acc[productId].ProductImages.push({
-              ProductImageID: row.ProductImageID,
-              ProductimageName: row.ProductimageName,
-              Productimagecode: row.Productimagecode
-            });
-          }
-          return acc;
-        }, {});
-
-        const productList = Object.values(productsWithImages);
-        
-        res.json(productList);
-      }
+router.get('/see', (req, res) => {
+    const { search, sortBy, sortOrder } = req.query;
+  
+    let query = `
+      SELECT p.*, pc.ProductCategoryName, pi.ProductImageID, pi.ProductimageName, pi.Productimagecode
+      FROM product p
+      INNER JOIN productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+      LEFT JOIN productimage pi ON p.ProductID = pi.ProductID
+    `;
+  
+    if (search) {
+      query += `
+        WHERE p.ProductName LIKE '%${search}%'
+        OR pc.ProductCategoryName LIKE '%${search}%'
+      `;
     }
-  );
-});
+  
+    if (sortBy) {
+      const order = sortOrder === 'desc' ? 'DESC' : 'ASC';
+      query += ` ORDER BY ${sortBy} ${order}`;
+    }
+  
+    connection.query(query, (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err });
+      }
+      const productsWithImages = results.reduce((acc, row) => {
+        const productId = row.ProductID;
+        if (!acc[productId]) {
+          acc[productId] = {
+            ProductID: row.ProductID,
+            ProductName: row.ProductName,
+            ProductDescription: row.ProductDescription,
+            Price: row.Price,
+            QuantityAvailable: row.QuantityAvailable,
+            RatingAvg: row.RatingAvg,
+            Date: row.Date,
+            ProductCategoryID: row.ProductCategoryID,
+            ShopID: row.ShopID,
+            PromotionID: row.PromotionID,
+            StaffID: row.StaffID,
+            ProductCategoryName: row.ProductCategoryName,
+            Published: row.Published,
+            ProductImages: []
+          };
+        }
+        if (row.ProductImageID) {
+          acc[productId].ProductImages.push({
+            ProductImageID: row.ProductImageID,
+            ProductimageName: row.ProductimageName,
+            Productimagecode: row.Productimagecode
+          });
+        }
+        return acc;
+      }, {});
+  
+      const productList = Object.values(productsWithImages);
+      res.json(productList);
+    });
+  });
 
 router.get('/category-see', function (req, res, next) {
     connection.query(

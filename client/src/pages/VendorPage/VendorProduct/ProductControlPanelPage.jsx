@@ -55,7 +55,11 @@ function ProductControlPanelPage() {
     try {
       await updateProduct(product);
       setProducts((prevProducts) =>
-        prevProducts.map(p => (p.ProductID === product.ProductID ? product : p))
+        prevProducts.map(p => 
+          p.ProductID === product.ProductID 
+            ? { ...product, ProductImages: p.ProductImages }  // Preserve existing images
+            : p
+        )
       );
       closeModal();
     } catch (error) {
@@ -120,7 +124,6 @@ function ProductControlPanelPage() {
           setProductCategoryId={(categoryId) => setModalState((prev) => ({ ...prev, product: { ...prev.product, ProductCategoryID: parseInt(categoryId) } }))}
           productCategories={productCategories}
           setProductCount={(count) => setModalState((prev) => ({ ...prev, product: { ...prev.product, QuantityAvailable: parseInt(count) } }))}
-          setProductPublished={(published) => setModalState((prev) => ({ ...prev, product: { ...prev.product, published } }))}
           setProductCategory={(category) => setModalState((prev) => ({ ...prev, product: { ...prev.product, ProductCategoryName: category } }))}
           handleSubmit={modalState.mode === 'add' ? handleAddProduct : handleEditProduct}
           closeModal={closeModal}

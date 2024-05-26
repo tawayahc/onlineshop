@@ -4,6 +4,7 @@ import {
   productSearchTermState,
   selectedCategoryState,
   productSortByState,
+  productSortOrderState,
   productCategoriesState,
 } from '../../../recoil/productControlPanel.js';
 
@@ -11,12 +12,14 @@ function ProductFilters() {
   const [searchTerm, setSearchTerm] = useRecoilState(productSearchTermState);
   const [selectedCategory, setSelectedCategory] = useRecoilState(selectedCategoryState);
   const [sortBy, setSortBy] = useRecoilState(productSortByState);
+  const [sortOrder, setSortOrder] = useRecoilState(productSortOrderState);
   const [productCategories] = useRecoilState(productCategoriesState);
 
   const resetFilters = () => {
     setSearchTerm('');
     setSelectedCategory('All');
-    setSortBy('default');
+    setSortBy('');
+    setSortOrder('asc');
   };
 
   return (
@@ -47,10 +50,20 @@ function ProductFilters() {
         onChange={(e) => setSortBy(e.target.value)}
         className="input mr-2"
       >
-        <option value="default">Sort By</option>
-        <option value="ascending">Price: Low to High</option>
-        <option value="descending">Price: High to Low</option>
+        <option value="">Sort By</option>
+        <option value="Price">Price</option>
+        <option value="ProductName">Product Name</option>
       </select>
+      
+      <select
+        value={sortOrder}
+        onChange={(e) => setSortOrder(e.target.value)}
+        className="input mr-2"
+      >
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+
       <button onClick={resetFilters} className="btn btn-secondary">Reset Filters</button>
     </div>
   );

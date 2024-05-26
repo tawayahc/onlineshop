@@ -2,9 +2,11 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:3333/admin/products';
 
-export const fetchProducts = async () => {
+export const fetchProducts = async (search = '', sortBy = '', sortOrder = 'asc') => {
   try {
-    const response = await axios.get(`${API_URL}/see`);
+    const response = await axios.get(`${API_URL}/see`, {
+      params: { search, sortBy, sortOrder }
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching products:', error);
