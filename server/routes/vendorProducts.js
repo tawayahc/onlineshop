@@ -75,6 +75,28 @@ router.get('/see', function (req, res, next) {
   );
 });
 
+router.get('/summary', function (req, res, next) {
+  connection.query(
+    `SELECT 
+      pc.ProductCategoryName, 
+      COUNT(p.ProductID) AS productCount, 
+      COALESCE(SUM(p.Price), 0) AS totalPrice, 
+      COALESCE(AVG(p.Price), 0) AS avgPrice,
+      COUNT(o.OrderID) AS totalOrders
+    FROM product p
+    INNER JOIN productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+    LEFT JOIN orderitem o ON p.ProductID = o.ProductID
+    GROUP BY pc.ProductCategoryName`,
+    function (err, results, fields) {
+      if (err) {
+        return res.json({ status: 'error', message: err });
+      }
+      res.json(results);
+    }
+  );
+});
+
+
 router.get('/category-see', function (req, res, next) {
     connection.query(
         'SELECT * FROM ProductCategory',

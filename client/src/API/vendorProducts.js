@@ -53,17 +53,17 @@ export const deleteProducts = async (productIDs) => {
 };
 
 export const updateProduct = async (product) => {
-    try {
-      await axios.put(`${API_URL}/update`, product, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-    } catch (error) {
-      console.error('Failed to update product:', error);
-      throw error;
-    }
-};  
+  try {
+    await axios.put(`${API_URL}/update`, product, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    console.error('Failed to update product:', error);
+    throw error;
+  }
+};
 
 export const addProductImage = async (productId, imageUrl, imageBlob) => {
   try {
@@ -93,6 +93,16 @@ export const removeProductImage = async (imageId) => {
     });
   } catch (error) {
     console.error('Failed to remove image:', error);
+    throw error;
+  }
+};
+
+export const fetchProductSummary = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/summary`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching summary data:', error);
     throw error;
   }
 };

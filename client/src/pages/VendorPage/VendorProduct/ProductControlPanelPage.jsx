@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../../../components/Layout/Layout.jsx';
 import ProductFilters from './ProductFilters.jsx';
 import ProductActions from './ProductActions.jsx';
 import ProductTable from './ProductTable.jsx';
+import ProductSummaryTable from './ProductSummaryTable.jsx';
 import AddEditModal from './AddEditModal.jsx';
 import ImageModal from './ImageModal.jsx';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -26,6 +27,7 @@ function ProductControlPanelPage() {
   const [selectedImage, setSelectedImage] = useRecoilState(selectedImageState);
   const [products, setProducts] = useRecoilState(productListState);
   const [productCategories, setProductCategories] = useRecoilState(productCategoriesState);
+  const [view, setView] = useState('list'); // State to manage view
 
   useEffect(() => {
     fetchProducts()
@@ -55,11 +57,7 @@ function ProductControlPanelPage() {
     try {
       await updateProduct(product);
       setProducts((prevProducts) =>
-        prevProducts.map(p => 
-          p.ProductID === product.ProductID 
-            ? { ...product, ProductImages: p.ProductImages }  // Preserve existing images
-            : p
-        )
+        prevProducts.map(p => (p.ProductID === product.ProductID ? product : p))
       );
       closeModal();
     } catch (error) {
@@ -71,9 +69,9 @@ function ProductControlPanelPage() {
     setModalState((prev) => ({ ...prev, isOpen: false }));
   };
 
-  const handleAddImage = async (productId, imageUrl, imageBlob) => {
+  const handleAddImage = async (productId, imageUrl) => {
     try {
-      const image = await addProductImage(productId, imageUrl, imageBlob);
+      const image = await addProductImage(productId, imageUrl);
       setProducts((prevProducts) =>
         prevProducts.map(p => {
           if (p.ProductID === productId) {
@@ -112,9 +110,18 @@ function ProductControlPanelPage() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Product Control Panel</h1>
-      <ProductActions />
-      <ProductFilters />
-      <ProductTable />
+      <button onClick={() => setView(view === 'list' ? 'summary' : 'list')} className="btn btn-secondary mb-4">
+        {view === 'list' ? 'View Summary' : 'View Products'}
+      </button>
+      {view === 'list' ? (
+        <>
+          <ProductActions />
+          <ProductFilters />
+          <ProductTable />
+        </>
+      ) : (
+        <ProductSummaryTable />
+      )}
       {modalState.isOpen && (
         <AddEditModal
           modalMode={modalState.mode}
@@ -124,6 +131,7 @@ function ProductControlPanelPage() {
           setProductCategoryId={(categoryId) => setModalState((prev) => ({ ...prev, product: { ...prev.product, ProductCategoryID: parseInt(categoryId) } }))}
           productCategories={productCategories}
           setProductCount={(count) => setModalState((prev) => ({ ...prev, product: { ...prev.product, QuantityAvailable: parseInt(count) } }))}
+          setProductPublished={(published) => setModalState((prev) => ({ ...prev, product: { ...prev.product, published } }))}
           setProductCategory={(category) => setModalState((prev) => ({ ...prev, product: { ...prev.product, ProductCategoryName: category } }))}
           handleSubmit={modalState.mode === 'add' ? handleAddProduct : handleEditProduct}
           closeModal={closeModal}
