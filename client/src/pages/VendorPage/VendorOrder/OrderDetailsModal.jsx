@@ -1,10 +1,6 @@
 import React from 'react';
 
 const OrderDetailsModal = ({ order, closeModal }) => {
-  const getProductDetails = (productId) => {
-    return order.products.find(product => product.id === productId);
-  };
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-3xl w-full">
@@ -15,7 +11,7 @@ const OrderDetailsModal = ({ order, closeModal }) => {
         <div className="mb-4">
           <p className="mb-2"><strong>Order ID:</strong> {order.id}</p>
           <p className="mb-2"><strong>Customer:</strong> {order.customer}</p>
-          <p className="mb-2"><strong>Total:</strong> {order.total}$</p>
+          <p className="mb-2"><strong>Total Price:</strong> {order.totalprice}$</p>
           <p className="mb-2"><strong>Status:</strong> {order.status}</p>
         </div>
         <div>
@@ -37,8 +33,8 @@ const OrderDetailsModal = ({ order, closeModal }) => {
                 <div>
                   <p className="font-semibold">{product.name}</p>
                   <p className="text-gray-700">Price: {product.price}$</p>
-                  <p className="text-gray-700">Quantity: {product.count}</p>
-                  <p className="text-gray-700">Total Price: {product.price * product.count}$</p>
+                  <p className="text-gray-700">Quantity: {product.quantity}</p>
+                  <p className="text-gray-700">Total Price: {product.totalprice}$</p>
                 </div>
               </li>
             ))}

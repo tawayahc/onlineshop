@@ -6,7 +6,7 @@ router.get('/reviews', (req, res) => {
     const { search, sortBy, sortOrder } = req.query;
   
     let query = `
-      SELECT pr.*, c.FirstName, c.LastName, c.Gender, c.DOB
+      SELECT pr.*, c.FirstName, c.LastName, c.Gender
       FROM productreviews pr
       JOIN client c ON pr.ClientID = c.ClientID
     `;
@@ -36,7 +36,7 @@ router.get('/reviews', (req, res) => {
     const { search, sortBy, sortOrder } = req.query;
   
     let query = `
-      SELECT csr.*, c.FirstName, c.LastName, c.Gender, c.DOB
+      SELECT csr.*, c.FirstName, c.LastName, c.Gender
       FROM customerservicerequests csr
       JOIN client c ON csr.ClientID = c.ClientID
     `;

@@ -54,7 +54,6 @@ function CustomerServiceRequests() {
             <th className="border px-4 py-2">First Name</th>
             <th className="border px-4 py-2">Last Name</th>
             <th className="border px-4 py-2">Gender</th>
-            <th className="border px-4 py-2">DOB</th>
           </tr>
         </thead>
         <tbody>
@@ -66,7 +65,6 @@ function CustomerServiceRequests() {
               <td className="border px-4 py-2">{request.FirstName}</td>
               <td className="border px-4 py-2">{request.LastName}</td>
               <td className="border px-4 py-2">{request.Gender}</td>
-              <td className="border px-4 py-2">{request.DOB}</td>
             </tr>
           ))}
         </tbody>

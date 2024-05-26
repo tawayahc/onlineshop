@@ -7,13 +7,15 @@ router.get('/see', function (req, res, next) {
   const { searchTerm, selectedStatus, sortBy } = req.query;
 
   let query = `
-    SELECT orders.OrderID, orders.Status, orders.ExpectedDate, 
-           orderitem.ProductID, orderitem.Count, product.ProductName, 
-           product.Price, productimage.Productimageblob
+    SELECT orders.OrderID, orders.Status, orders.ExpectedDate, orders.totalprice AS OrderTotalPrice,
+           orderitem.ProductID, orderitem.Quantity, orderitem.totalprice AS ItemTotalPrice,
+           product.ProductName, product.Price, productimage.Productimageblob,
+           client.FirstName, client.LastName
     FROM orders 
     LEFT JOIN orderitem ON orders.OrderID = orderitem.OrderID 
     LEFT JOIN product ON orderitem.ProductID = product.ProductID 
     LEFT JOIN productimage ON product.ProductID = productimage.ProductID
+    LEFT JOIN client ON orders.ClientID = client.ClientID
   `;
 
   let conditions = [];
@@ -25,8 +27,8 @@ router.get('/see', function (req, res, next) {
   }
 
   if (searchTerm) {
-    conditions.push('(orders.ExpectedDate LIKE ? OR product.ProductName LIKE ?)');
-    params.push(`%${searchTerm}%`, `%${searchTerm}%`);
+    conditions.push('(orders.ExpectedDate LIKE ? OR product.ProductName LIKE ? OR CONCAT(client.FirstName, " ", client.LastName) LIKE ?)');
+    params.push(`%${searchTerm}%`, `%${searchTerm}%`, `%${searchTerm}%`);
   }
 
   if (conditions.length > 0) {
@@ -62,6 +64,8 @@ router.get('/see', function (req, res, next) {
           id: row.OrderID,
           status: row.Status,
           expectedDate: row.ExpectedDate,
+          totalprice: row.OrderTotalPrice,
+          customer: `${row.FirstName} ${row.LastName}`,
           products: []
         };
       }
@@ -76,8 +80,9 @@ router.get('/see', function (req, res, next) {
             id: row.ProductID,
             name: row.ProductName,
             price: row.Price,
+            totalprice: row.ItemTotalPrice,
             images: [row.Productimageblob ? row.Productimageblob.toString('base64') : null],
-            count: row.Count
+            quantity: row.Quantity
           });
         }
       }

@@ -56,7 +56,6 @@ function CustomerReviews() {
             <th className="border px-4 py-2">First Name</th>
             <th className="border px-4 py-2">Last Name</th>
             <th className="border px-4 py-2">Gender</th>
-            <th className="border px-4 py-2">DOB</th>
           </tr>
         </thead>
         <tbody>
@@ -69,7 +68,6 @@ function CustomerReviews() {
               <td className="border px-4 py-2">{review.FirstName}</td>
               <td className="border px-4 py-2">{review.LastName}</td>
               <td className="border px-4 py-2">{review.Gender}</td>
-              <td className="border px-4 py-2">{review.DOB}</td>
             </tr>
           ))}
         </tbody>

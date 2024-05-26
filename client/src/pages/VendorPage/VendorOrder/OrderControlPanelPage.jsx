@@ -3,6 +3,7 @@ import Layout from '../../../components/Layout/Layout';
 import { useRecoilState } from 'recoil';
 import {
   ordersState, searchTermState, selectedStatusState, orderSortByState,
+  orderCurrentPageState, ordersPerPageState, currentOrdersState, selectedOrdersState
 } from '../../../recoil/orderControlPanel';
 import { fetchOrders, updateOrderStatus as updateOrderStatusAPI } from '../../../API/vendorOrders';
 import OrderDetailsModal from './OrderDetailsModal';
@@ -13,9 +14,6 @@ import OrderPagination from './OrderPagination';
 
 function OrderControlPanelPage() {
   const [orders, setOrders] = useRecoilState(ordersState);
-  const [searchTerm, setSearchTerm] = useRecoilState(searchTermState);
-  const [selectedStatus, setSelectedStatus] = useRecoilState(selectedStatusState);
-  const [sortBy, setSortBy] = useRecoilState(orderSortByState);
   const [selectedOrderDetails, setSelectedOrderDetails] = React.useState(null);
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
@@ -55,22 +53,20 @@ function OrderControlPanelPage() {
     }
   };
 
-  const resetFilters = () => {
-    setSearchTerm('');
-    setSelectedStatus('All');
-    setSortBy('default');
-  };
-
   return (
     <Layout>
-      <div className="p-4 max-w-6xl mx-auto">
+      <div className="p-4 max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Order Control Panel</h1>
 
         {isModalOpen && selectedOrderDetails && (
           <OrderDetailsModal order={selectedOrderDetails} closeModal={closeOrderDetailsModal} />
         )}
 
-        <OrderFilters resetFilters={resetFilters} />
+        <OrderFilters resetFilters={() => {
+          setSearchTerm('');
+          setSelectedStatus('All');
+          setSortBy('default');
+        }} />
 
         <OrderList
           toggleOrderSelection={(orderId) => {
