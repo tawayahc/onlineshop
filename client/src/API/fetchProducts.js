@@ -37,11 +37,9 @@ const fetchProductsList = () => {
   };
   
   const fetchProductbyCategory = async (categoryID) => {
-    console.log(categoryID);
     try {
       const response = await axios.get(`${url}products/category/${categoryID}`);
       if (response.data.status === "ok") {
-        console.log(response.data.data);
         setProducts(response.data.data);
         return response.data.data;
       } else {

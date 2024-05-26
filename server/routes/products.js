@@ -158,7 +158,7 @@ router.get("/:id", function (req, res, next) {
       pr.Rating,
       c.Firstname,
       c.Lastname,
-      c.Image_code
+      c.ClientImageBlob
     FROM product p
     LEFT JOIN 
       productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
@@ -217,7 +217,7 @@ router.get("/:id", function (req, res, next) {
               Rating: row.Rating,
               Firstname: row.Firstname,
               Lastname: row.Lastname,
-              Image_code: row.Image_code,
+              Image_code: row.ClientImageBlob,
             });
           }
         }

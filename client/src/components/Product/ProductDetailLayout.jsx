@@ -18,8 +18,12 @@ import { cartStatusState } from "../../recoil/cart";
 import Toast from "../../components/Toast";
 import useWishActions from "../../API/userWishAction";
 import { wishlistState } from "../../recoil/wishlist";
+import { useNavigate } from "react-router-dom";
 
 const renderStars = (rating) => {
+  if (typeof rating !== 'number' || rating < 0 || rating > 5) {
+    rating = 0; // default to 0 if rating is invalid
+  }
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
   const emptyStars = Math.max(0, 5 - fullStars - (hasHalfStar ? 1 : 0));
@@ -40,6 +44,7 @@ const renderStars = (rating) => {
   );
 };
 
+
 function debounce(func, wait) {
   let timeout;
   return function (...args) {
@@ -56,6 +61,8 @@ function ProductDetailLayout({ productId }) {
   );
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
+
+  const navigate = useNavigate();
 
   // cart
   const { addToCart } = useCartActions(userId);
@@ -110,7 +117,7 @@ function ProductDetailLayout({ productId }) {
     };
 
     fetchData();
-  }, [productId, setProductDetail, setLoading]);
+  }, []);
 
   useEffect(() => {
     if (status.visible) {
@@ -127,7 +134,6 @@ function ProductDetailLayout({ productId }) {
     fetchWishlist().finally(() => setLoading(false));
   }, []);
 
-  console.log(status.type);
   // const thumbnailImages =
   //   productDetail?.ProductImages.map((image) => (
   //     <img
@@ -136,7 +142,7 @@ function ProductDetailLayout({ productId }) {
   //       alt={image.ProductimageName}
   //     />
   //   )) || [];
-
+// FIX Image`
   const imageData = [
     "https://picsum.photos/id/237/200/300",
     "https://picsum.photos/id/1025/200/300",
@@ -159,6 +165,7 @@ function ProductDetailLayout({ productId }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-center mx-auto">
+          
           <ProductImage thumbnailImages={imageData} />
           <div className="grid grid-rows-6 max-w-[450px] max-h-[450px] gap-2 px-4">
             <div className="flex flex-col w-full py-2">
@@ -211,6 +218,7 @@ function ProductDetailLayout({ productId }) {
                   </button>
                 </div>
               </div>
+              <button className="btn btn-wide" onClick={() => navigate(-1)}>Back</button>
             </div>
           </div>
           <div className="col-span-2 w-full gap-4 justify-center mx-auto mt-4 bg-gray-200 ">

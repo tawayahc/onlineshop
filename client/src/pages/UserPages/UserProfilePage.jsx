@@ -111,7 +111,7 @@ function UserProfilePage() {
           ) : (
             <>
               <div className="flex flex-col justify-center">
-                <div className="avatar flex justify-center">
+                {/* <div className="avatar flex justify-center">
                   <div className="w-40 rounded-full">
                     <label htmlFor="imageUpload" className="cursor-pointer">
                       <img
@@ -132,8 +132,8 @@ function UserProfilePage() {
                       onChange={handleImageChange}
                     />
                   </div>
-                </div>
-                <div className="flex justify-center mt-2">
+                </div> */}
+                {/* <div className="flex justify-center mt-2">
                   <button
                     className="btn btn-accent btn-outline"
                     type="button"
@@ -141,7 +141,7 @@ function UserProfilePage() {
                   >
                     Upload Image
                   </button>
-                </div>
+                </div> */}
               </div>
 
               <form onSubmit={handleSubmit}>

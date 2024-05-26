@@ -38,7 +38,7 @@ const CategorySelectSection = () => {
       }).finally(() => setLoading(false));
   };
 
-  console.log(products);
+  // console.log(products);
   
   
   return (
