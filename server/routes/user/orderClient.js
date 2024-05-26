@@ -21,12 +21,13 @@ router.get('/:id', function (req, res, next) {
 router.post("/checkout", (req, res) => {
   const { userId, selectedAddress, selectedPayment, cart, status, expectedDate, totalPrice, totalQuantity } = req.body;
 
-  const address = `${selectedAddress.Address}, ${selectedAddress.SubDistrict}, ${selectedAddress.District}, ${selectedAddress.Province}, ${selectedAddress.PostalCode}`;
+  const shippingAddressId = selectedAddress.ShippingAddressID;
   const paymentMethodId = selectedPayment.PaymentMethodID;
-  const shippingAddressId = selectedAddress.ShippingAddressId;
 
-  const orderItemsValues = cart.map(item => `(@OrderID, ${item.ProductID}, ${item.Quantity}, ${item.TotalPrice})`).join(', ');
-  "Unknown column 'undefined' in 'field list'"
+  const orderItemsValues = cart.flatMap(cartItem =>
+    cartItem.Products.map(product => `(@OrderID, ${product.ProductID}, ${product.Quantity}, ${product.Quantity * product.Price})`)
+  ).join(', ');
+
   const query = `
     START TRANSACTION;
     INSERT INTO orders (ClientID, Status, ExpectedDate, TotalPrice, ShippingAddressID, PaymentMethodID)
@@ -52,7 +53,6 @@ router.post("/checkout", (req, res) => {
     }
   );
 });
-
 
 
 // Process orde
