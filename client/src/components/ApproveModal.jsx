@@ -1,13 +1,7 @@
 import React from "react";
 import Modal from "./Modal";
 
-function ApproveModal({ isOpen, onClose, onSubmit }) {
-  const handleSubmit = () => {
-    if (onSubmit) {
-      onSubmit();
-    }
-    onClose();
-  };
+function ApproveModal({ isOpen, onClose, submit }) {
   if (!isOpen) return null;
   return (
     <div>
@@ -19,7 +13,7 @@ function ApproveModal({ isOpen, onClose, onSubmit }) {
               <button className="btn btn-accent btn-ghost btn-lg" onClick={onClose}>
                 ยกเลิก
               </button>
-              <button className="btn btn-error btn-lg" onClick={handleSubmit}>
+              <button className="btn btn-error btn-lg" onClick={submit}>
                 ยืนยัน
               </button>
             </form>

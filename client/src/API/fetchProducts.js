@@ -1,7 +1,7 @@
+import { useCallback } from "react";
 import { useRecoilState } from "recoil";
 import axios from "axios";
 import { productsState, categoriesState } from "../recoil/atom";
-import { useCallback } from "react";
 
 const url = "http://localhost:3333/";
 const fetchProductsList = () => {
@@ -21,24 +21,12 @@ const fetchProductsList = () => {
     }
   }, [setProducts]);
 
-  
-  const fetchCategories = async () => {
+  const fetchProductWithCategories = useCallback(async ({ filters }) => {
+    // console.log(filters);
     try {
-      const response = await axios.get(url + "products/categories");
-      if (response.data.status === "ok") {
-        setCategories(response.data.data);
-        return response.data.data;
-      } else {
-        console.error("Error fetching categories:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-  
-  const fetchProductbyCategory = async (categoryID) => {
-    try {
-      const response = await axios.get(`${url}products/category/${categoryID}`);
+      const response = await axios.get(url + "products/category", {
+        params: filters,
+      });
       if (response.data.status === "ok") {
         setProducts(response.data.data);
         return response.data.data;
@@ -48,25 +36,24 @@ const fetchProductsList = () => {
     } catch (error) {
       console.error("Error:", error);
     }
+  }, [setProducts]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(url + "products/categories");
+      if (response.data.status === "ok") {
+        setCategories(response.data.data);
+        // console.log(response.data.data);
+        // console.log(products);
+        return response.data.data;
+      } else {
+        console.error("Error fetching categories:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
-  
-  // WARN : code below is not used.
-  // const fetchProductWithCategories = useCallback(async ({ filters }) => {
-  //   // console.log(filters);
-  //   try {
-  //     const response = await axios.get(url + "products/category", {
-  //       params: filters,
-  //     });
-  //     if (response.data.status === "ok") {
-  //       setProducts(response.data.data);
-  //       return response.data.data;
-  //     } else {
-  //       console.error("Error fetching products:", response.data.message);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error:", error);
-  //   }
-  // }, [setProducts]);
-  return { fetchProducts, fetchCategories, fetchProductbyCategory };
+
+  return { fetchProducts, fetchCategories, fetchProductWithCategories };
 };
 export default fetchProductsList;

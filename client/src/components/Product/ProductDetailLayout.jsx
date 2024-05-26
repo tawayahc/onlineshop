@@ -16,14 +16,8 @@ import axios from "axios";
 import useCartActions from "../../API/userCartActions";
 import { cartStatusState } from "../../recoil/cart";
 import Toast from "../../components/Toast";
-import useWishActions from "../../API/userWishAction";
-import { wishlistState } from "../../recoil/wishlist";
-import { useNavigate } from "react-router-dom";
 
 const renderStars = (rating) => {
-  if (typeof rating !== 'number' || rating < 0 || rating > 5) {
-    rating = 0; // default to 0 if rating is invalid
-  }
   const fullStars = Math.floor(rating);
   const hasHalfStar = rating % 1 !== 0;
   const emptyStars = Math.max(0, 5 - fullStars - (hasHalfStar ? 1 : 0));
@@ -44,7 +38,6 @@ const renderStars = (rating) => {
   );
 };
 
-
 function debounce(func, wait) {
   let timeout;
   return function (...args) {
@@ -62,29 +55,10 @@ function ProductDetailLayout({ productId }) {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
 
-  const navigate = useNavigate();
-
-  // cart
   const { addToCart } = useCartActions(userId);
   const status = useRecoilValue(cartStatusState);
   const setStatus = useSetRecoilState(cartStatusState);
 
-  //wishlist
-  const { addToWishlist, removeFromWishlist, fetchWishlist } = useWishActions(userId);
-  const wishlist = useRecoilValue(wishlistState);
-  const isInWishlist = wishlist.map((item) => item.ProductID);
-
-  const checkProductIsinwishlist = (productID) => {
-    return isInWishlist.includes(productID);
-  };
-
-  const handleAddToWishlist = (productID) => {
-    if (checkProductIsinwishlist(productID)) {
-      removeFromWishlist(productID);
-    } else {
-      addToWishlist(productID);
-    }
-  };
   const handleClick = (buttonName) => {
     setActiveButton(buttonName);
   };
@@ -105,8 +79,6 @@ function ProductDetailLayout({ productId }) {
         const response = await axios.get(
           `http://localhost:3333/products/${productId}`
         );
-        console.log(response.data.data[0]);
-        console.log(productId);
         setProductDetail(response.data.data[0]);
         setLoading(false);
       } catch (error) {
@@ -117,7 +89,7 @@ function ProductDetailLayout({ productId }) {
     };
 
     fetchData();
-  }, []);
+  }, [productId, setProductDetail, setLoading]);
 
   useEffect(() => {
     if (status.visible) {
@@ -129,11 +101,7 @@ function ProductDetailLayout({ productId }) {
     }
   }, [status, setStatus]);
 
-  useEffect(() => {
-    setLoading(true);
-    fetchWishlist().finally(() => setLoading(false));
-  }, []);
-
+  console.log(status.type);
   // const thumbnailImages =
   //   productDetail?.ProductImages.map((image) => (
   //     <img
@@ -142,30 +110,27 @@ function ProductDetailLayout({ productId }) {
   //       alt={image.ProductimageName}
   //     />
   //   )) || [];
-// FIX Image`
+
   const imageData = [
     "https://picsum.photos/id/237/200/300",
     "https://picsum.photos/id/1025/200/300",
     "https://picsum.photos/id/847/200/300",
     "https://picsum.photos/id/1074/200/300",
   ];
-  //WARN : change Image Source
+  //WARN : properties name
   return (
     <div className="flex flex-col">
-      {status.visible && (
-        <Toast
-          message={status.message}
-          type={status.type}
-          onClose={() => setStatus({ visible: false, message: "", type: "" })}
-        />
-      )}
+      <Toast
+        message={status.message}
+        type={status.type}
+        onClose={() => setStatus({ visible: false, message: "", type: "" })}
+      />
       {loading ? (
         <div className="flex justify-center h-96">
           <span className="loading loading-spinner loading-lg"></span>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-center mx-auto">
-          
           <ProductImage thumbnailImages={imageData} />
           <div className="grid grid-rows-6 max-w-[450px] max-h-[450px] gap-2 px-4">
             <div className="flex flex-col w-full py-2">
@@ -206,19 +171,11 @@ function ProductDetailLayout({ productId }) {
                   >
                     <BsBagFill /> Add to cart
                   </button>
-                  <button
-                    className={
-                      checkProductIsinwishlist(productDetail.ProductID)
-                        ? "btn btn-error"
-                        : "btn"
-                    }
-                    onClick={() => handleAddToWishlist(productDetail.ProductID)}
-                  >
+                  <button className="btn">
                     <BsHeart />
                   </button>
                 </div>
               </div>
-              <button className="btn btn-wide" onClick={() => navigate(-1)}>Back</button>
             </div>
           </div>
           <div className="col-span-2 w-full gap-4 justify-center mx-auto mt-4 bg-gray-200 ">
@@ -231,15 +188,22 @@ function ProductDetailLayout({ productId }) {
               >
                 Description
               </button>
-              {/* FIX REview */}
-              {/* <button
+              <button
                 className={`m-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${
                   activeButton === "component2" && "bg-opacity-50"
                 }`}
                 onClick={() => handleClick("Review")}
               >
                 Review
-              </button> */}
+              </button>
+              <button
+                className={`m-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ${
+                  activeButton === "component3" && "bg-opacity-50"
+                }`}
+                onClick={() => handleClick("AboutSeller")}
+              >
+                About Seller
+              </button>
             </div>
             {activeButton === "Description" && (
               <div className="p-4 bg-gray-200 rounded">
@@ -247,6 +211,7 @@ function ProductDetailLayout({ productId }) {
               </div>
             )}
             {activeButton === "Review" && <Review />}
+            {activeButton === "AboutSeller" && <AboutSeller />}
           </div>
         </div>
       )}

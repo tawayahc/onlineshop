@@ -1,15 +1,7 @@
 // Modal.js
 import React from 'react';
-import { useRecoilState } from 'recoil';
-import { addressFormDataState} from '../recoil/userInfo';
 
-const Modal = ({ isOpen, onClose, children, onSubmit }) => {
-  const handleSubmit = () => {
-    if (onSubmit) {
-      onSubmit();
-    }
-    onClose();
-  };
+const Modal = ({ isOpen, onClose, children, submit }) => {
   if (!isOpen) return null;
 
   return (
@@ -20,7 +12,7 @@ const Modal = ({ isOpen, onClose, children, onSubmit }) => {
           <button className="btn" onClick={onClose}>
             ยกเลิก
           </button>
-          <button className="btn btn-accent" onClick={handleSubmit}>
+          <button className="btn btn-accent" onClick={submit}>
             บันทึก
           </button>
         </div>
