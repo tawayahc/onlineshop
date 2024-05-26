@@ -98,6 +98,8 @@ function ProductDetailLayout({ productId }) {
         const response = await axios.get(
           `http://localhost:3333/products/${productId}`
         );
+        console.log(response.data.data[0]);
+        console.log(productId);
         setProductDetail(response.data.data[0]);
         setLoading(false);
       } catch (error) {
@@ -221,22 +223,15 @@ function ProductDetailLayout({ productId }) {
               >
                 Description
               </button>
-              <button
+              {/* FIX REview */}
+              {/* <button
                 className={`m-2 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ${
                   activeButton === "component2" && "bg-opacity-50"
                 }`}
                 onClick={() => handleClick("Review")}
               >
                 Review
-              </button>
-              <button
-                className={`m-2 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded ${
-                  activeButton === "component3" && "bg-opacity-50"
-                }`}
-                onClick={() => handleClick("AboutSeller")}
-              >
-                About Seller
-              </button>
+              </button> */}
             </div>
             {activeButton === "Description" && (
               <div className="p-4 bg-gray-200 rounded">
@@ -244,7 +239,6 @@ function ProductDetailLayout({ productId }) {
               </div>
             )}
             {activeButton === "Review" && <Review />}
-            {activeButton === "AboutSeller" && <AboutSeller />}
           </div>
         </div>
       )}

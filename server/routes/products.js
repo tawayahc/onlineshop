@@ -137,6 +137,102 @@ router.get("/category/:id", async (req, res) => {
   );
 });
 
+// NOTE: fetchproduct by id
+router.get("/:id", function (req, res, next) {
+  const productId = req.params.id;
+  connection.execute(
+    `
+    SELECT 
+      p.ProductID,
+      p.ProductName,
+      p.ProductDescription,
+      p.QuantityAvailable,
+      p.RatingAvg,
+      p.Price,  
+      pc.ProductCategoryName, 
+      pi.ProductimageID,
+      pi.ProductimageName,
+      pi.Productimagecode,
+      pr.ProductReviewID,
+      pr.Comment,
+      pr.Rating,
+      c.Firstname,
+      c.Lastname,
+      c.Image_code
+    FROM product p
+    LEFT JOIN 
+      productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+    LEFT JOIN 
+      productimage pi ON p.ProductID = pi.ProductID
+    LEFT JOIN
+      productreviews pr ON p.ProductID = pr.ProductID
+    LEFT JOIN
+      client c ON pr.ClientID = c.ClientID
+    WHERE p.ProductID = ?`,
+    [productId],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      }
+
+      const productCategorylist = results.reduce((acc, row) => {
+        const productId = row.ProductID;
+        if (!acc[productId]) {
+          acc[productId] = {
+            ProductID: productId,
+            ProductName: row.ProductName,
+            ProductDescription: row.ProductDescription,
+            QuantityAvailable: row.QuantityAvailable,
+            RatingAvg: row.RatingAvg,
+            Price: row.Price,
+            ProductImages: [],
+            Reviews: [],
+          };
+        }
+
+        // images
+        if (row.ProductimageID) {
+          const productImage = acc[productId].ProductImages.find(
+            (pi) => pi.ProductimageID === row.ProductimageID
+          );
+          if (!productImage) {
+            acc[productId].ProductImages.push({
+              ProductimageID: row.ProductimageID,
+              ProductimageName: row.ProductimageName,
+              Productimagecode: row.Productimagecode,
+            });
+          }
+        }
+
+        // reviews
+        if (row.ProductReviewID) {
+          const review = acc[productId].Reviews.find(
+            (r) => r.ProductReviewID === row.ProductReviewID
+          );
+          if (!review) {
+            acc[productId].Reviews.push({
+              ProductReviewID: row.ProductReviewID,
+              Comment: row.Comment,
+              Rating: row.Rating,
+              Firstname: row.Firstname,
+              Lastname: row.Lastname,
+              Image_code: row.Image_code,
+            });
+          }
+        }
+
+        return acc;
+      }, {});
+
+      const products = Object.values(productCategorylist);
+      res.json({ status: "ok", data: products });
+    }
+  );
+});
+
+
+
 // WARN : fetch products by category
 // router.get("/category", function (req, res, next) {
 //   const { category = [], priceRange = [0, 100000], rating = [] } = req.query;
