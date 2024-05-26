@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout/Layout";
 import Modal from "../../components/Modal";
 import PaymentList from "../../components/User/PaymentMethod/PaymentList";
@@ -7,21 +7,50 @@ import AddressList from "../../components/User/Address/AddressList";
 import NewAddressModal from "../../components/User/Address/NewAddressModal";
 
 function CheckoutPage() {
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const [loading, setLoading] = useState(true);
+  const [shippingAddress, setShippingAddress] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState(null);
   const handleLinkClick = () => {
     console.log("Submit button clicked");
   };
   const handleSubmitAddress = (event) => {
     // event.preventDefault();
-  
     // const formData = new FormData(event.currentTarget);
-
     // const data = Object.fromEntries(formData.entries());
     // console.log("Form Data:", data);
     // Perform other actions with the data (optional)
     // setShowNewAddress(false)
     // console.log(event);
-  }; 
+  };
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      if (!userId) return;
 
+      try {
+        setLoading(true);
+        const shippingaddressResponse = await axios.get(
+          `http://localhost:3333/shippingaddress/${userId}`
+        );
+        const paymentmethodResponse = await axios.get(
+          `http://localhost:3333/paymentmethod/${userId}`
+        );
+        if (
+          shippingaddressResponse.data.status === "ok" &&
+          paymentmethodResponse.data.status === "ok"
+        ) {
+          setShippingAddress(shippingaddressResponse.data.data);
+          setPaymentMethod(paymentmethodResponse.data.data);
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserInfo();
+  }, [userId]);
   const [showPaymentList, setShowPaymentList] = useState(false);
   const [showNewPayment, setShowNewPayment] = useState(false);
   const [showAddressList, setShowAddressList] = useState(false);
@@ -74,7 +103,9 @@ function CheckoutPage() {
               <h2 className="card-title ">ที่อยู่จัดส่ง</h2>
               <p>If a dog chews shoes whose shoes does he choose?</p>
               <div className="card-actions justify-end">
-                <button className="btn" onClick={openAddressList}>เปลี่ยน</button>
+                <button className="btn" onClick={openAddressList}>
+                  เปลี่ยน
+                </button>
               </div>
             </div>
           </div>
@@ -83,7 +114,9 @@ function CheckoutPage() {
               <h2 className="card-title">ช่องทางการชําระเงิน</h2>
               <p>If a dog chews shoes whose shoes does he choose?</p>
               <div className="card-actions justify-end">
-                <button className="btn" onClick={openPaymentList}>เปลี่ยน</button>
+                <button className="btn" onClick={openPaymentList}>
+                  เปลี่ยน
+                </button>
               </div>
             </div>
           </div>
@@ -120,7 +153,7 @@ function CheckoutPage() {
         onClose={closePaymentList}
         submit={handleLinkClick}
       >
-        <PaymentList onClick={openNewPayment}/>
+        <PaymentList onClick={openNewPayment} />
       </Modal>
 
       <Modal
@@ -128,7 +161,7 @@ function CheckoutPage() {
         onClose={closeNewPayment}
         submit={handleLinkClick}
       >
-        <NewPaymentModal/>
+        <NewPaymentModal />
       </Modal>
 
       <Modal
@@ -136,7 +169,7 @@ function CheckoutPage() {
         onClose={closeAddressList}
         submit={handleLinkClick}
       >
-        <AddressList onClick={handleLinkClick}/>
+        <AddressList onClick={handleLinkClick} />
       </Modal>
 
       <Modal
@@ -144,7 +177,7 @@ function CheckoutPage() {
         onClose={closeNewAddress}
         submit={handleLinkClick}
       >
-        <NewAddressModal handleSubmit={handleLinkClick}/>
+        <NewAddressModal handleSubmit={handleLinkClick} />
       </Modal>
     </div>
   );
