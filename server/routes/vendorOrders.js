@@ -4,50 +4,88 @@ const connection = require('../db');
 const router = express.Router();
 
 router.get('/see', function (req, res, next) {
-  connection.query(
-    'SELECT orders.OrderID, orders.Status, orders.ExpectedDate, ' +
-    'orderitem.ProductID, orderitem.Count, product.ProductName, product.Price, productimage.Productimageblob ' +
-    'FROM orders ' +
-    'LEFT JOIN orderitem ON orders.OrderID = orderitem.OrderID ' +
-    'LEFT JOIN product ON orderitem.ProductID = product.ProductID ' +
-    'LEFT JOIN productimage ON product.ProductID = productimage.ProductID',
-    function (err, results) {
-      if (err) {
-        return res.json({ status: 'error', message: err });
-      }
+  const { searchTerm, selectedStatus, sortBy } = req.query;
 
-      const orders = results.reduce((acc, row) => {
-        const orderId = row.OrderID;
-        if (!acc[orderId]) {
-          acc[orderId] = {
-            id: row.OrderID,
-            status: row.Status,
-            expectedDate: row.ExpectedDate,
-            products: []
-          };
-        }
-        if (row.ProductID) {
-          const productIndex = acc[orderId].products.findIndex(product => product.id === row.ProductID);
-          if (productIndex > -1) {
-            // Product already exists, just add the image blob
-            acc[orderId].products[productIndex].images.push(row.Productimageblob ? row.Productimageblob.toString('base64') : null);
-          } else {
-            // Add new product with images array
-            acc[orderId].products.push({
-              id: row.ProductID,
-              name: row.ProductName,
-              price: row.Price,
-              images: [row.Productimageblob ? row.Productimageblob.toString('base64') : null],
-              count: row.Count
-            });
-          }
-        }
-        return acc;
-      }, {});
+  let query = `
+    SELECT orders.OrderID, orders.Status, orders.ExpectedDate, 
+           orderitem.ProductID, orderitem.Count, product.ProductName, 
+           product.Price, productimage.Productimageblob
+    FROM orders 
+    LEFT JOIN orderitem ON orders.OrderID = orderitem.OrderID 
+    LEFT JOIN product ON orderitem.ProductID = product.ProductID 
+    LEFT JOIN productimage ON product.ProductID = productimage.ProductID
+  `;
 
-      res.json(Object.values(orders));
+  let conditions = [];
+  let params = [];
+
+  if (selectedStatus && selectedStatus !== 'All') {
+    conditions.push('orders.Status = ?');
+    params.push(selectedStatus);
+  }
+
+  if (searchTerm) {
+    conditions.push('(orders.ExpectedDate LIKE ? OR product.ProductName LIKE ?)');
+    params.push(`%${searchTerm}%`, `%${searchTerm}%`);
+  }
+
+  if (conditions.length > 0) {
+    query += ' WHERE ' + conditions.join(' AND ');
+  }
+
+  switch (sortBy) {
+    case 'orderIdAsc':
+      query += ' ORDER BY orders.OrderID ASC';
+      break;
+    case 'orderIdDesc':
+      query += ' ORDER BY orders.OrderID DESC';
+      break;
+    case 'dateAsc':
+      query += ' ORDER BY orders.ExpectedDate ASC';
+      break;
+    case 'dateDesc':
+      query += ' ORDER BY orders.ExpectedDate DESC';
+      break;
+    default:
+      query += ' ORDER BY orders.OrderID ASC';
+  }
+
+  connection.query(query, params, function (err, results) {
+    if (err) {
+      return res.json({ status: 'error', message: err });
     }
-  );
+
+    const orders = results.reduce((acc, row) => {
+      const orderId = row.OrderID;
+      if (!acc[orderId]) {
+        acc[orderId] = {
+          id: row.OrderID,
+          status: row.Status,
+          expectedDate: row.ExpectedDate,
+          products: []
+        };
+      }
+      if (row.ProductID) {
+        const productIndex = acc[orderId].products.findIndex(product => product.id === row.ProductID);
+        if (productIndex > -1) {
+          // Product already exists, just add the image blob
+          acc[orderId].products[productIndex].images.push(row.Productimageblob ? row.Productimageblob.toString('base64') : null);
+        } else {
+          // Add new product with images array
+          acc[orderId].products.push({
+            id: row.ProductID,
+            name: row.ProductName,
+            price: row.Price,
+            images: [row.Productimageblob ? row.Productimageblob.toString('base64') : null],
+            count: row.Count
+          });
+        }
+      }
+      return acc;
+    }, {});
+
+    res.json(Object.values(orders));
+  });
 });
 
 router.put('/update', function (req, res, next) {
