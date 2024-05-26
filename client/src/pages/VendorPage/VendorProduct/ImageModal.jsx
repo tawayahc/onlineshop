@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Compressor from 'compressorjs';
 
 const ImageModal = ({ images, productId, onAddImage, onRemoveImage, onClose }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -13,15 +14,39 @@ const ImageModal = ({ images, productId, onAddImage, onRemoveImage, onClose }) =
     setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
 
+  const compressImage = (file, quality, callback, convertToJPEG = false) => {
+    new Compressor(file, {
+      quality: quality,
+      convertSize: Infinity, // Prevents auto conversion to JPEG
+      mimeType: convertToJPEG ? 'image/jpeg' : file.type,
+      success: (compressedResult) => {
+        if (compressedResult.size / 1024 <= 20) {
+          callback(compressedResult);
+        } else if (quality > 0.1) {
+          compressImage(file, quality - 0.1, callback, convertToJPEG); // Reduce quality and try again
+        } else if (!convertToJPEG) {
+          compressImage(file, 1.0, callback, true); // Convert to JPEG and try again
+        } else {
+          callback(compressedResult); // Use the lowest quality if size is still above 20KB
+        }
+      },
+      error: (err) => {
+        console.error('Image compression error:', err);
+      },
+    });
+  };
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setNewImageBlob(reader.result.split(',')[1]); // Remove base64 prefix
-        setNewImage(URL.createObjectURL(file));
-      };
-      reader.readAsDataURL(file);
+      compressImage(file, 1.0, (compressedResult) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setNewImageBlob(reader.result.split(',')[1]); // Remove base64 prefix
+          setNewImage(URL.createObjectURL(compressedResult));
+        };
+        reader.readAsDataURL(compressedResult);
+      });
     }
   };
 
@@ -45,7 +70,7 @@ const ImageModal = ({ images, productId, onAddImage, onRemoveImage, onClose }) =
           <>
             <img
               src={images[currentImageIndex].ProductImageBlob
-                ? `data:image/jpeg;base64,${images[currentImageIndex].ProductImageBlob}`
+                ? `data:image/${images[currentImageIndex].mimeType || 'jpeg'};base64,${images[currentImageIndex].ProductImageBlob}`
                 : ''}
               alt={images[currentImageIndex].ProductimageName}
               className="w-full h-full object-contain"

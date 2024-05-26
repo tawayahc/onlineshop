@@ -5,7 +5,9 @@ var bodyParser = require("body-parser");
 var app = express();
 
 app.use(cors());
-app.use(bodyParser.json());
+
+app.use(bodyParser.json({ limit: '50mb' })); // Increase limit to 50MB
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
