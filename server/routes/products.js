@@ -6,17 +6,57 @@ const router = express.Router();
 router.get("/", function (req, res, next) {
   connection.execute(
     `
-    SELECT p.*, pc.ProductCategoryName, pi.Productimagecode
+    SELECT 
+      p.ProductID,
+      p.ProductName,
+      p.RatingAvg,
+      p.Price,  
+      pc.ProductCategoryName, 
+      pi.ProductimageID,
+      pi.ProductimageName,
+      pi.Productimagecode
     FROM product p
-    LEFT JOIN productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
-    LEFT JOIN productimage pi ON p.ProductID = pi.ProductID
+    LEFT JOIN 
+      productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+    LEFT JOIN 
+      productimage pi ON p.ProductID = pi.ProductID
     `,
     function (err, results, fields) {
       if (err) {
         res.json({ status: "error", message: err });
         return;
       }
-      res.json({ status: "ok", data: results });
+      const productlist = results.reduce((acc, row) => {
+        const productId = row.ProductID;
+        if (!acc[productId]) {
+          acc[productId] = {
+            ProductID: productId,
+            ProductName: row.ProductName,
+            RatingAvg: row.RatingAvg,
+            Price: row.Price,
+            ProductImages: [],
+          };
+        }
+
+        // images
+        if (row.ProductimageID) {
+          const productImage = acc[productId].ProductImages.find(
+            (pi) => pi.ProductimageID === row.ProductimageID
+          );
+          if (!productImage) {
+            acc[productId].ProductImages.push({
+              ProductimageID: row.ProductimageID,
+              ProductimageName: row.ProductimageName,
+              Productimagecode: row.Productimagecode,
+            });
+          }
+        }
+
+        return acc;
+      }, {});
+
+      const products = Object.values(productlist);
+      res.json({ status: "ok", data: products });
     }
   );
 });
@@ -36,141 +76,123 @@ router.get("/categories", function (req, res, next) {
 });
 
 // NOTE : fetch products by category
-router.get("/category", function (req, res, next) {
-  const { category = [], priceRange = [0, 100000], rating = [] } = req.query;
+router.get("/category/:id", async (req, res) => {
+  const categoryId = req.params.id;
 
-  // console.log("Received filters:");
-  // console.log("category:", category);
-  // console.log("priceRange:", priceRange);
-  // console.log("rating:", rating);
-
-  let categoryFilter = "";
-  let priceFilter = "";
-  let ratingFilter = "";
-
-  // Handle category filter
-  if (category && category.length > 0) {
-    const categoryList = category.map((cat) => `'${cat}'`).join(",");
-    categoryFilter = `pc.ProductCategoryName IN (${categoryList})`;
-    // console.log("categoryFilter ",categoryFilter);
-  }
-
-  // Handle price range filter
-  if (priceRange && priceRange.length === 2) {
-    const minPrice = parseFloat(priceRange[0]);
-    const maxPrice = parseFloat(priceRange[1]);
-    priceFilter = `p.Price BETWEEN ${minPrice} AND ${maxPrice}`;
-    // console.log("priceFilter ",priceFilter);
-  }
-
-  // Handle rating filter
-  if (rating && rating.length > 0) {
-    const ratingList = rating.map((rate) => parseFloat(rate)).join(",");
-    ratingFilter = `p.RatingAvg <= (${ratingList})`;
-    // console.log("ratingFilter ",ratingFilter);
-  }
-
-  // Combine all filters
-  let whereClause = "";
-  if (categoryFilter) {
-    whereClause += categoryFilter;
-  }
-  if (priceFilter) {
-    if (whereClause) whereClause += " AND ";
-    whereClause += priceFilter;
-  }
-  if (ratingFilter) {
-    if (whereClause) whereClause += " AND ";
-    whereClause += ratingFilter;
-  }
-  // console.log("whereClause :",whereClause);
-  const query = `
-    SELECT p.*, pc.ProductCategoryName
-    FROM product p
-    LEFT JOIN productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
-    ${whereClause ? `WHERE ${whereClause}` : ""}
-  `;
-
-  connection.execute(query, function (err, results, fields) {
-    if (err) {
-      res.json({ status: "error", message: err });
-      return;
-    }
-    res.json({ status: "ok", data: results });
-  });
-});
-
-// NOTE: fetch product detail
-router.get("/:id", function (req, res, next) {
-  const { id } = req.params;
   connection.execute(
     `
-  SELECT 
+  SELECT
     p.ProductID,
     p.ProductName,
     p.RatingAvg,
-    p.ProductDescription,
-    p.Price,
-    p.QuantityAvailable,
-    pi.Productimagecode,
+    p.Price,  
+    pc.ProductCategoryName, 
     pi.ProductimageID,
     pi.ProductimageName,
-    s.ShopName,
-    s.ShopDescription,
-    s.RatingAvg AS ShopRatingAvg,
-    pr.Comment AS ReviewComment,
-    pr.Rating AS ReviewRating,
-    c.FirstName,
-    c.LastName,
-    c.Image AS ClientImage
+    pi.Productimagecode
   FROM product p
   LEFT JOIN 
+    productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+  LEFT JOIN 
     productimage pi ON p.ProductID = pi.ProductID
-  LEFT JOIN
-    shop s ON p.ShopID = s.ShopID
-  LEFT JOIN
-    productreviews pr ON p.ProductID = pr.ProductID
-  LEFT JOIN
-    client c ON pr.ClientID = c.ClientID
-  WHERE 
-    p.ProductID = ?`,
-    [id],
+  WHERE p.ProductCategoryID = ?`,
+    [categoryId],
     function (err, results, fields) {
       if (err) {
         res.json({ status: "error", message: err });
         return;
       }
-      const productDetail = results.reduce((acc, row) => {
+      const productCategorylist = results.reduce((acc, row) => {
         const productId = row.ProductID;
         if (!acc[productId]) {
           acc[productId] = {
             ProductID: productId,
             ProductName: row.ProductName,
             RatingAvg: row.RatingAvg,
-            ProductDescription: row.ProductDescription,
             Price: row.Price,
-            QuantityAvailable: row.QuantityAvailable,
-            Shop:[],
             ProductImages: [],
-            Reviews: [],
           };
         }
-        // shop
-        if (row.ShopName) {
-          const shopExists = acc[productId].Shop.some(
-            (shop) => shop.ShopName === row.ShopName
+
+        // images
+        if (row.ProductimageID) {
+          const productImage = acc[productId].ProductImages.find(
+            (pi) => pi.ProductimageID === row.ProductimageID
           );
-          if (!shopExists) {
-            acc[productId].Shop.push({
-              ShopName: row.ShopName,
-              ShopDescription: row.ShopDescription,
-              RatingAvg: row.ShopRatingAvg,
+          if (!productImage) {
+            acc[productId].ProductImages.push({
+              ProductimageID: row.ProductimageID,
+              ProductimageName: row.ProductimageName,
+              Productimagecode: row.Productimagecode,
             });
           }
         }
 
+        return acc;
+      }, {});
+
+      const products = Object.values(productCategorylist);
+      res.json({ status: "ok", data: products });
+    }
+  );
+});
+
+// NOTE: fetchproduct by id
+router.get("/:id", function (req, res, next) {
+  const productId = req.params.id;
+  connection.execute(
+    `
+    SELECT 
+      p.ProductID,
+      p.ProductName,
+      p.ProductDescription,
+      p.QuantityAvailable,
+      p.RatingAvg,
+      p.Price,  
+      pc.ProductCategoryName, 
+      pi.ProductimageID,
+      pi.ProductimageName,
+      pi.Productimagecode,
+      pr.ProductReviewID,
+      pr.Comment,
+      pr.Rating,
+      c.Firstname,
+      c.Lastname,
+      c.ClientImageBlob
+    FROM product p
+    LEFT JOIN 
+      productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+    LEFT JOIN 
+      productimage pi ON p.ProductID = pi.ProductID
+    LEFT JOIN
+      productreviews pr ON p.ProductID = pr.ProductID
+    LEFT JOIN
+      client c ON pr.ClientID = c.ClientID
+    WHERE p.ProductID = ?`,
+    [productId],
+    function (err, results, fields) {
+      if (err) {
+        res.json({ status: "error", message: err });
+        return;
+      }
+
+      const productCategorylist = results.reduce((acc, row) => {
+        const productId = row.ProductID;
+        if (!acc[productId]) {
+          acc[productId] = {
+            ProductID: productId,
+            ProductName: row.ProductName,
+            ProductDescription: row.ProductDescription,
+            QuantityAvailable: row.QuantityAvailable,
+            RatingAvg: row.RatingAvg,
+            Price: row.Price,
+            ProductImages: [],
+            Reviews: [],
+          };
+        }
+
         // images
-        if (row.Productimagecode) {
+        if (row.ProductimageID) {
           const productImage = acc[productId].ProductImages.find(
             (pi) => pi.ProductimageID === row.ProductimageID
           );
@@ -184,23 +206,18 @@ router.get("/:id", function (req, res, next) {
         }
 
         // reviews
-        if (row.ReviewComment) {
-          const reviewExists = acc[productId].Reviews.some(
-            (review) =>
-              review.Comment === row.ReviewComment &&
-              review.Rating === row.ReviewRating &&
-              review.Client.FirstName === row.FirstName &&
-              review.Client.LastName === row.LastName
+        if (row.ProductReviewID) {
+          const review = acc[productId].Reviews.find(
+            (r) => r.ProductReviewID === row.ProductReviewID
           );
-          if (!reviewExists) {
+          if (!review) {
             acc[productId].Reviews.push({
-              Comment: row.ReviewComment,
-              Rating: row.ReviewRating,
-              Client: {
-                FirstName: row.FirstName,
-                LastName: row.LastName,
-                Image: row.ClientImage,
-              },
+              ProductReviewID: row.ProductReviewID,
+              Comment: row.Comment,
+              Rating: row.Rating,
+              Firstname: row.Firstname,
+              Lastname: row.Lastname,
+              Image_code: row.ClientImageBlob,
             });
           }
         }
@@ -208,28 +225,78 @@ router.get("/:id", function (req, res, next) {
         return acc;
       }, {});
 
-      const products = Object.values(productDetail);
-      console.log(products.ProductImages);
+      const products = Object.values(productCategorylist);
       res.json({ status: "ok", data: products });
     }
   );
 });
 
 
-router.get("/category/:category", function (req, res, next) {
-  const { category } = req.params;
-  connection.execute(
-    "SELECT * FROM `product` WHERE Category = ?",
-    [category],
-    function (err, results, fields) {
-      if (err) {
-        res.json({ status: "error", message: err });
-        return;
-      }
-      res.json({ status: "ok", data: results });
-    }
-  );
-});
+
+// WARN : fetch products by category
+// router.get("/category", function (req, res, next) {
+//   const { category = [], priceRange = [0, 100000], rating = [] } = req.query;
+
+//   // console.log("Received filters:");
+//   // console.log("category:", category);
+//   // console.log("priceRange:", priceRange);
+//   // console.log("rating:", rating);
+
+//   let categoryFilter = "";
+//   let priceFilter = "";
+//   let ratingFilter = "";
+
+//   // Handle category filter
+//   if (category && category.length > 0) {
+//     const categoryList = category.map((cat) => `'${cat}'`).join(",");
+//     categoryFilter = `pc.ProductCategoryName IN (${categoryList})`;
+//     // console.log("categoryFilter ",categoryFilter);
+//   }
+
+//   // Handle price range filter
+//   if (priceRange && priceRange.length === 2) {
+//     const minPrice = parseFloat(priceRange[0]);
+//     const maxPrice = parseFloat(priceRange[1]);
+//     priceFilter = `p.Price BETWEEN ${minPrice} AND ${maxPrice}`;
+//     // console.log("priceFilter ",priceFilter);
+//   }
+
+//   // Handle rating filter
+//   if (rating && rating.length > 0) {
+//     const ratingList = rating.map((rate) => parseFloat(rate)).join(",");
+//     ratingFilter = `p.RatingAvg <= (${ratingList})`;
+//     // console.log("ratingFilter ",ratingFilter);
+//   }
+
+//   // Combine all filters
+//   let whereClause = "";
+//   if (categoryFilter) {
+//     whereClause += categoryFilter;
+//   }
+//   if (priceFilter) {
+//     if (whereClause) whereClause += " AND ";
+//     whereClause += priceFilter;
+//   }
+//   if (ratingFilter) {
+//     if (whereClause) whereClause += " AND ";
+//     whereClause += ratingFilter;
+//   }
+//   // console.log("whereClause :",whereClause);
+//   const query = `
+//     SELECT p.*, pc.ProductCategoryName
+//     FROM product p
+//     LEFT JOIN productcategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+//     ${whereClause ? `WHERE ${whereClause}` : ""}
+//   `;
+
+//   connection.execute(query, function (err, results, fields) {
+//     if (err) {
+//       res.json({ status: "error", message: err });
+//       return;
+//     }
+//     res.json({ status: "ok", data: results });
+//   });
+// });
 
 router.get("/search/:name", function (req, res, next) {
   const { name } = req.params;

@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BsBagFill, BsStarFill, BsStarHalf, BsStar } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import useCartActions from "../../API/userCartActions";
 import GenericImagePlaceholder from "../../assets/svg/generic-image-placeholder.svg";
+import { useRecoilValue } from "recoil";
+import { wishlistState } from "../../recoil/wishlist";
+import useWishActions from "../../API/userWishAction";
 
-function ProductCard({ data, onWishlistChange }) {
+function ProductCard({ data }) {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const { addToCart } = useCartActions(userId);
-  const isInWishlist = data.isInWishlist;
+  const { fetchWishlist, addToWishlist, removeFromWishlist } = useWishActions(userId);
+  const wishListProductID = useRecoilValue(wishlistState);
+
+  useEffect(() => {
+    fetchWishlist();
+  }, []);
+  const isInWishlist = wishListProductID.map((item) => item.ProductID);
+
+  const checkProductIsinwishlist = (productID) => {
+    return isInWishlist.includes(productID);
+  };
 
   const renderStars = (rating) => {
     const fullStars = Math.floor(rating);
@@ -38,24 +51,32 @@ function ProductCard({ data, onWishlistChange }) {
   const handleAddToCart = () => {
     addToCart(data.ProductID, 1);
   };
+
+  const onWishlistChange = (productID) => {
+    if (checkProductIsinwishlist(productID)) {
+      removeFromWishlist(productID);
+    } else {
+      addToWishlist(productID);
+    }
+  };
   return (
-    // TODO : Add to cart & wishlist
+    // FIX : Add to cart / Change to cartitem
     <div className="group">
       <div className="card card-compact w-60 min-96 shadow-xl">
         <figure className="h-40">
           <img
-            src={GenericImagePlaceholder}
+            src={data.ProductImagescode || GenericImagePlaceholder}
             alt={data.name}
             className="w-full h-full object-cover cursor-pointer"
             onClick={handleCardClick}
           />
         </figure>
         <button
-          onClick={() => onWishlistChange(data.id)}
+          onClick={() => onWishlistChange(data.ProductID)}
           className={
-            isInWishlist
-              ? "btn btn-circle btn-sm absolute top-2 right-2 btn-error"
-              : "btn btn-circle btn-sm absolute top-2 right-2"
+            checkProductIsinwishlist(data.ProductID)
+            ? "btn btn-circle btn-sm absolute top-2 right-2 btn-error"
+            : "btn btn-circle btn-sm absolute top-2 right-2"
           }
         >
           <svg

@@ -1,58 +1,53 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ThailandAddressTypeahead,
   ThailandAddressValue,
 } from "react-thailand-address-typeahead";
+import { addressFormDataState } from "../../../recoil/userInfo";
+import { useRecoilState } from "recoil";
 
-function NewAddressModal({ handleSubmit }) {
-  const [formData, setFormData] = useState({
-    name: "",
-    contact: "",
-    address: "",
-    subdistrict: "",
-    district: "",
-    province: "",
-    postalCode: "",
-  });
+function NewAddressModal() {
+  const [formData, setFormData] = useRecoilState(addressFormDataState);
   const [val, setVal] = useState(ThailandAddressValue.empty());
 
+  useEffect(() => {
+    if (formData.subdistrict || formData.district || formData.province || formData.postalCode) {
+      setVal({
+        subdistrict: formData.SubDistrict || '',
+        district: formData.District || '',
+        province: formData.Province || '',
+        postalCode: formData.ZipCode || ''
+      });
+    }
+  }, [formData]);
+
   const handleNameChange = (event) => {
-    setFormData({ ...formData, name: event.target.value });
+    setFormData({ ...formData, FullName: event.target.value });
   };
 
   const handleContactChange = (event) => {
-    setFormData({ ...formData, contact: event.target.value });
+    setFormData({ ...formData, PhoneNumber: event.target.value });
   };
 
   const handleAddressChange = (event) => {
-    setFormData({ ...formData, address: event.target.value });
-  };
-  const handleSubmitForm = (event) => {
-    try {
-      event.preventDefault();
-      const formData = new FormData(event.currentTarget); // Extract data from form (e.g., using new FormData(event.currentTarget))
-      handleSubmit(formData); // Pass data to parent component
-      console.log(formData);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    setFormData({ ...formData, Address: event.target.value });
   };
 
   const handleThailandAddressChange = (val) => {
     setVal(val);
     setFormData({
       ...formData,
-      subdistrict: val.subdistrict,
-      district: val.district,
-      province: val.province,
-      postalCode: val.postalCode,
+      SubDistrict: val.subdistrict,
+      District: val.district,
+      Province: val.province,
+      ZipCode: val.postalCode,
     });
   };
 
   return (
     <div className="flex flex-col m-4 w-[896px] h-[500px]">
       <h1 className="font-bold text-2xl">ที่อยู่จัดส่ง</h1>
-      <form onSubmit={handleSubmitForm}>
+      <form>
         <div className="flex flex-row justify-between space-x-4 mt-4">
           <div className="flex flex-col w-full">
             <span className="text-sm mb-1">ชื่อ - นามสกุล</span>
@@ -60,7 +55,7 @@ function NewAddressModal({ handleSubmit }) {
               type="text"
               placeholder=""
               className="input input-bordered w-full"
-              value={formData.name}
+              value={formData.FullName || ''}
               onChange={handleNameChange}
             />
           </div>
@@ -70,18 +65,18 @@ function NewAddressModal({ handleSubmit }) {
               type="text"
               placeholder=""
               className="input input-bordered w-full"
-              value={formData.contact}
+              value={formData.PhoneNumber || ''}
               onChange={handleContactChange}
             />
           </div>
         </div>
         <div className="mt-4">
-          <span className="text-sm mb-1 ">ที่อยู่</span>
+          <span className="text-sm mb-1">ที่อยู่</span>
           <input
             type="text"
             placeholder=""
             className="input input-bordered w-full h-16"
-            value={formData.address}
+            value={formData.Address || ''}
             onChange={handleAddressChange}
           />
         </div>

@@ -12,12 +12,12 @@ import {
 import fetchProductsList from "../../API/fetchProducts";
 import { cartStatusState } from "../../recoil/cart";
 import Toast from "../../components/Toast";
-import CategorySelectSection from "../../components/CategorySelectSection";
+import CategorySelectSection from "../../components/Home/BrowseByCategory/CategorySelect";
 
 function ProductListPage() {
   // const displayedProducts = useRecoilValue(paginatedProductsState);
   const [loading, setLoading] = useState(true);
-  const { fetchProducts, fetchProductWithCategories } = fetchProductsList();
+  const { fetchProducts, fetchProductbyCategory } = fetchProductsList();
   const setProducts = useSetRecoilState(productsState);
   const products = useRecoilValue(productsState);
 
@@ -30,17 +30,8 @@ function ProductListPage() {
     setLoading(true);
     fetchProducts().finally(() => setLoading(false));
   }, []);
-  console.log(products);
-  useEffect(() => {
-    const fetchFilteredProducts = async () => {
-      setLoading(true);
-      const data = await fetchProductWithCategories({ filters: categories });
-      setProducts(data);
-      setLoading(false);
-    };
 
-    fetchFilteredProducts();
-  }, [categories, fetchProductWithCategories, setProducts]);
+  // console.log(products);
 
   useEffect(() => {
     if (status.visible) {
