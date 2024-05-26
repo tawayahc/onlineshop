@@ -1,4 +1,3 @@
-// import { useCallback } from "react";
 import { useRecoilState } from "recoil";
 import axios from "axios";
 import { productsState, categoriesState } from "../recoil/atom";
