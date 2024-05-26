@@ -11,7 +11,7 @@ router.get('/see', function (req, res, next) {
     'LEFT JOIN orderitem ON orders.OrderID = orderitem.OrderID ' +
     'LEFT JOIN product ON orderitem.ProductID = product.ProductID ' +
     'LEFT JOIN productimage ON product.ProductID = productimage.ProductID',
-    function(err, results) {
+    function (err, results) {
       if (err) {
         return res.json({ status: 'error', message: err });
       }
@@ -30,7 +30,7 @@ router.get('/see', function (req, res, next) {
           const productIndex = acc[orderId].products.findIndex(product => product.id === row.ProductID);
           if (productIndex > -1) {
             // Product already exists, just add the image blob
-            acc[orderId].products[productIndex].images.push(row.Productimageblob.toString('base64'));
+            acc[orderId].products[productIndex].images.push(row.Productimageblob ? row.Productimageblob.toString('base64') : null);
           } else {
             // Add new product with images array
             acc[orderId].products.push({
@@ -55,7 +55,7 @@ router.put('/update', function (req, res, next) {
   connection.query(
     'UPDATE orders SET Status = ? WHERE OrderID = ?',
     [status, orderId],
-    function(err) {
+    function (err) {
       if (err) {
         return res.json({ status: 'error', message: err });
       }
@@ -69,7 +69,7 @@ router.delete('/delete', function (req, res, next) {
   connection.query(
     'DELETE FROM orders WHERE OrderID IN (?)',
     [orderIDs],
-    function(err) {
+    function (err) {
       if (err) {
         return res.json({ status: 'error', message: err });
       }
