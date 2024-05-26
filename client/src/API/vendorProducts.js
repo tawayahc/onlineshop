@@ -65,11 +65,12 @@ export const updateProduct = async (product) => {
     }
 };  
 
-export const addProductImage = async (productId, imageUrl) => {
+export const addProductImage = async (productId, imageUrl, imageBlob) => {
   try {
     const response = await axios.post(`${API_URL}/add-image`, {
       productId,
       imageUrl,
+      imageBlob,
     }, {
       headers: {
         'Content-Type': 'application/json',

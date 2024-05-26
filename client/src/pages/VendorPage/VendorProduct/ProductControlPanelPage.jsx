@@ -71,9 +71,9 @@ function ProductControlPanelPage() {
     setModalState((prev) => ({ ...prev, isOpen: false }));
   };
 
-  const handleAddImage = async (productId, imageUrl) => {
+  const handleAddImage = async (productId, imageUrl, imageBlob) => {
     try {
-      const image = await addProductImage(productId, imageUrl);
+      const image = await addProductImage(productId, imageUrl, imageBlob);
       setProducts((prevProducts) =>
         prevProducts.map(p => {
           if (p.ProductID === productId) {

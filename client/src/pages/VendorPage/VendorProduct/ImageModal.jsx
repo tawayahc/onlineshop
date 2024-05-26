@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 const ImageModal = ({ images, productId, onAddImage, onRemoveImage, onClose }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [newImage, setNewImage] = useState('');
+  const [newImageBlob, setNewImageBlob] = useState(null);
 
   const handleNext = () => {
     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
@@ -12,9 +13,24 @@ const ImageModal = ({ images, productId, onAddImage, onRemoveImage, onClose }) =
     setCurrentImageIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
   };
 
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewImageBlob(reader.result.split(',')[1]); // Remove base64 prefix
+        setNewImage(URL.createObjectURL(file));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleAddImage = () => {
-    onAddImage(productId, newImage);
-    setNewImage('');
+    if (newImageBlob) {
+      onAddImage(productId, newImage, newImageBlob);
+      setNewImage('');
+      setNewImageBlob(null);
+    }
   };
 
   const handleRemoveImage = () => {
@@ -27,7 +43,13 @@ const ImageModal = ({ images, productId, onAddImage, onRemoveImage, onClose }) =
       <div className="bg-white p-4 rounded-lg shadow-lg max-w-screen-md w-full h-screen/2" onClick={(e) => e.stopPropagation()}>
         {images.length > 0 && (
           <>
-            <img src={images[currentImageIndex].Productimagecode} alt="Selected Image" className="w-full h-full object-contain" />
+            <img
+              src={images[currentImageIndex].ProductImageBlob
+                ? `data:image/jpeg;base64,${images[currentImageIndex].ProductImageBlob}`
+                : ''}
+              alt={images[currentImageIndex].ProductimageName}
+              className="w-full h-full object-contain"
+            />
             <div className="flex justify-between mt-4">
               <button onClick={handlePrev} className="btn btn-secondary">&lt; Prev</button>
               <button onClick={handleNext} className="btn btn-secondary">Next &gt;</button>
@@ -35,7 +57,7 @@ const ImageModal = ({ images, productId, onAddImage, onRemoveImage, onClose }) =
           </>
         )}
         <div className="mt-4">
-          <input type="url" value={newImage} onChange={(e) => setNewImage(e.target.value)} className="input mb-2" placeholder="New Image URL" />
+          <input type="file" accept="image/*" onChange={handleImageUpload} className="input mb-2" />
           <button onClick={handleAddImage} className="btn btn-primary mr-2">Add Image</button>
           {images.length > 0 && (
             <button onClick={handleRemoveImage} className="btn btn-danger">Remove Current Image</button>
