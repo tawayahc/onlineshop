@@ -145,20 +145,41 @@ router.put('/update', function (req, res, next) {
   );
 });
 
+// router.delete('/delete', function (req, res, next) {
+//     const productIDs = req.body.productIDs;
+
+//     console.log('delete', productIDs);
+//     connection.query(
+//         'DELETE FROM `product` WHERE ProductID IN (?)',
+//         [productIDs],
+//         function(err, results) {
+//             if (err) {
+//                 res.json({ status: 'error', message: err });
+//             } else {
+//                 res.json({ status: 'ok', message: 'Products deleted successfully' });
+//             }
+//         }
+//     );
+// });
+
 router.delete('/delete', function (req, res, next) {
     const productIDs = req.body.productIDs;
+    console.log('Deleting products with IDs:', productIDs);
     connection.query(
-        'DELETE FROM `product` WHERE ProductID IN (?)',
-        [productIDs],
-        function(err, results) {
-            if (err) {
-                res.json({ status: 'error', message: err });
-            } else {
-                res.json({ status: 'ok', message: 'Products deleted successfully' });
-            }
+      'DELETE FROM `product` WHERE ProductID IN (?)',
+      [productIDs],
+      function (err, results) {
+        if (err) {
+          console.error('Error deleting products:', err);
+          res.json({ status: 'error', message: err });
+        } else {
+          console.log('Delete results:', results);
+          res.json({ status: 'ok', message: 'Products deleted successfully' });
         }
+      }
     );
-});
+  });
+  
 
 // Add Image Route
 router.post('/add-image', function (req, res, next) {
