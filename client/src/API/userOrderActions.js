@@ -1,11 +1,14 @@
 import { useRecoilState } from "recoil";
 import axios from "axios";
 import { orderListState } from "../recoil/order";
+import { useNavigate } from "react-router-dom";
 
 const url = "http://localhost:3333/user/";
 
 const useOrderActions = (userId) => {
   const [orderList, setOrderList] = useRecoilState(orderListState);
+  const navigate = useNavigate();
+
 
   const fetchOrderList = async () => {
     try {
@@ -25,6 +28,7 @@ const useOrderActions = (userId) => {
       const response = await axios.post(`${url}orders/checkout`, orderData);
       if (response.data.status === "ok") {
         console.log("Order and order items created successfully.");
+        navigate("/complete");
       } else {
         console.error("Error creating order:", response.data.message);
       }

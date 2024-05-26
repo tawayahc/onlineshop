@@ -22,6 +22,7 @@ import Register from './pages/Auth/Register';
 import Login from './pages/Auth/Login';
 import AdminLogin from './pages/Auth/AdminLogin';
 import AdminRegister from './pages/Auth/AdminRegister';
+import CompletePage from './pages/CompletePage';
 
 function App() {
 
@@ -40,6 +41,7 @@ function App() {
         </Route>
         
 
+        <Route path="/complete" element={<CompletePage />} />
         <Route path="/products" element={<Products />} />
         <Route path="/products/:productId" element={<ProductDetails />} /> 
         <Route path="/checkout" element={<Checkout />} />

@@ -19,6 +19,7 @@ import Toast from "../../components/Toast";
 import useWishActions from "../../API/userWishAction";
 import { wishlistState } from "../../recoil/wishlist";
 import { useNavigate } from "react-router-dom";
+import imageDataList from "../../db/image";
 
 const renderStars = (rating) => {
   if (typeof rating !== 'number' || rating < 0 || rating > 5) {
@@ -142,14 +143,12 @@ function ProductDetailLayout({ productId }) {
   //       alt={image.ProductimageName}
   //     />
   //   )) || [];
-// FIX Image`
-  const imageData = [
-    "https://picsum.photos/id/237/200/300",
-    "https://picsum.photos/id/1025/200/300",
-    "https://picsum.photos/id/847/200/300",
-    "https://picsum.photos/id/1074/200/300",
-  ];
-  //WARN : change Image Source
+  const getProductImages = (productId) => {
+    const productImages = imageDataList.find((item) => item.ProductID === productId);
+    return productImages ? productImages.imageData : [];
+  };
+
+  const thumbnailImages = getProductImages(productDetail.ProductID);
   return (
     <div className="flex flex-col">
       {status.visible && (
@@ -166,7 +165,7 @@ function ProductDetailLayout({ productId }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 justify-center mx-auto">
           
-          <ProductImage thumbnailImages={imageData} />
+          <ProductImage thumbnailImages={thumbnailImages} />
           <div className="grid grid-rows-6 max-w-[450px] max-h-[450px] gap-2 px-4">
             <div className="flex flex-col w-full py-2">
               <h1 className="text-3xl max-w-[418px]">
@@ -176,7 +175,7 @@ function ProductDetailLayout({ productId }) {
             <div className="flex flex-col w-full row-span-2 space-y-4 mt-4">
               <div className="flex w-full items-center">
                 {renderStars(productDetail.RatingAvg)}
-                <div className="ml-2">{productDetail.RatingAvg}</div>
+                <div className="ml-2">{productDetail.RatingAvg.toFixed(1)}</div>
                 <div className="divider divider-horizontal mx-2"></div>
                 <div>
                   {productDetail.QuantityAvailable > 0

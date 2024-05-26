@@ -6,6 +6,8 @@ import GenericImagePlaceholder from "../../assets/svg/generic-image-placeholder.
 import { useRecoilValue } from "recoil";
 import { wishlistState } from "../../recoil/wishlist";
 import useWishActions from "../../API/userWishAction";
+import imageDataList from "../../db/image";
+import { productsState } from "../../recoil/atom";
 
 function ProductCard({ data }) {
   const navigate = useNavigate();
@@ -13,6 +15,7 @@ function ProductCard({ data }) {
   const { addToCart } = useCartActions(userId);
   const { fetchWishlist, addToWishlist, removeFromWishlist } = useWishActions(userId);
   const wishListProductID = useRecoilValue(wishlistState);
+  const productDetail = useRecoilValue(productsState);
 
   useEffect(() => {
     fetchWishlist();
@@ -59,13 +62,19 @@ function ProductCard({ data }) {
       addToWishlist(productID);
     }
   };
+
+  const getProductImages = (productId) => {
+    const productImages = imageDataList.find((item) => item.ProductID === productId);
+    return productImages ? productImages.imageData : [];
+  };
+
+  const thumbnailImages = getProductImages(productDetail.ProductID);
   return (
-    // FIX : Add to cart / Change to cartitem
     <div className="group">
       <div className="card card-compact w-60 min-96 shadow-xl">
         <figure className="h-40">
           <img
-            src={data.ProductImagescode || GenericImagePlaceholder}
+            src={thumbnailImages || GenericImagePlaceholder}
             alt={data.name}
             className="w-full h-full object-cover cursor-pointer"
             onClick={handleCardClick}
@@ -107,7 +116,7 @@ function ProductCard({ data }) {
           <div className="card-actions justify-between items-center mt-auto">
             <div className="flex flex-row items-center">
               {renderStars(data.RatingAvg)}
-              <p>{data.RatingAvg}</p>
+              <p>{data.RatingAvg.toFixed(1)}</p>
             </div>
             <div className="flex flex-row justify-between w-full items-center">
               <p className="text-xl">${data.Price}</p>

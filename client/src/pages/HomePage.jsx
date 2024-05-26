@@ -12,9 +12,9 @@ export default function HomePage() {
         <Banner />
         <div className="flex justify-center items-center my-4">
           <div className="w-full max-w-5xl px-4">
-            <FlashSale />
+            {/* <FlashSale /> */}
             <ExploreProducts />
-            <NewArrival />
+            {/* <NewArrival /> */}
           </div>
         </div>
       </Layout>
