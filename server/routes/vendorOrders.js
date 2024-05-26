@@ -6,7 +6,7 @@ const router = express.Router();
 router.get('/see', function (req, res, next) {
   connection.query(
     'SELECT orders.OrderID, orders.Status, orders.ExpectedDate, ' +
-    'orderitem.ProductID, orderitem.Count, product.ProductName, product.Price, productimage.Productimagecode ' +
+    'orderitem.ProductID, orderitem.Count, product.ProductName, product.Price, productimage.Productimageblob ' +
     'FROM orders ' +
     'LEFT JOIN orderitem ON orders.OrderID = orderitem.OrderID ' +
     'LEFT JOIN product ON orderitem.ProductID = product.ProductID ' +
@@ -27,13 +27,20 @@ router.get('/see', function (req, res, next) {
           };
         }
         if (row.ProductID) {
-          acc[orderId].products.push({
-            id: row.ProductID,
-            name: row.ProductName,
-            price: row.Price,
-            image: row.Productimagecode,
-            count: row.Count
-          });
+          const productIndex = acc[orderId].products.findIndex(product => product.id === row.ProductID);
+          if (productIndex > -1) {
+            // Product already exists, just add the image blob
+            acc[orderId].products[productIndex].images.push(row.Productimageblob.toString('base64'));
+          } else {
+            // Add new product with images array
+            acc[orderId].products.push({
+              id: row.ProductID,
+              name: row.ProductName,
+              price: row.Price,
+              images: [row.Productimageblob ? row.Productimageblob.toString('base64') : null],
+              count: row.Count
+            });
+          }
         }
         return acc;
       }, {});
