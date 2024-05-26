@@ -91,6 +91,7 @@ function UserPayOptionPage() {
   const handleDeletePayment = (paymentId) => {
     setLoading(true);
     deletePaymentMethod(paymentId).finally(() => {
+      console.log("Deleted payment method with ID:", paymentId);
       closeDeletePaymentModal();
       fetchPaymentMethod().finally(() => setLoading(false));
     });
@@ -120,8 +121,8 @@ function UserPayOptionPage() {
                   key={payment.PaymentMethodID}
                   type="payment"
                   data={payment}
-                  onEditAddress={() => openEditPaymentModal(payment.PaymentMethodID)}
-                  onDeleteAddress={() => openDeletePaymentModal(payment.PaymentMethodID)}
+                  onEdit={() => openEditPaymentModal(payment.PaymentMethodID)}
+                  onDelete={() => openDeletePaymentModal(payment.PaymentMethodID)}
                 />
               ))}
             </div>
