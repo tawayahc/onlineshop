@@ -14,10 +14,13 @@ export default function Footer() {
         </aside>
         <nav>
           <h6 className="footer-title">Member</h6>
-          <div className="grid grid-flow-row gap-4">
-            <p>Member 1</p>
-            <p>Member 2</p>
-            <p>Member 3</p>
+          <div className="grid grid-cols-2 grid-flow-row  gap-4">
+            <p>กิตติ์พิพัฒน์ สุขสวย 1004</p>
+            <p>ชยาวัฒน์ อะนาโรจน์ 1012</p>
+            <p>ธีรวุฒิ พลอยจินดามณี 1031</p>
+            <p>ศรัณย์ คำไทย 1051</p>
+            <p>ศุภกร ตั้งปฐมปราโมทย์ 1053</p>
+            <p>ภูวเดช อินทอง 1085</p>
           </div>
         </nav>
       </footer>
