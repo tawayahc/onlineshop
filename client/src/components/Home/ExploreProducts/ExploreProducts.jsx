@@ -1,7 +1,12 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import ProductCard from "../../Product/ProductCard"; // Adjust the import path as necessary
 import CategorySelect from '../BrowseByCategory/CategorySelect'; // Adjust the import path as necessary
+import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil';
+import fetchProductsList from '../../../API/fetchProducts';
+import { productsState } from '../../../recoil/atom';
+import { cartStatusState } from '../../../recoil/cart';
+import { useNavigate } from 'react-router-dom';
 
 const allProducts = [
   { ProductID: 1, ProductName: '1', Category: 'Phones', Price: 100, RatingAvg: 4, ProductImagescode: 'https://inwfile.com/s-fl/sffm8k.jpg' },
@@ -29,7 +34,27 @@ const allProducts = [
 const ExploreProducts = () => {
   const scrollRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('All');
+  const products = useRecoilValue(productsState);
+  const [loading, setLoading] = useState(true);
+  const {fetchProducts} = fetchProductsList();
+
+  const status = useRecoilValue(cartStatusState);
+  const setStatus = useSetRecoilState(cartStatusState);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchProducts().finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (status.visible) {
+      const timer = setTimeout(() => {
+        setStatus({ visible: false, message: "", type: "" });
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [status, setStatus]);
 
   const scroll = (direction) => {
     if (scrollRef.current) {
@@ -41,9 +66,6 @@ const ExploreProducts = () => {
     }
   };
 
-  const filteredProducts = selectedCategory === 'All'
-    ? allProducts
-    : allProducts.filter(product => product.Category === selectedCategory);
 
   const splitProducts = (products) => {
     const rows = [];
@@ -54,12 +76,22 @@ const ExploreProducts = () => {
     return rows.slice(0, 2); // Only show the first 2 rows
   };
 
-  const rows = splitProducts(filteredProducts);
+  const rows = splitProducts(products);
+
+  const navigate = useNavigate();
+  const viewAllproducts = () => {
+    navigate('/products');
+  };
 
   return (
     <div style={styles.container}>
-      
-      
+      {status.visible && (
+          <Toast
+            message={status.message}
+            type={status.type}
+            onClose={() => setStatus({ visible: false, message: "", type: "" })}
+          />
+        )}
       <div className="flex items-center mb-4">
         <div className="bg-blue-500 h-8 w-2 mr-2"></div>
         <h2 className="text-blue-500 text-xl font-bold">Our Products</h2>
@@ -68,8 +100,6 @@ const ExploreProducts = () => {
        Explore by Category
       </h3>
       <CategorySelect
-        selectedCategory={selectedCategory}
-        onSelectCategory={setSelectedCategory}
       />
       <div style={styles.productListContainer}>
         <div style={styles.scrollButtonContainer}>
@@ -105,6 +135,7 @@ const ExploreProducts = () => {
             margin: '0 auto',
             display: 'block',
           }}
+          onClick={viewAllproducts}
         >
           View All Products
         </button>

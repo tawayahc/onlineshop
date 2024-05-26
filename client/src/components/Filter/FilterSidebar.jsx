@@ -10,11 +10,6 @@ function FilterSidebar() {
       <div className="flex flex-col md:w-32 lg:w-72 ">
         <div className="border rounded-lg p-4">
           <FilterCollapse
-            title="ประเภทสินค้า"
-            type="category"
-          />
-          <div className="divider mt-0"></div>
-          <FilterCollapse
             title="รีวิว"
             type="review"
           />

@@ -12,25 +12,6 @@ const fetchProductsList = () => {
     try {
       const response = await axios.get(url + "products");
       if (response.data.status === "ok") {
-        console.log(response.data.data);
-        setProducts(response.data.data);
-        console.log(products);
-        return response.data.data;
-      } else {
-        console.error("Error fetching products:", response.data.message);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }, [setProducts]);
-
-  const fetchProductWithCategories = useCallback(async ({ filters }) => {
-    // console.log(filters);
-    try {
-      const response = await axios.get(url + "products/category", {
-        params: filters,
-      });
-      if (response.data.status === "ok") {
         setProducts(response.data.data);
         return response.data.data;
       } else {
@@ -41,13 +22,12 @@ const fetchProductsList = () => {
     }
   }, [setProducts]);
 
+  
   const fetchCategories = async () => {
     try {
       const response = await axios.get(url + "products/categories");
       if (response.data.status === "ok") {
         setCategories(response.data.data);
-        // console.log(response.data.data);
-        // console.log(products);
         return response.data.data;
       } else {
         console.error("Error fetching categories:", response.data.message);
@@ -56,7 +36,40 @@ const fetchProductsList = () => {
       console.error("Error:", error);
     }
   };
-
-  return { fetchProducts, fetchCategories, fetchProductWithCategories };
+  
+  const fetchProductbyCategory = async (categoryID) => {
+    console.log(categoryID);
+    try {
+      const response = await axios.get(`${url}products/category/${categoryID}`);
+      if (response.data.status === "ok") {
+        console.log(response.data.data);
+        setProducts(response.data.data);
+        return response.data.data;
+      } else {
+        console.error("Error fetching products:", response.data.message);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
+  // WARN : code below is not used.
+  // const fetchProductWithCategories = useCallback(async ({ filters }) => {
+  //   // console.log(filters);
+  //   try {
+  //     const response = await axios.get(url + "products/category", {
+  //       params: filters,
+  //     });
+  //     if (response.data.status === "ok") {
+  //       setProducts(response.data.data);
+  //       return response.data.data;
+  //     } else {
+  //       console.error("Error fetching products:", response.data.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error:", error);
+  //   }
+  // }, [setProducts]);
+  return { fetchProducts, fetchCategories, fetchProductbyCategory };
 };
 export default fetchProductsList;
