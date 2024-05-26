@@ -26,9 +26,6 @@ function AddressList({ onClick, onSelect }) {
             onClick={handleRadioClick}
           />
         ))}
-        <button className="btn btn-outline btn-accent" onClick={onClick}>
-          + เพิ่ม
-        </button>
       </div>
     </div>
   );
