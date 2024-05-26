@@ -19,8 +19,10 @@ const OrderActions = () => {
   };
 
   return (
-    <div className="flex items-center mb-2">
-      <button onClick={deleteSelectedOrders} className="btn btn-danger mr-2">Delete Selected</button>
+    <div className="mb-2 md:mb-0 md:mr-2">
+      <button onClick={deleteSelectedOrders} className="btn btn-danger ml-4 p-2 border rounded-md bg-red-500 text-white w-full md:w-auto">
+        Delete Selected
+      </button>
     </div>
   );
 };

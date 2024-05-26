@@ -18,7 +18,7 @@ export const categoriesState = atom({
 export const selectedFiltersState = atom({
   key: "selectedFiltersState",
   default: {
-    category: 'All',
+    category: [],
     priceRange: [0, 100000],
     rating: [],
   },

@@ -28,15 +28,6 @@ function ProductActions() {
     });
   };
 
-  const handleAddProduct = async (product) => {
-    try {
-      const addedProduct = await addProduct(product);
-      setProducts((prevProducts) => [...prevProducts, addedProduct]);
-    } catch (error) {
-      console.error('Failed to add product:', error);
-    }
-  };
-
   const handleDeleteSelectedProducts = async () => {
     try {
       await deleteProducts(selectedProducts);

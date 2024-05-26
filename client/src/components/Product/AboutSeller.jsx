@@ -27,11 +27,12 @@ function AboutSeller() {
   const productDetail = useRecoilValue(currentProductDetailState);
   const shop = productDetail.Shop[0];
   return (
+    // TODO : Get data from database Seller
     <div className="p-4">
       {shop ? (<div className="card card-side bg-base-100 shadow-xl">
         <figure>
           <img
-            src={shop.ShopImage}
+            src="https://img.daisyui.com/images/stock/photo-1635805737707-575885ab0820.jpg"
             alt="Movie"
           />
         </figure>

@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../../../components/Layout/Layout.jsx';
 import ProductFilters from './ProductFilters.jsx';
 import ProductActions from './ProductActions.jsx';
 import ProductTable from './ProductTable.jsx';
+import ProductSummaryTable from './ProductSummaryTable.jsx';
 import AddEditModal from './AddEditModal.jsx';
 import ImageModal from './ImageModal.jsx';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -26,6 +27,7 @@ function ProductControlPanelPage() {
   const [selectedImage, setSelectedImage] = useRecoilState(selectedImageState);
   const [products, setProducts] = useRecoilState(productListState);
   const [productCategories, setProductCategories] = useRecoilState(productCategoriesState);
+  const [view, setView] = useState('list'); // State to manage view
 
   useEffect(() => {
     fetchProducts()
@@ -108,9 +110,18 @@ function ProductControlPanelPage() {
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Product Control Panel</h1>
-      <ProductActions />
-      <ProductFilters />
-      <ProductTable />
+      <button onClick={() => setView(view === 'list' ? 'summary' : 'list')} className="btn btn-secondary mb-4">
+        {view === 'list' ? 'View Summary' : 'View Products'}
+      </button>
+      {view === 'list' ? (
+        <>
+          <ProductActions />
+          <ProductFilters />
+          <ProductTable />
+        </>
+      ) : (
+        <ProductSummaryTable />
+      )}
       {modalState.isOpen && (
         <AddEditModal
           modalMode={modalState.mode}

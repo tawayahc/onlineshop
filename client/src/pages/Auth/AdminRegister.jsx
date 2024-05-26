@@ -23,14 +23,6 @@ function AdminRegister() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const fname = data.get("fname");
-    const lname = data.get("lname");
-    const email = data.get("email");
-    const password = data.get("password");
-    const confirmPassword = data.get("confirmPassword");
-    const position = data.get("position");
-
     if (password !== confirmPassword) {
       setConfirmPasswordError("Passwords do not match");
       return;
@@ -46,11 +38,11 @@ function AdminRegister() {
     }
 
     const jsonData = {
-      fname,
-      lname,
       email,
       password,
-      position,
+      fname: firstName,
+      lname: lastName,
+      role,
     };
 
     try {
@@ -79,10 +71,10 @@ function AdminRegister() {
     <div className="font-noto bg-neutral">
       <div className="hero min-h-screen">
         <div className="hero-content w-full flex-col lg:flex-row-reverse">
-          <div className="text-center lg:text-left text-white lg:ml-[5%]">
+          <div className="text-center lg:text-left text-white">
             <img src={LogoSVG} className="max-w-sm rounded-lg" alt="Logo" />
-            <br /><hr />
-            <h1 className="text-5xl font-bold mt-4">Staff Register</h1>
+            <h1 className="text-5xl font-bold mt-4">Register now!</h1>
+            <p className="text-xl py-6">Join us and start selling today</p>
           </div>
           <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
             <form className="card-body" onSubmit={handleSubmit}>
@@ -91,7 +83,6 @@ function AdminRegister() {
                   <span className="label-text">First Name</span>
                 </label>
                 <input
-                  name="fname"
                   type="text"
                   placeholder="First Name"
                   className="input input-bordered"
@@ -105,7 +96,6 @@ function AdminRegister() {
                   <span className="label-text">Last Name</span>
                 </label>
                 <input
-                  name="lname"
                   type="text"
                   placeholder="Last Name"
                   className="input input-bordered"
@@ -119,7 +109,6 @@ function AdminRegister() {
                   <span className="label-text">Email</span>
                 </label>
                 <input
-                  name="email"
                   type="email"
                   placeholder="email"
                   className="input input-bordered"
@@ -138,7 +127,6 @@ function AdminRegister() {
                   <span className="label-text">Password</span>
                 </label>
                 <input
-                  name="password"
                   type="password"
                   placeholder="password"
                   className="input input-bordered"
@@ -152,7 +140,6 @@ function AdminRegister() {
                   <span className="label-text">Confirm Password</span>
                 </label>
                 <input
-                  name="confirmPassword"
                   type="password"
                   placeholder="confirm password"
                   className="input input-bordered"
@@ -168,16 +155,15 @@ function AdminRegister() {
               </div>
               <div className="form-control mt-6">
                 <label className="label">
-                  <span className="label-text">Position</span>
+                  <span className="label-text">Role</span>
                 </label>
                 <select
-                  name="position"
                   className="input input-bordered"
-                  // value={role}
+                  value={role}
                   onChange={(e) => setRole(e.target.value)}
                 >
-                  <option value="1">Stock Manager</option>
-                  <option value="2">Client Manager</option>
+                  <option value="staff">Staff</option>
+                  <option value="seller">Seller</option>
                 </select>
               </div>
               <div className="form-control mt-8">

@@ -79,7 +79,7 @@ function CartPage() {
                       }
                       name={product.ProductName}
                       price={product.Price}
-                      quantity={product.Quantity}
+                      quantity={cartItem.Quantity}
                       onRemove={() => removeFromCart(product.ProductID)}
                       onQuantityChange={(newQuantity) =>
                         updateCartQuantity(product.ProductID, newQuantity)

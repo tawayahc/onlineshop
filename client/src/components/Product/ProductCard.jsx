@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { BsBagFill, BsStarFill, BsStarHalf, BsStar } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import useCartActions from "../../API/userCartActions";
@@ -9,7 +9,7 @@ import useWishActions from "../../API/userWishAction";
 import imageDataList from "../../db/image";
 import { productsState } from "../../recoil/atom";
 
-function ProductCard({ data }) {
+function ProductCard({ data, onWishlistChange }) {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const { addToCart } = useCartActions(userId);
@@ -81,11 +81,11 @@ function ProductCard({ data }) {
           />
         </figure>
         <button
-          onClick={() => onWishlistChange(data.ProductID)}
+          onClick={() => onWishlistChange(data.id)}
           className={
-            checkProductIsinwishlist(data.ProductID)
-            ? "btn btn-circle btn-sm absolute top-2 right-2 btn-error"
-            : "btn btn-circle btn-sm absolute top-2 right-2"
+            isInWishlist
+              ? "btn btn-circle btn-sm absolute top-2 right-2 btn-error"
+              : "btn btn-circle btn-sm absolute top-2 right-2"
           }
         >
           <svg

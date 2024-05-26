@@ -8,12 +8,11 @@ const AddEditModal = ({
   setProductCategoryId,
   productCategories = [],
   setProductCount,
-  setProductPublished,
   setProductCategory,
   handleSubmit,
   closeModal,
 }) => {
-  const { ProductName, Price, ProductCategoryID, QuantityAvailable, published } = product;
+  const { ProductName, Price, ProductCategoryID, QuantityAvailable } = product;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
@@ -38,15 +37,6 @@ const AddEditModal = ({
           ))}
         </select>
         <input type="number" value={QuantityAvailable} onChange={(e) => setProductCount(parseInt(e.target.value))} className="input mb-2" placeholder="Product Count" />
-        <div className="flex items-center mb-4">
-          <label className="mr-2">Published:</label>
-          <input
-            type="checkbox"
-            className="toggle toggle-success"
-            checked={published}
-            onChange={() => setProductPublished(!published)}
-          />
-        </div>
         <div className="flex justify-end">
           <button onClick={closeModal} className="btn btn-secondary mr-2">Cancel</button>
           <button onClick={handleSubmit} className="btn btn-primary">{modalMode === 'add' ? 'Add' : 'Save'}</button>

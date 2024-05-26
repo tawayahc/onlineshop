@@ -1,16 +1,12 @@
 import React, { useState } from "react";
 import ButtonRadio from "../../ButtonRadio";
-import { paymentListState } from "../../../recoil/userInfo";
-import { useRecoilValue } from "recoil";
 
-function PaymentList({ onClick, onSelect }) {
-  const [selectedValue, setSelectedValue] = useState(null);
-  const paymentList = useRecoilValue(paymentListState);
+function PaymentList({ onClick }) {
+  const [selectedValue, setSelectedValue] = useState("option1");
 
   const handleRadioClick = (value) => {
     setSelectedValue(value);
-    const selectedPayment = paymentList.find((item) => item.PaymentMethodID === value);
-    onSelect(selectedPayment);
+    console.log(value);
   };
 
   return (
@@ -19,19 +15,19 @@ function PaymentList({ onClick, onSelect }) {
       <div className="form-control space-y-2 mt-4">
         <ButtonRadio
           label="ชำระเงินปลายทาง"
-          value="ชำระเงินปลายทาง"
-          isSelected={selectedValue === "ชำระเงินปลายทาง"}
+          value="option1"
+          isSelected={selectedValue === "option1"}
           onClick={handleRadioClick}
         />
-        {paymentList.map((item) => (
-          <ButtonRadio
-            key={item.PaymentMethodID}
-            label={"xxxx xxxx xxxx " + item.CardNumber}
-            value={item.PaymentMethodID}
-            isSelected={selectedValue === item.PaymentMethodID}
-            onClick={handleRadioClick}
-          />
-        ))}
+        <ButtonRadio
+          label="ชำระด้วยบัตร [xxxx xxxx xxxx xxxx]"
+          value="option2"
+          isSelected={selectedValue === "option2"}
+          onClick={handleRadioClick}
+        />
+        <button className="btn btn-outline btn-accent" onClick={onClick}>
+          + เพิ่ม
+        </button>
       </div>
     </div>
   );

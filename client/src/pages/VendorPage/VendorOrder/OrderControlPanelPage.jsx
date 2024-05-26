@@ -1,23 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import Layout from '../../../components/Layout/Layout';
+import { useRecoilState } from 'recoil';
+import {
+  ordersState, searchTermState, selectedStatusState, orderSortByState,
+  orderCurrentPageState, ordersPerPageState, currentOrdersState, selectedOrdersState
+} from '../../../recoil/orderControlPanel';
 import { fetchOrders, updateOrderStatus as updateOrderStatusAPI } from '../../../API/vendorOrders';
 import OrderDetailsModal from './OrderDetailsModal';
 import OrderFilters from './OrderFilters';
 import OrderActions from './OrderActions';
 import OrderList from './OrderList';
 import OrderPagination from './OrderPagination';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { ordersState, selectedOrdersState, orderCurrentPageState } from '../../../recoil/orderControlPanel';
 
 function OrderControlPanelPage() {
-  const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
   const [orders, setOrders] = useRecoilState(ordersState);
-  const [selectedOrders, setSelectedOrders] = useRecoilState(selectedOrdersState);
-  const setCurrentPage = useSetRecoilState(orderCurrentPageState);
+  const [selectedOrderDetails, setSelectedOrderDetails] = React.useState(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
 
-  // Fetch orders from the backend
   useEffect(() => {
     const fetchAllOrders = async () => {
       try {
@@ -28,7 +27,7 @@ function OrderControlPanelPage() {
       }
     };
     fetchAllOrders();
-  }, [setOrders]);
+  }, []);
 
   const openOrderDetailsModal = (orderId) => {
     const order = orders.find(order => order.id === orderId);
@@ -38,21 +37,6 @@ function OrderControlPanelPage() {
 
   const closeOrderDetailsModal = () => {
     setIsModalOpen(false);
-  };
-
-  const toggleOrderSelection = (orderId) => {
-    setSelectedOrders(prevSelectedOrders => {
-      if (prevSelectedOrders.includes(orderId)) {
-        return prevSelectedOrders.filter(id => id !== orderId);
-      } else {
-        return [...prevSelectedOrders, orderId];
-      }
-    });
-  };
-
-  const resetFilters = () => {
-    setSelectedOrders([]);
-    setCurrentPage(1);
   };
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
@@ -70,28 +54,36 @@ function OrderControlPanelPage() {
   };
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Order Control Panel</h1>
+    <Layout>
+      <div className="p-4 max-w-5xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Order Control Panel</h1>
 
-      {/* Order Details Modal */}
-      {isModalOpen && selectedOrderDetails && (
-        <OrderDetailsModal order={selectedOrderDetails} closeModal={closeOrderDetailsModal} />
-      )}
+        {isModalOpen && selectedOrderDetails && (
+          <OrderDetailsModal order={selectedOrderDetails} closeModal={closeOrderDetailsModal} />
+        )}
 
-      <OrderFilters resetFilters={resetFilters} />
-      <OrderActions />
-      <OrderList
-        toggleOrderSelection={toggleOrderSelection}
-        openOrderDetailsModal={openOrderDetailsModal}
-        handleUpdateOrderStatus={handleUpdateOrderStatus}
-      />
-      <OrderPagination />
-    </div>
+        <OrderFilters resetFilters={() => {
+          setSearchTerm('');
+          setSelectedStatus('All');
+          setSortBy('default');
+        }} />
+
+        <OrderList
+          toggleOrderSelection={(orderId) => {
+            if (selectedOrders.includes(orderId)) {
+              setSelectedOrders(selectedOrders.filter(id => id !== orderId));
+            } else {
+              setSelectedOrders([...selectedOrders, orderId]);
+            }
+          }}
+          openOrderDetailsModal={openOrderDetailsModal}
+          handleUpdateOrderStatus={handleUpdateOrderStatus}
+        />
+
+        <OrderPagination />
+      </div>
+    </Layout>
   );
 }
 
-export default () => (
-  <Layout>
-    <OrderControlPanelPage />
-  </Layout>
-);
+export default OrderControlPanelPage;
