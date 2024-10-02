@@ -1,50 +1,42 @@
 import { atom, selector } from 'recoil';
 
-// Atom for managing the list of orders
 export const ordersState = atom({
-  key: 'ordersState', // Unique key for this atom
-  default: [], // Initial state
+  key: 'ordersState',
+  default: [],
 });
 
-// Atom for managing the selected orders
 export const selectedOrdersState = atom({
-  key: 'selectedOrdersState', // Unique key for this atom
-  default: [], // Initial state
+  key: 'selectedOrdersState',
+  default: [],
 });
 
-// Atom for managing the search term
 export const searchTermState = atom({
-  key: 'searchTermState', // Unique key for this atom
-  default: '', // Initial state
+  key: 'searchTermState',
+  default: '',
 });
 
-// Atom for managing the selected status filter
 export const selectedStatusState = atom({
-  key: 'selectedStatusState', // Unique key for this atom
-  default: 'All', // Initial state
+  key: 'selectedStatusState', 
+  default: 'All', 
 });
 
-// Atom for managing the sort by option
 export const orderSortByState = atom({
-  key: 'orderSortByState', // Unique key for this atom
-  default: 'default', // Initial state
+  key: 'orderSortByState', 
+  default: 'default',
 });
 
-// Atom for managing the current page
 export const orderCurrentPageState = atom({
-  key: 'orderCurrentPageState', // Unique key for this atom
-  default: 1, // Initial state
+  key: 'orderCurrentPageState', 
+  default: 1,
 });
 
-// Atom for managing the number of orders per page
 export const ordersPerPageState = atom({
-  key: 'ordersPerPageState', // Unique key for this atom
-  default: 20, // Initial state
+  key: 'ordersPerPageState',
+  default: 20,
 });
 
-// Selector for filtering orders based on search term, status, and sorting
 export const filteredOrdersState = selector({
-  key: 'filteredOrdersState', // Unique key for this selector
+  key: 'filteredOrdersState',
   get: ({ get }) => {
     const orders = get(ordersState);
     const searchTerm = get(searchTermState);
@@ -85,9 +77,8 @@ export const filteredOrdersState = selector({
   },
 });
 
-// Selector for paginated orders
 export const currentOrdersState = selector({
-  key: 'currentOrdersState', // Unique key for this selector
+  key: 'currentOrdersState',
   get: ({ get }) => {
     const filteredOrders = get(filteredOrdersState);
     const currentPage = get(orderCurrentPageState);
